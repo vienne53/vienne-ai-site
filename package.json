@@ -1,0 +1,15 @@
+{
+  "name": "vienne-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "chat-proxy": "node server/chat-proxy.mjs",
+    "verify-chat": "node server/verify-chat-config.mjs",
+    "site": "npx --yes serve . -l 8765"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
+  }
+}
