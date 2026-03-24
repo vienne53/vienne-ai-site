@@ -1,7 +1,13 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm install",
   "functions": {
     "api/chat.js": {
       "maxDuration": 60
+    },
+    "api/health.js": {
+      "maxDuration": 10
     }
   }
 }
