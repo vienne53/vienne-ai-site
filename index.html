@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vienne | AI Studio</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon-v.svg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script>
@@ -267,6 +268,8 @@
             box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
         }
 
+        /* no separate light/dark modes, always dark theme */
+
         /* Neon Text Effects */
         .neon-text {
             text-shadow: 
@@ -326,6 +329,25 @@
             border-radius: 50%;
             box-shadow: 0 0 20px #00f3ff;
         }
+
+        /* AI 分身上方 token 提示气泡 */
+        .chat-hint-bubble {
+            position: relative;
+            animation: chat-hint-float 2.8s ease-in-out infinite;
+        }
+        @keyframes chat-hint-float {
+            0%, 100% { transform: translateY(0); box-shadow: 0 0 12px rgba(251, 191, 36, 0.15); }
+            50% { transform: translateY(-4px); box-shadow: 0 0 22px rgba(251, 191, 36, 0.35); }
+        }
+        .chat-hint-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -7px;
+            left: 50%;
+            margin-left: -7px;
+            border: 7px solid transparent;
+            border-top-color: rgba(251, 191, 36, 0.45);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -363,20 +385,26 @@
                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center shadow-[0_0_20px_rgba(0,243,255,0.5)] animate-pulse-glow overflow-hidden">
                     <img src="images/bella.png" alt="Bella Logo" class="w-full h-full object-cover">
                 </div>
-                <span class="font-bold text-xl tracking-wider neon-text">Vienne.AI</span>
+                <span class="font-bold text-xl tracking-wider neon-text" data-i18n="brand">Vienne.AI</span>
             </div>
             
             <div class="hidden md:flex gap-8 font-medium text-sm text-gray-400">
-                <a href="#about" class="hover:text-neon-cyan transition-colors duration-300">关于</a>
-                <a href="notes.html" class="hover:text-neon-cyan transition-colors duration-300 text-neon-cyan">学习笔记</a>
-                <a href="#projects" class="hover:text-neon-cyan transition-colors duration-300">项目</a>
-                <a href="#contact" class="hover:text-neon-cyan transition-colors duration-300">联系</a>
+                <a href="#about" class="hover:text-neon-cyan transition-colors duration-300" data-i18n="nav.about">关于</a>
+                <a href="notes.html" class="hover:text-neon-cyan transition-colors duration-300 text-neon-cyan" data-i18n="nav.notes">学习笔记</a>
+                <a href="#projects" class="hover:text-neon-cyan transition-colors duration-300" data-i18n="nav.projects">项目</a>
+                <a href="#resume" class="hover:text-neon-cyan transition-colors duration-300" data-i18n="nav.resume">简历</a>
+                <a href="#contact" class="hover:text-neon-cyan transition-colors duration-300" data-i18n="nav.contact">联系</a>
             </div>
-
-            <button onclick="toggleChat()" class="px-6 py-2 rounded-full glass border border-neon-cyan/50 text-neon-cyan text-sm font-medium hover:bg-neon-cyan/10 transition-all shadow-[0_0_15px_rgba(0,243,255,0.3)]">
-                <span class="inline-block w-2 h-2 bg-neon-cyan rounded-full mr-2 animate-pulse"></span>
-                AI 分身
-            </button>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="toggleLanguage()" class="px-3 py-1 rounded-full glass border border-white/20 text-[11px] text-gray-300 hover:text-neon-cyan hover:border-neon-cyan/60 transition-colors" id="langToggle">
+                    中 / EN
+                </button>
+                <button onclick="toggleChat()" class="px-6 py-2 rounded-full glass border border-neon-cyan/50 text-neon-cyan text-sm font-medium hover:bg-neon-cyan/10 transition-all shadow-[0_0_15px_rgba(0,243,255,0.3)]">
+                    <span class="inline-block w-2 h-2 bg-neon-cyan rounded-full mr-2 animate-pulse"></span>
+                    <span data-i18n="nav.agent">AI 分身</span>
+                </button>
+            </div>
         </div>
     </nav>
 
@@ -386,9 +414,9 @@
             
             <!-- Left Content -->
             <div class="space-y-8">
-                <div class="inline-flex items-center gap-2 glass px-4 py-2 rounded-full border border-neon-cyan/30 text-neon-cyan text-sm">
+                <div class="inline-flex items-center gap-2 glass px-4 py-2 rounded-full border border-neon-cyan/30 text-neon-cyan text-sm" data-i18n="hero.badge">
                     <span class="w-2 h-2 bg-neon-cyan rounded-full animate-pulse"></span>
-                    Engineer
+                    AI 产品落地实践者
                 </div>
 
                 <h1 class="text-6xl md:text-8xl font-black leading-none">
@@ -396,35 +424,35 @@
                 </h1>
 
                 <div class="flex flex-wrap gap-3">
-                    <span class="px-4 py-2 rounded-full glass text-neon-cyan border border-neon-cyan/30 text-sm font-bold">AI Agent</span>
-                    <span class="px-4 py-2 rounded-full glass text-neon-purple border border-neon-purple/30 text-sm font-bold">Data Analysis</span>
-                    <span class="px-4 py-2 rounded-full glass text-neon-pink border border-neon-pink/30 text-sm font-bold">商业落地</span>
-                    <span class="px-4 py-2 rounded-full glass text-blue-400 border border-blue-400/30 text-sm font-bold">工程化思维</span>
+                    <span class="px-4 py-2 rounded-full glass text-neon-cyan border border-neon-cyan/30 text-sm font-bold" data-i18n="hero.tag1">AI Agent</span>
+                    <span class="px-4 py-2 rounded-full glass text-neon-purple border border-neon-purple/30 text-sm font-bold" data-i18n="hero.tag2">LangChain</span>
+                    <span class="px-4 py-2 rounded-full glass text-neon-pink border border-neon-pink/30 text-sm font-bold" data-i18n="hero.tag3">全栈落地</span>
+                    <span class="px-4 py-2 rounded-full glass text-blue-400 border border-blue-400/30 text-sm font-bold" data-i18n="hero.tag4">工程化思维</span>
                 </div>
 
                 <div class="space-y-4 text-gray-400 leading-relaxed border-l-2 border-neon-cyan/50 pl-6">
-                    <p>
+                    <p data-i18n-html="hero.p1">
                         持有<strong class="text-white">香港大学硕士</strong>及<strong class="text-white">中南财经政法大学学士学位</strong>，
                         曾任职<strong class="text-white">意法半导体</strong>、<strong class="text-white">UL香港</strong>、<strong class="text-white">京科</strong>，
                         历任IC测试工程师、项目工程师、AI产品负责人。
                     </p>
-                    <p>
+                    <p data-i18n-html="hero.p2">
                         具备<strong class="text-white">跨时区多团队项目管理</strong>能力，精通<strong class="text-white">8D/FMEA/六西格玛</strong>工程化方法；
                         雅思7分、粤语熟练。主导AI教育对话Agent等多款产品从0到1闭环落地，深耕<strong class="text-neon-cyan">LangChain/LangGraph</strong>、
                         <strong class="text-neon-purple">RAG</strong>、<strong class="text-neon-pink">Prompt工程</strong>等技术。
                     </p>
-                    <p>
+                    <p data-i18n-html="hero.p3">
                         熟练运用OpenClaw、Cursor、Dify、Coze、火山方舟等AI工具，覆盖AI产品需求分析、系统设计、商业变现全链路。
                         目前聚焦<strong class="text-white">AI Agent产品落地与优化</strong>，主攻<strong class="text-white">AI教育/内容创作</strong>赛道。
                     </p>
                 </div>
 
                 <div class="flex gap-4 pt-4">
-                    <a href="notes.html" class="group px-8 py-4 rounded-full bg-gradient-to-r from-neon-cyan to-neon-blue text-white font-bold drop-shadow-[0_0_6px_rgba(0,0,0,0.8)] hover:shadow-[0_0_30px_rgba(0,243,255,0.5)] transition-all hover:scale-105 flex items-center gap-2">
+                    <a href="notes.html" class="group px-8 py-4 rounded-full bg-gradient-to-r from-neon-cyan to-neon-blue text-white font-bold drop-shadow-[0_0_6px_rgba(0,0,0,0.8)] hover:shadow-[0_0_30px_rgba(0,243,255,0.5)] transition-all hover:scale-105 flex items-center gap-2" data-i18n-html="hero.btnNotes">
                         <span>🚀</span>
                         学习笔记
                     </a>
-                    <a href="#projects" class="px-8 py-4 rounded-full glass border border-white/20 text-white font-medium hover:border-neon-cyan/50 transition-all hover:shadow-[0_0_20px_rgba(0,243,255,0.3)]">
+                    <a href="#projects" class="px-8 py-4 rounded-full glass border border-white/20 text-white font-medium hover:border-neon-cyan/50 transition-all hover:shadow-[0_0_20px_rgba(0,243,255,0.3)]" data-i18n="hero.btnProjects">
                         查看项目
                     </a>
                 </div>
@@ -463,21 +491,21 @@
     <section id="learning" class="py-24 px-6 relative">
         <div class="max-w-7xl mx-auto relative z-10">
             <div class="text-center mb-16">
-                <p class="text-neon-cyan font-mono text-sm mb-2">// KNOWLEDGE_BASE</p>
-                <h2 class="text-4xl md:text-6xl font-black text-white mb-4">
+                <p class="text-neon-cyan font-mono text-sm mb-2" data-i18n="learning.tag">// KNOWLEDGE_BASE</p>
+                <h2 class="text-4xl md:text-6xl font-black text-white mb-4" data-i18n-html="learning.title">
                     AI Agent <span class="neon-purple">学习笔记</span>
                 </h2>
-                <p class="text-gray-400 max-w-2xl mx-auto">
+                <p class="text-gray-400 max-w-2xl mx-auto" data-i18n="learning.desc">
                     沉淀AI产品设计、大模型实操、工程化方法等方向学习笔记，持续探索大模型应用与商业化路径
                 </p>
             </div>
 
             <!-- Filter Buttons -->
             <div class="flex justify-center flex-wrap gap-3 mb-12">
-                <button onclick="filterNotes('all')" class="filter-btn active px-6 py-2 rounded-full border border-neon-cyan bg-neon-cyan/10 text-neon-cyan text-sm font-medium transition-all hover:shadow-[0_0_20px_rgba(0,243,255,0.3)]">全部</button>
-                <button onclick="filterNotes('langchain')" class="filter-btn px-6 py-2 rounded-full border border-white/20 text-gray-400 text-sm font-medium transition-all hover:border-neon-purple hover:text-neon-purple hover:shadow-[0_0_20px_rgba(191,0,255,0.3)]">LangChain</button>
-                <button onclick="filterNotes('rag')" class="filter-btn px-6 py-2 rounded-full border border-white/20 text-gray-400 text-sm font-medium transition-all hover:border-neon-pink hover:text-neon-pink hover:shadow-[0_0_20px_rgba(255,0,170,0.3)]">RAG</button>
-                <button onclick="filterNotes('product')" class="filter-btn px-6 py-2 rounded-full border border-white/20 text-gray-400 text-sm font-medium transition-all hover:border-blue-400 hover:text-blue-400">产品设计</button>
+                <button onclick="filterNotes('all')" class="filter-btn active px-6 py-2 rounded-full border border-neon-cyan bg-neon-cyan/10 text-neon-cyan text-sm font-medium transition-all hover:shadow-[0_0_20px_rgba(0,243,255,0.3)]" data-i18n="learning.filter.all">全部</button>
+                <button onclick="filterNotes('langchain')" class="filter-btn px-6 py-2 rounded-full border border-white/20 text-gray-400 text-sm font-medium transition-all hover:border-neon-purple hover:text-neon-purple hover:shadow-[0_0_20px_rgba(191,0,255,0.3)]" data-i18n="learning.filter.langchain">LangChain</button>
+                <button onclick="filterNotes('rag')" class="filter-btn px-6 py-2 rounded-full border border-white/20 text-gray-400 text-sm font-medium transition-all hover:border-neon-pink hover:text-neon-pink hover:shadow-[0_0_20px_rgba(255,0,170,0.3)]" data-i18n="learning.filter.rag">RAG</button>
+                <button onclick="filterNotes('product')" class="filter-btn px-6 py-2 rounded-full border border-white/20 text-gray-400 text-sm font-medium transition-all hover:border-blue-400 hover:text-blue-400" data-i18n="learning.filter.product">产品设计</button>
             </div>
 
             <div class="grid lg:grid-cols-3 gap-6">
@@ -485,20 +513,20 @@
                 <article class="note-card glass p-6 rounded-2xl hover:border-neon-cyan/50 transition-all duration-300 group" data-category="langchain">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex gap-2">
-                            <span class="px-3 py-1 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan text-xs font-mono">LangChain</span>
+                            <span class="px-3 py-1 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan text-xs font-mono" data-i18n="learning.a1.tag">LangChain</span>
                         </div>
                         <span class="text-xs text-gray-500 font-mono">2026-02-15</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-neon-cyan transition-colors">
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-neon-cyan transition-colors" data-i18n="learning.a1.title">
                         LangGraph构建多轮对话Agent实战
                     </h3>
-                    <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                    <p class="text-gray-400 mb-4 text-sm leading-relaxed" data-i18n="learning.a1.desc">
                         基于StateGraph实现教育场景下的连贯教学逻辑与长期记忆能力，解决AI教师上下文理解问题。
                     </p>
                     <div class="bg-black/30 rounded-lg p-3 mb-4 border border-white/10 font-mono text-xs text-gray-300 overflow-x-auto">
                         <span class="text-neon-purple">from</span> langgraph <span class="text-neon-purple">import</span> StateGraph, END
                     </div>
-                    <button class="text-neon-cyan text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <button class="text-neon-cyan text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all" data-i18n="learning.readMore">
                         阅读全文 →
                     </button>
                 </article>
@@ -507,17 +535,17 @@
                 <article class="note-card glass p-6 rounded-2xl hover:border-neon-pink/50 transition-all duration-300 group" data-category="rag">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex gap-2">
-                            <span class="px-3 py-1 rounded-full bg-neon-pink/10 border border-neon-pink/30 text-neon-pink text-xs font-mono">RAG</span>
+                            <span class="px-3 py-1 rounded-full bg-neon-pink/10 border border-neon-pink/30 text-neon-pink text-xs font-mono" data-i18n="learning.a2.tag">RAG</span>
                         </div>
                         <span class="text-xs text-gray-500 font-mono">2026-01-28</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-neon-pink transition-colors">
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-neon-pink transition-colors" data-i18n="learning.a2.title">
                         教育场景RAG优化：召回率15%→85%
                     </h3>
-                    <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                    <p class="text-gray-400 mb-4 text-sm leading-relaxed" data-i18n="learning.a2.desc">
                         向量数据库选型、文本分块策略、重排序层优化，解决大模型幻觉问题提升知识准确性。
                     </p>
-                    <button class="text-neon-pink text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <button class="text-neon-pink text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all" data-i18n="learning.readMore">
                         阅读全文 →
                     </button>
                 </article>
@@ -526,17 +554,17 @@
                 <article class="note-card glass p-6 rounded-2xl hover:border-blue-400/50 transition-all duration-300 group" data-category="product">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex gap-2">
-                            <span class="px-3 py-1 rounded-full bg-blue-400/10 border border-blue-400/30 text-blue-400 text-xs font-mono">产品设计</span>
+                            <span class="px-3 py-1 rounded-full bg-blue-400/10 border border-blue-400/30 text-blue-400 text-xs font-mono" data-i18n="learning.a3.tag">产品设计</span>
                         </div>
                         <span class="text-xs text-gray-500 font-mono">2026-01-10</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors" data-i18n="learning.a3.title">
                         8D方法论在AI产品中的应用
                     </h3>
-                    <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                    <p class="text-gray-400 mb-4 text-sm leading-relaxed" data-i18n="learning.a3.desc">
                         将半导体行业的8D/FMEA工程化方法应用于AI Agent产品迭代，构建稳健的质量管控体系。
                     </p>
-                    <button class="text-blue-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <button class="text-blue-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all" data-i18n="learning.readMore">
                         阅读全文 →
                     </button>
                 </article>
@@ -545,17 +573,17 @@
                 <article class="note-card glass p-6 rounded-2xl hover:border-neon-purple/50 transition-all duration-300 group" data-category="langchain">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex gap-2">
-                            <span class="px-3 py-1 rounded-full bg-neon-purple/10 border border-neon-purple/30 text-neon-purple text-xs font-mono">Prompt工程</span>
+                            <span class="px-3 py-1 rounded-full bg-neon-purple/10 border border-neon-purple/30 text-neon-purple text-xs font-mono" data-i18n="learning.a4.tag">Prompt工程</span>
                         </div>
                         <span class="text-xs text-gray-500 font-mono">2025-12-20</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-neon-purple transition-colors">
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-neon-purple transition-colors" data-i18n="learning.a4.title">
                         Cursor+Dify快速交付AI产品MVP
                     </h3>
-                    <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                    <p class="text-gray-400 mb-4 text-sm leading-relaxed" data-i18n="learning.a4.desc">
                         Vibe Coding实战：利用Cursor与Dify协作，从需求到上线48小时完成AI内容创作Agent。
                     </p>
-                    <button class="text-neon-purple text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <button class="text-neon-purple text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all" data-i18n="learning.readMore">
                         阅读全文 →
                     </button>
                 </article>
@@ -564,17 +592,17 @@
                 <article class="note-card glass p-6 rounded-2xl hover:border-neon-cyan/50 transition-all duration-300 group" data-category="product">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex gap-2">
-                            <span class="px-3 py-1 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan text-xs font-mono">商业化</span>
+                            <span class="px-3 py-1 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan text-xs font-mono" data-i18n="learning.a5.tag">商业化</span>
                         </div>
                         <span class="text-xs text-gray-500 font-mono">2025-12-05</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-neon-cyan transition-colors">
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-neon-cyan transition-colors" data-i18n="learning.a5.title">
                         AI教育产品商业化路径探索
                     </h3>
-                    <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                    <p class="text-gray-400 mb-4 text-sm leading-relaxed" data-i18n="learning.a5.desc">
                         从获客成本到付费转化，分析AI教育Agent的商业模式设计与变现策略。
                     </p>
-                    <button class="text-neon-cyan text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <button class="text-neon-cyan text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all" data-i18n="learning.readMore">
                         阅读全文 →
                     </button>
                 </article>
@@ -583,17 +611,17 @@
                 <article class="note-card glass p-6 rounded-2xl hover:border-neon-pink/50 transition-all duration-300 group" data-category="rag">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex gap-2">
-                            <span class="px-3 py-1 rounded-full bg-neon-pink/10 border border-neon-pink/30 text-neon-pink text-xs font-mono">多模态</span>
+                            <span class="px-3 py-1 rounded-full bg-neon-pink/10 border border-neon-pink/30 text-neon-pink text-xs font-mono" data-i18n="learning.a6.tag">多模态</span>
                         </div>
                         <span class="text-xs text-gray-500 font-mono">2025-11-28</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-neon-pink transition-colors">
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-neon-pink transition-colors" data-i18n="learning.a6.title">
                         ASR/TTS集成实现全语音交互
                     </h3>
-                    <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                    <p class="text-gray-400 mb-4 text-sm leading-relaxed" data-i18n="learning.a6.desc">
                         火山方舟与Azure语音服务对比，低延迟实时语音对话技术实现细节。
                     </p>
-                    <button class="text-neon-pink text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <button class="text-neon-pink text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all" data-i18n="learning.readMore">
                         阅读全文 →
                     </button>
                 </article>
@@ -605,30 +633,30 @@
     <section id="projects" class="py-24 px-6 relative">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
-                <p class="text-neon-cyan font-mono text-sm mb-2">// PORTFOLIO</p>
-                <h2 class="text-4xl md:text-5xl font-black text-white mb-4">
+                <p class="text-neon-cyan font-mono text-sm mb-2" data-i18n="projects.tag">// PORTFOLIO</p>
+                <h2 class="text-4xl md:text-5xl font-black text-white mb-4" data-i18n-html="projects.title">
                     实战<span class="text-neon-cyan neon-text">项目</span>
                 </h2>
-                <p class="text-gray-400 max-w-2xl mx-auto">
+                <p class="text-gray-400 max-w-2xl mx-auto" data-i18n="projects.desc">
                     机器学习、工程系统、AI产品类实战项目，覆盖AI教育、内容创作等赛道
                 </p>
             </div>
             
             <div class="grid md:grid-cols-2 gap-8">
-                <div class="glass rounded-3xl p-8 hover:border-neon-cyan/50 transition-all duration-300 group border border-white/10">
+                <div class="glass rounded-3xl p-8 hover:border-neon-cyan/50 transition-all duration-300 group border border-white/10" data-i18n-project="project1">
                     <div class="w-14 h-14 rounded-2xl bg-neon-cyan/10 border border-neon-cyan/30 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
                         🎙️
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-3">AI教育对话Agent</h3>
-                    <p class="text-gray-400 mb-6 text-sm leading-relaxed">
+                    <h3 class="text-2xl font-bold text-white mb-3" data-i18n="projects.p1.title">AI教育对话Agent</h3>
+                    <p class="text-gray-400 mb-6 text-sm leading-relaxed" data-i18n="projects.p1.desc">
                         基于LangGraph搭建多轮对话系统，集成ASR/TTS实现全语音交互。采用RAG技术构建教育知识库，
                         结合发音纠正算法，知识召回准确率提升15%，覆盖从需求分析到商业变现全链路。
                     </p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-cyan text-xs border border-neon-cyan/20">LangGraph</span>
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-cyan text-xs border border-neon-cyan/20">RAG</span>
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-cyan text-xs border border-neon-cyan/20">ASR/TTS</span>
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-cyan text-xs border border-neon-cyan/20">商业变现</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-cyan text-xs border border-neon-cyan/20" data-i18n="projects.p1.tag1">LangGraph</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-cyan text-xs border border-neon-cyan/20" data-i18n="projects.p1.tag2">RAG</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-cyan text-xs border border-neon-cyan/20" data-i18n="projects.p1.tag3">ASR/TTS</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-cyan text-xs border border-neon-cyan/20" data-i18n="projects.p1.tag4">商业变现</span>
                     </div>
                 </div>
 
@@ -636,16 +664,16 @@
                     <div class="w-14 h-14 rounded-2xl bg-neon-purple/10 border border-neon-purple/30 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
                         ✍️
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-3">AI自媒体创作Agent</h3>
-                    <p class="text-gray-400 mb-6 text-sm leading-relaxed">
+                    <h3 class="text-2xl font-bold text-white mb-3" data-i18n="projects.p2.title">AI自媒体创作Agent</h3>
+                    <p class="text-gray-400 mb-6 text-sm leading-relaxed" data-i18n="projects.p2.desc">
                         利用Dify+Coze搭建自动化内容创作工作流，实现从热点抓取、文案生成到多平台分发的全流程自动化。
                         结合Cursor快速迭代前端界面，48小时完成MVP验证。
                     </p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-purple text-xs border border-neon-purple/20">Dify</span>
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-purple text-xs border border-neon-purple/20">Coze</span>
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-purple text-xs border border-neon-purple/20">自动化</span>
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-purple text-xs border border-neon-purple/20">MVP</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-purple text-xs border border-neon-purple/20" data-i18n="projects.p2.tag1">Dify</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-purple text-xs border border-neon-purple/20" data-i18n="projects.p2.tag2">Coze</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-purple text-xs border border-neon-purple/20" data-i18n="projects.p2.tag3">自动化</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-purple text-xs border border-neon-purple/20" data-i18n="projects.p2.tag4">MVP</span>
                     </div>
                 </div>
 
@@ -653,15 +681,29 @@
                     <div class="w-14 h-14 rounded-2xl bg-green-400/10 border border-green-400/30 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
                         🌀
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-3">台风图像预测模型</h3>
-                    <p class="text-gray-400 mb-6 text-sm leading-relaxed">
+                    <h3 class="text-2xl font-bold text-white mb-3" data-i18n="projects.p3.title">台风图像预测模型</h3>
+                    <p class="text-gray-400 mb-6 text-sm leading-relaxed" data-i18n="projects.p3.desc">
                         香港大学毕业论文项目。设计SE-Unet+CDDPM架构，引入三元损失函数优化预测效果，
                         在Google Colab完成模型训练与部署，图像核心特征清晰度大幅提升。
                     </p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-green-400 text-xs border border-green-400/20">PyTorch</span>
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-green-400 text-xs border border-green-400/20">Computer Vision</span>
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-green-400 text-xs border border-green-400/20">Deep Learning</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-green-400 text-xs border border-green-400/20" data-i18n="projects.p3.tag1">PyTorch</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-green-400 text-xs border border-green-400/20" data-i18n="projects.p3.tag2">Computer Vision</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-green-400 text-xs border border-green-400/20" data-i18n="projects.p3.tag3">Deep Learning</span>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="https://colab.research.google.com/drive/1Du8s8IbJHnGOyiewI4NyJLxVQqKXDp9s" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-green-400/40 text-xs text-green-300 hover:border-green-300 hover:text-white transition-colors"
+                           data-i18n="projects.p3.colab">
+                            在 Google Colab 运行
+                            <span>↗</span>
+                        </a>
+                        <a href="https://github.com/vienne53/CDDPM" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white/20 text-xs text-gray-300 hover:border-neon-cyan hover:text-neon-cyan transition-colors"
+                           data-i18n="projects.p3.code">
+                            查看 GitHub 代码
+                            <span>↗</span>
+                        </a>
                     </div>
                 </div>
 
@@ -669,16 +711,71 @@
                     <div class="w-14 h-14 rounded-2xl bg-yellow-400/10 border border-yellow-400/30 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
                         🏭
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-3">STULT质量追踪系统</h3>
-                    <p class="text-gray-400 mb-6 text-sm leading-relaxed">
+                    <h3 class="text-2xl font-bold text-white mb-3" data-i18n="projects.p4.title">STULT质量追踪系统</h3>
+                    <p class="text-gray-400 mb-6 text-sm leading-relaxed" data-i18n="projects.p4.desc">
                         意法半导体产线缺陷追踪平台，运用8D/六西格玛方法分析产线缺陷数据。
                         实现缺陷率降低80%，97%人工记录自动化替代，跨区域协同全球制造基地。
                     </p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-yellow-400 text-xs border border-yellow-400/20">六西格玛</span>
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-yellow-400 text-xs border border-yellow-400/20">8D方法</span>
-                        <span class="px-3 py-1 rounded-full bg-white/5 text-yellow-400 text-xs border border-yellow-400/20">工业自动化</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-yellow-400 text-xs border border-yellow-400/20" data-i18n="projects.p4.tag1">六西格玛</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-yellow-400 text-xs border border-yellow-400/20" data-i18n="projects.p4.tag2">8D方法</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-yellow-400 text-xs border border-yellow-400/20" data-i18n="projects.p4.tag3">工业自动化</span>
                     </div>
+                </div>
+
+                <!-- EliteBay 多语言精英教育官网 -->
+                <div class="glass rounded-3xl p-8 hover:border-neon-cyan/50 transition-all duration-300 group border border-white/10">
+                    <div class="w-14 h-14 rounded-2xl bg-neon-cyan/10 border border-neon-cyan/30 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                        🌐
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-3" data-i18n="projects.p5.title">EliteBay 多语言精英教育官网</h3>
+                    <p class="text-gray-400 mb-6 text-sm leading-relaxed" data-i18n="projects.p5.desc">
+                        为 EliteBay 打造的一站式精英教育官网，支持中/英/日/韩/粤多语言切换，覆盖语言培训、留学申请、海外求职等业务线。
+                        以高转化着陆页结构与信任感模块设计，聚焦家长与学生的咨询与留资转化。
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-cyan text-xs border border-neon-cyan/20" data-i18n="projects.p5.tag1">多语言站点</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-cyan text-xs border border-neon-cyan/20" data-i18n="projects.p5.tag2">教育行业</span>
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-neon-cyan text-xs border border-neon-cyan/20" data-i18n="projects.p5.tag3">Landing Page</span>
+                    </div>
+                    <a href="https://elitebay.study/" target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center gap-2 text-neon-cyan text-sm font-medium hover:gap-3 transition-all">
+                        访问线上网站
+                        <span>↗</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resume Preview Section -->
+    <section id="resume" class="py-24 px-6 relative">
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="text-center mb-12">
+                <p class="text-neon-cyan font-mono text-sm mb-2" data-i18n="resume.tag">// RESUME_PREVIEW</p>
+                <h2 class="text-4xl md:text-5xl font-black text-white mb-4" data-i18n="resume.title">在线简历预览</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto" data-i18n="resume.desc">
+                    可直接预览我的在线简历，也可一键跳转到金山文档查看完整信息。
+                </p>
+            </div>
+
+            <div class="glass rounded-3xl p-5 md:p-8 border border-white/10">
+                <div class="rounded-2xl overflow-hidden border border-white/10 bg-black/30">
+                    <iframe
+                        src="https://www.kdocs.cn/l/cthregZCmg0I"
+                        class="w-full h-[560px]"
+                        title="Vienne Resume Preview">
+                    </iframe>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-4 mt-6">
+                    <p class="text-sm text-gray-400" data-i18n="resume.tip">
+                        若当前浏览器限制了文档内嵌，请点击右侧按钮在新页面查看。
+                    </p>
+                    <a href="https://www.kdocs.cn/l/cthregZCmg0I" target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center gap-2 px-5 py-3 rounded-full glass border border-neon-cyan/40 text-neon-cyan text-sm font-medium hover:border-neon-cyan hover:text-white transition-colors"
+                       data-i18n="resume.openBtn">
+                        打开完整简历 ↗
+                    </a>
                 </div>
             </div>
         </div>
@@ -687,10 +784,10 @@
     <!-- Contact Section -->
     <section id="contact" class="py-24 px-6 relative">
         <div class="max-w-4xl mx-auto text-center relative z-10">
-            <h2 class="text-4xl md:text-6xl font-black text-white mb-4">
+            <h2 class="text-4xl md:text-6xl font-black text-white mb-4" data-i18n-html="contact.title">
                 Let's <span class="text-neon-cyan neon-text">Connect</span>
             </h2>
-            <p class="text-gray-400 mb-12 text-lg">
+            <p class="text-gray-400 mb-12 text-lg" data-i18n="contact.desc">
                 无论是AI Agent技术交流，还是AI教育/内容创作赛道合作，欢迎随时联系
             </p>
 
@@ -727,23 +824,25 @@
                 </a>
 
                 <!-- WeChat -->
-                <div onclick="alert('微信号：13331522033')" class="glass p-6 rounded-2xl border border-white/10 hover:border-neon-pink/50 hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
+                <div onclick="alert('微信号：Vienne71')" class="glass p-6 rounded-2xl border border-white/10 hover:border-neon-pink/50 hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
                     <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-neon-pink/10 transition-colors">
                         <svg class="w-6 h-6 text-gray-400 group-hover:text-neon-pink" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 01.598.082l1.584.926a.272.272 0 00.14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 01-.023-.156.49.49 0 01.201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-6.656-6.088V8.89c-.135-.01-.269-.03-.407-.03zm-2.53 3.274c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.969-.982z"/>
                         </svg>
                     </div>
                     <p class="text-sm font-medium text-gray-300 group-hover:text-white">微信</p>
-                    <p class="text-xs text-gray-500 mt-1 group-hover:text-neon-pink">13331522033</p>
+                    <p class="text-xs text-gray-500 mt-1 group-hover:text-neon-pink">Vienne71</p>
                 </div>
             </div>
 
             <!-- Email -->
-            <a href="mailto:viennewang53@gmail.com" class="inline-flex items-center gap-3 glass px-8 py-4 rounded-full border border-white/10 hover:border-neon-cyan/50 transition-all group">
+            <a href="#"
+               onclick="copyEmail(event)"
+               class="inline-flex items-center gap-3 glass px-8 py-4 rounded-full border border-white/10 hover:border-neon-cyan/50 transition-all group">
                 <svg class="w-5 h-5 text-gray-400 group-hover:text-neon-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                 </svg>
-                <span class="text-gray-300 group-hover:text-white font-mono">viennewang53@gmail.com</span>
+                <span class="text-gray-300 group-hover:text-white font-mono">yingnan24@yeah.net</span>
             </a>
         </div>
     </section>
@@ -753,11 +852,20 @@
         <p class="font-mono">© 2026 Vienne. AI Product Full-Stack Engineer.</p>
     </footer>
 
-    <!-- Chat Widget -->
-    <div id="chatWidget" class="fixed bottom-24 right-6 w-80 glass rounded-2xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] transform translate-y-[150%] transition-transform duration-300 z-50 overflow-hidden backdrop-blur-xl">
+    <!-- Chat dock：上方气泡 + 主窗口一并滑入 -->
+    <div id="chatDock" class="fixed bottom-24 right-6 z-50 w-80 max-w-[calc(100vw-3rem)] flex flex-col gap-2 items-stretch transform translate-y-[150%] transition-transform duration-300 ease-out">
+        <div
+            class="chat-hint-bubble glass rounded-2xl border border-amber-400/40 bg-gradient-to-br from-amber-500/10 to-orange-600/5 px-3 py-2.5 backdrop-blur-xl"
+            role="note"
+        >
+            <p class="text-[11px] leading-snug text-amber-100/95 text-center" data-i18n="chat.tokenHint">
+                为节省 token 请手下留情～深度聊天欢迎联系主人微信 Vienne71
+            </p>
+        </div>
+        <div id="chatWidget" class="w-full glass rounded-2xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden backdrop-blur-xl">
         <div class="bg-gradient-to-r from-neon-cyan/20 to-neon-purple/20 p-4 border-b border-white/10 flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-black border border-neon-cyan overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop" class="w-full h-full object-cover opacity-80">
+                <img src="images/bella.png" alt="Bella" class="w-full h-full object-cover">
             </div>
             <div>
                 <h4 class="font-bold text-white text-sm">AI 分身</h4>
@@ -767,22 +875,272 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
-        <div class="h-64 overflow-y-auto p-4 space-y-3 bg-black/40">
-            <div class="bg-white/5 p-3 rounded-xl text-sm text-gray-300 border border-white/5">
-                你好！我是 Vienne 的 AI 分身。关于 AI Agent 技术、AI教育产品或者跨时区项目管理经验，都可以向我咨询。
+        <div id="chatMessages" class="h-64 overflow-y-auto p-4 space-y-3 bg-black/40">
+            <div id="chatWelcome" class="bg-white/5 p-3 rounded-xl text-sm text-gray-300 border border-white/5" data-i18n="chat.welcome">
+                你好！我是 Bella（Vienne 的 AI 分身）。关于 AI Agent 技术、AI 教育产品或者跨时区项目管理经验，都可以向我咨询。
             </div>
         </div>
         <div class="p-3 bg-black/40 border-t border-white/10">
             <div class="flex gap-2">
-                <input type="text" placeholder="输入消息..." class="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-white placeholder-gray-500 focus:outline-none focus:border-neon-cyan/50">
-                <button class="w-10 h-10 bg-neon-cyan/20 border border-neon-cyan/50 text-neon-cyan rounded-full flex items-center justify-center hover:bg-neon-cyan/30 transition-colors">
+                <input id="chatInput" type="text" placeholder="输入消息..." data-i18n-placeholder="chat.placeholder" class="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-white placeholder-gray-500 focus:outline-none focus:border-neon-cyan/50" onkeydown="if(event.key==='Enter')sendChatMessage()">
+                <button type="button" onclick="sendChatMessage()" class="w-10 h-10 bg-neon-cyan/20 border border-neon-cyan/50 text-neon-cyan rounded-full flex items-center justify-center hover:bg-neon-cyan/30 transition-colors disabled:opacity-50" id="chatSendBtn" aria-label="发送">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                 </button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- 境外链接跳转前提示 -->
+    <div id="abroadModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/65 backdrop-blur-sm" style="display: none;" aria-hidden="true">
+        <div class="glass max-w-md w-full rounded-2xl border border-amber-400/30 p-6 shadow-[0_0_40px_rgba(0,0,0,0.5)]">
+            <p class="text-amber-200 font-bold text-sm" data-i18n="abroad.title">即将访问境外网站</p>
+            <p class="text-gray-300 text-sm mt-3 leading-relaxed" data-i18n="abroad.body">
+                该链接服务器可能在境外。若您当前不在境外或网络受限，可能出现打不开、很慢或不稳定的情况，请注意当前网络环境。
+            </p>
+            <p class="text-xs text-gray-500 mt-2 font-mono break-all" id="abroadUrlPreview"></p>
+            <div class="flex gap-3 mt-6 justify-end">
+                <button type="button" id="abroadCancel" class="px-4 py-2 rounded-full border border-white/20 text-gray-300 text-sm hover:bg-white/5" data-i18n="abroad.cancel">取消</button>
+                <button type="button" id="abroadOk" class="px-4 py-2 rounded-full bg-neon-cyan/20 border border-neon-cyan/50 text-neon-cyan text-sm font-medium hover:bg-neon-cyan/30" data-i18n="abroad.continue">仍要访问</button>
             </div>
         </div>
     </div>
 
     <script>
+        const LANG_KEY = 'vienne-lang';
+
+        // Language toggle
+        const i18nDict = {
+            zh: {
+                'nav.about': '关于',
+                'nav.notes': '学习笔记',
+                'nav.projects': '项目',
+                'nav.resume': '简历',
+                'nav.contact': '联系',
+                'nav.agent': 'AI 分身',
+                'chat.welcome': '你好！我是 Bella（Vienne 的 AI 分身）。关于 AI Agent 技术、AI 教育产品或者跨时区项目管理经验，都可以向我咨询。',
+                'chat.tokenHint': '为节省 token 请手下留情～深度聊天欢迎联系主人微信 Vienne71',
+                'chat.placeholder': '输入消息...',
+                'chat.thinking': '思考中…',
+                'chat.errNetwork': '无法连接对话服务：请在本机终端运行 npm run chat-proxy，并配置 .env 中的 OPENCLAW_API_KEY 与 OPENCLAW_CHAT_URL。',
+                'chat.errApi': '对话服务返回错误，请检查代理日志与上游接口格式。',
+                'hero.badge': 'AI 产品落地实践者',
+                'hero.tag1': 'AI Agent',
+                'hero.tag2': 'LangChain',
+                'hero.tag3': '全栈落地',
+                'hero.tag4': '工程化思维',
+                'hero.p1': '持有<strong class="text-white">香港大学硕士</strong>及<strong class="text-white">中南财经政法大学学士学位</strong>，曾任职<strong class="text-white">意法半导体</strong>、<strong class="text-white">UL香港</strong>、<strong class="text-white">京科</strong>，历任IC测试工程师、项目工程师、AI产品负责人。',
+                'hero.p2': '具备<strong class="text-white">跨时区多团队项目管理</strong>能力，精通<strong class="text-white">8D/FMEA/六西格玛</strong>工程化方法；雅思7分、粤语熟练。主导AI教育对话Agent等多款产品从0到1闭环落地，深耕<strong class="text-neon-cyan">LangChain/LangGraph</strong>、<strong class="text-neon-purple">RAG</strong>、<strong class="text-neon-pink">Prompt工程</strong>等技术。',
+                'hero.p3': '熟练运用OpenClaw、Cursor、Dify、Coze、火山方舟等AI工具，覆盖AI产品需求分析、系统设计、商业变现全链路。目前聚焦<strong class="text-white">AI Agent产品落地与优化</strong>，主攻<strong class="text-white">AI教育/内容创作</strong>赛道。',
+                'hero.btnNotes': '<span>🚀</span>学习笔记',
+                'hero.btnProjects': '查看项目',
+                'learning.tag': '// KNOWLEDGE_BASE',
+                'learning.title': 'AI Agent <span class="neon-purple">学习笔记</span>',
+                'learning.desc': '沉淀AI产品设计、大模型实操、工程化方法等方向学习笔记，持续探索大模型应用与商业化路径',
+                'learning.filter.all': '全部',
+                'learning.filter.langchain': 'LangChain',
+                'learning.filter.rag': 'RAG',
+                'learning.filter.product': '产品设计',
+                'learning.a1.tag': 'LangChain',
+                'learning.a1.title': 'LangGraph构建多轮对话Agent实战',
+                'learning.a1.desc': '基于StateGraph实现教育场景下的连贯教学逻辑与长期记忆能力，解决AI教师上下文理解问题。',
+                'learning.a2.tag': 'RAG',
+                'learning.a2.title': '教育场景RAG优化：召回率15%→85%',
+                'learning.a2.desc': '向量数据库选型、文本分块策略、重排序层优化，解决大模型幻觉问题提升知识准确性。',
+                'learning.a3.tag': '产品设计',
+                'learning.a3.title': '8D方法论在AI产品中的应用',
+                'learning.a3.desc': '将半导体行业的8D/FMEA工程化方法应用于AI Agent产品迭代，构建稳健的质量管控体系。',
+                'learning.a4.tag': 'Prompt工程',
+                'learning.a4.title': 'Cursor+Dify快速交付AI产品MVP',
+                'learning.a4.desc': 'Vibe Coding实战：利用Cursor与Dify协作，从需求到上线48小时完成AI内容创作Agent。',
+                'learning.a5.tag': '商业化',
+                'learning.a5.title': 'AI教育产品商业化路径探索',
+                'learning.a5.desc': '从获客成本到付费转化，分析AI教育Agent的商业模式设计与变现策略。',
+                'learning.a6.tag': '多模态',
+                'learning.a6.title': 'ASR/TTS集成实现全语音交互',
+                'learning.a6.desc': '火山方舟与Azure语音服务对比，低延迟实时语音对话技术实现细节。',
+                'learning.readMore': '阅读全文 →',
+                'projects.tag': '// PORTFOLIO',
+                'projects.title': '实战<span class="text-neon-cyan neon-text">项目</span>',
+                'projects.desc': '机器学习、工程系统、AI产品类实战项目，覆盖AI教育、内容创作等赛道',
+                'learning.filter.all': '全部',
+                'learning.filter.langchain': 'LangChain',
+                'learning.filter.rag': 'RAG',
+                'learning.filter.product': '产品设计',
+                'projects.p1.title': 'AI教育对话Agent',
+                'projects.p1.desc': '基于LangGraph搭建多轮对话系统，集成ASR/TTS实现全语音交互。采用RAG技术构建教育知识库，结合发音纠正算法，知识召回准确率提升15%，覆盖从需求分析到商业变现全链路。',
+                'projects.p1.tag1': 'LangGraph',
+                'projects.p1.tag2': 'RAG',
+                'projects.p1.tag3': 'ASR/TTS',
+                'projects.p1.tag4': '商业变现',
+                'projects.p2.title': 'AI自媒体创作Agent',
+                'projects.p2.desc': '利用Dify+Coze搭建自动化内容创作工作流，实现从热点抓取、文案生成到多平台分发的全流程自动化。结合Cursor快速迭代前端界面，48小时完成MVP验证。',
+                'projects.p2.tag1': 'Dify',
+                'projects.p2.tag2': 'Coze',
+                'projects.p2.tag3': '自动化',
+                'projects.p2.tag4': 'MVP',
+                'projects.p3.title': '台风图像预测模型',
+                'projects.p3.desc': '香港大学毕业论文项目。设计SE-Unet+CDDPM架构，引入三元损失函数优化预测效果，在Google Colab完成模型训练与部署，图像核心特征清晰度大幅提升。',
+                'projects.p3.tag1': 'PyTorch',
+                'projects.p3.tag2': 'Computer Vision',
+                'projects.p3.tag3': 'Deep Learning',
+                'projects.p3.colab': '在 Google Colab 运行 ↗',
+                'projects.p3.code': '查看 GitHub 代码 ↗',
+                'projects.p4.title': 'STULT质量追踪系统',
+                'projects.p4.desc': '意法半导体产线缺陷追踪平台，运用8D/六西格玛方法分析产线缺陷数据。实现缺陷率降低80%，97%人工记录自动化替代，跨区域协同全球制造基地。',
+                'projects.p4.tag1': '六西格玛',
+                'projects.p4.tag2': '8D方法',
+                'projects.p4.tag3': '工业自动化',
+                'projects.p5.title': 'EliteBay 多语言精英教育官网',
+                'projects.p5.desc': '为 EliteBay 打造的一站式精英教育官网，支持中/英/日/韩/粤多语言切换，覆盖语言培训、留学申请、海外求职等业务线。以高转化着陆页结构与信任感模块设计，聚焦家长与学生的咨询与留资转化。',
+                'projects.p5.tag1': '多语言站点',
+                'projects.p5.tag2': '教育行业',
+                'projects.p5.tag3': 'Landing Page',
+                'resume.tag': '// RESUME_PREVIEW',
+                'resume.title': '在线简历预览',
+                'resume.desc': '可直接预览我的在线简历，也可一键跳转到金山文档查看完整信息。',
+                'resume.tip': '若当前浏览器限制了文档内嵌，请点击右侧按钮在新页面查看。',
+                'resume.openBtn': '打开完整简历 ↗',
+                'contact.title': 'Let\'s <span class="text-neon-cyan neon-text">Connect</span>',
+                'contact.desc': '无论是AI Agent技术交流，还是AI教育/内容创作赛道合作，欢迎随时联系',
+                'abroad.title': '即将访问境外网站',
+                'abroad.body': '该链接服务器可能在境外。若您当前不在境外或网络受限，可能出现打不开、很慢或不稳定的情况，请注意当前网络环境。',
+                'abroad.cancel': '取消',
+                'abroad.continue': '仍要访问'
+            },
+            en: {
+                'nav.about': 'About',
+                'nav.notes': 'Notes',
+                'nav.projects': 'Projects',
+                'nav.resume': 'Resume',
+                'nav.contact': 'Contact',
+                'nav.agent': 'AI Agent',
+                'chat.welcome': 'Hi! I\'m Bella, Vienne\'s AI assistant. Ask me about AI Agents, AI education products, or cross-timezone project management.',
+                'chat.tokenHint': 'Please go easy to save tokens — for longer chats, WeChat the owner: Vienne71',
+                'chat.placeholder': 'Type a message...',
+                'chat.thinking': 'Thinking…',
+                'chat.errNetwork': 'Cannot reach the chat service. Run npm run chat-proxy locally and set OPENCLAW_API_KEY and OPENCLAW_CHAT_URL in .env.',
+                'chat.errApi': 'The chat service returned an error. Check the proxy logs and upstream API format.',
+                'hero.badge': 'AI Product Builder',
+                'hero.tag1': 'AI Agent',
+                'hero.tag2': 'LangChain',
+                'hero.tag3': 'Full-stack Delivery',
+                'hero.tag4': 'Engineering Mindset',
+                'hero.p1': 'Master\'s degree from <strong class="text-white">The University of Hong Kong</strong> and Bachelor\'s from <strong class="text-white">Zhongnan University of Economics and Law</strong>. Previously worked at <strong class="text-white">STMicroelectronics</strong>, <strong class="text-white">UL Hong Kong</strong> and <strong class="text-white">JingKe</strong> as IC test engineer, project engineer and AI product owner.',
+                'hero.p2': 'Experienced in <strong class="text-white">cross-timezone, multi-team project management</strong>, proficient with <strong class="text-white">8D / FMEA / Six Sigma</strong>. Led multiple AI education dialogue Agents from 0 to 1, focusing on <strong class="text-neon-cyan">LangChain / LangGraph</strong>, <strong class="text-neon-purple">RAG</strong> and <strong class="text-neon-pink">prompt engineering</strong>.',
+                'hero.p3': 'Skilled with tools such as OpenClaw, Cursor, Dify, Coze and Volcano Engine, covering the whole lifecycle from product discovery and system design to commercialization. Currently focused on <strong class="text-white">AI Agent product delivery and optimization</strong> in <strong class="text-white">education and content creation</strong>.',
+                'hero.btnNotes': '<span>🚀</span>Study Notes',
+                'hero.btnProjects': 'View Projects',
+                'learning.tag': '// KNOWLEDGE_BASE',
+                'learning.title': 'AI Agent <span class="neon-purple">Study Notes</span>',
+                'learning.desc': 'Documenting AI product design, LLM engineering and best practices, continuously exploring real-world applications and monetization paths.',
+                'learning.filter.all': 'All',
+                'learning.filter.langchain': 'LangChain',
+                'learning.filter.rag': 'RAG',
+                'learning.filter.product': 'Product Design',
+                'learning.a1.tag': 'LangChain',
+                'learning.a1.title': 'Building Multi-turn Dialogue Agents with LangGraph',
+                'learning.a1.desc': 'Use StateGraph to implement coherent teaching flows and long-term memory in education scenarios, solving context tracking issues for AI teachers.',
+                'learning.a2.tag': 'RAG',
+                'learning.a2.title': 'RAG Optimization in Education: Recall 15% → 85%',
+                'learning.a2.desc': 'Covers vector DB selection, chunking strategy and re-ranking optimization to reduce hallucinations and improve knowledge accuracy.',
+                'learning.a3.tag': 'Product Design',
+                'learning.a3.title': 'Applying 8D Methodology to AI Products',
+                'learning.a3.desc': 'Brings 8D/FMEA practices from the semiconductor industry into AI Agent iterations to build a robust quality control system.',
+                'learning.a4.tag': 'Prompt Engineering',
+                'learning.a4.title': 'Delivering AI Product MVP with Cursor + Dify',
+                'learning.a4.desc': 'Vibe Coding in practice: collaborate with Cursor and Dify to ship an AI content creation Agent from idea to production in 48 hours.',
+                'learning.a5.tag': 'Monetization',
+                'learning.a5.title': 'Exploring Business Models for AI Education Products',
+                'learning.a5.desc': 'From acquisition cost to paid conversion, analyzes business models and monetization strategies for AI education Agents.',
+                'learning.a6.tag': 'Multimodal',
+                'learning.a6.title': 'Full Voice Interaction with ASR/TTS Integration',
+                'learning.a6.desc': 'Compares Volcano Engine and Azure speech services, and explains low-latency real-time voice dialogue implementation details.',
+                'learning.readMore': 'Read more →',
+                'projects.tag': '// PORTFOLIO',
+                'projects.title': 'Practical <span class="text-neon-cyan neon-text">Projects</span>',
+                'projects.desc': 'Hands-on projects in machine learning, engineering systems and AI products, focusing on education and content creation.',
+                'learning.filter.all': 'All',
+                'learning.filter.langchain': 'LangChain',
+                'learning.filter.rag': 'RAG',
+                'learning.filter.product': 'Product Design',
+                'projects.p1.title': 'AI Education Dialogue Agent',
+                'projects.p1.desc': 'Built a multi-turn dialogue system with LangGraph, integrated ASR/TTS for full voice interaction and constructed an education knowledge base with RAG. Pronunciation correction improved recall accuracy by 15%, covering the full journey from requirement analysis to monetization.',
+                'projects.p1.tag1': 'LangGraph',
+                'projects.p1.tag2': 'RAG',
+                'projects.p1.tag3': 'ASR/TTS',
+                'projects.p1.tag4': 'Monetization',
+                'projects.p2.title': 'AI Content Creator Agent',
+                'projects.p2.desc': 'Designed an automated content creation workflow with Dify + Coze, from trend discovery and copywriting to multi-platform publishing. Together with Cursor, delivered the front-end MVP in 48 hours.',
+                'projects.p2.tag1': 'Dify',
+                'projects.p2.tag2': 'Coze',
+                'projects.p2.tag3': 'Automation',
+                'projects.p2.tag4': 'MVP',
+                'projects.p3.title': 'Typhoon Image Forecasting Model',
+                'projects.p3.desc': 'Graduation project at HKU. Proposed an SE-Unet + CDDPM architecture with triplet loss to enhance prediction quality, trained and deployed on Google Colab with significantly sharper key visual features.',
+                'projects.p3.tag1': 'PyTorch',
+                'projects.p3.tag2': 'Computer Vision',
+                'projects.p3.tag3': 'Deep Learning',
+                'projects.p3.colab': 'Run on Google Colab ↗',
+                'projects.p3.code': 'View GitHub Code ↗',
+                'projects.p4.title': 'STULT Quality Tracking System',
+                'projects.p4.desc': 'Defect tracking platform for STMicroelectronics production lines, applying 8D / Six Sigma methodologies to analyze manufacturing defects. Achieved 80% defect reduction and automated 97% of manual logging across global factories.',
+                'projects.p4.tag1': 'Six Sigma',
+                'projects.p4.tag2': '8D Method',
+                'projects.p4.tag3': 'Industrial Automation',
+                'projects.p5.title': 'EliteBay Multilingual Education Website',
+                'projects.p5.desc': 'One-stop premium education website for EliteBay with Chinese / English / Japanese / Korean / Cantonese support, covering language training, overseas study and career coaching. High-conversion landing layout and trust-building sections focus on inquiries and lead collection.',
+                'projects.p5.tag1': 'Multilingual Site',
+                'projects.p5.tag2': 'Education',
+                'projects.p5.tag3': 'Landing Page',
+                'resume.tag': '// RESUME_PREVIEW',
+                'resume.title': 'Online Resume Preview',
+                'resume.desc': 'Preview my online resume directly, or open the full profile in Kingsoft Docs with one click.',
+                'resume.tip': 'If embedded viewing is blocked by your browser, use the button on the right to open it in a new tab.',
+                'resume.openBtn': 'Open Full Resume ↗',
+                'contact.title': 'Let\'s <span class="text-neon-cyan neon-text">Connect</span>',
+                'contact.desc': 'Whether for AI Agent tech discussions or collaboration in AI education / content creation, feel free to reach out any time.',
+                'abroad.title': 'Opening an overseas site',
+                'abroad.body': 'This link may be hosted outside mainland China. Without suitable network access, it might be slow or unreachable. Please check your connection.',
+                'abroad.cancel': 'Cancel',
+                'abroad.continue': 'Continue'
+            }
+        };
+
+        function applyLanguage(lang) {
+            const dict = i18nDict[lang] || i18nDict.zh;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) el.textContent = dict[key];
+            });
+            document.querySelectorAll('[data-i18n-html]').forEach(el => {
+                const key = el.getAttribute('data-i18n-html');
+                if (dict[key]) el.innerHTML = dict[key];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (dict[key]) el.setAttribute('placeholder', dict[key]);
+            });
+            const toggle = document.getElementById('langToggle');
+            if (toggle) {
+                toggle.textContent = lang === 'en' ? 'EN / 中' : '中 / EN';
+            }
+            document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
+        }
+
+        function toggleLanguage() {
+            const current = localStorage.getItem(LANG_KEY) || 'zh';
+            const next = current === 'zh' ? 'en' : 'zh';
+            localStorage.setItem(LANG_KEY, next);
+            applyLanguage(next);
+        }
+
+        // Init preferences
+        (function initPreferences() {
+            const savedLang = localStorage.getItem(LANG_KEY) || 'zh';
+            applyLanguage(savedLang);
+        })();
+
         // Generate Stars
         function createStars() {
             const starfield = document.getElementById('starfield');
@@ -835,13 +1193,209 @@
         }
 
         function toggleChat() {
-            const widget = document.getElementById('chatWidget');
-            if (widget.classList.contains('translate-y-[150%]')) {
-                widget.classList.remove('translate-y-[150%]');
-                widget.classList.add('translate-y-0');
+            const dock = document.getElementById('chatDock');
+            if (!dock) return;
+            if (dock.classList.contains('translate-y-[150%]')) {
+                dock.classList.remove('translate-y-[150%]');
+                dock.classList.add('translate-y-0');
             } else {
-                widget.classList.add('translate-y-[150%]');
-                widget.classList.remove('translate-y-0');
+                dock.classList.add('translate-y-[150%]');
+                dock.classList.remove('translate-y-0');
+            }
+        }
+
+        /** 本地开发：代理默认 127.0.0.1:8790（避免与占用 8787 的旧进程冲突）；可设 window.CHAT_PROXY_PORT 或 window.CHAT_API_URL */
+        function getChatApiUrl() {
+            if (typeof window.CHAT_API_URL === 'string' && window.CHAT_API_URL) return window.CHAT_API_URL;
+            const h = location.hostname;
+            if (h === 'localhost' || h === '127.0.0.1') {
+                const port = typeof window.CHAT_PROXY_PORT === 'number' ? window.CHAT_PROXY_PORT : 8790;
+                return `http://${h}:${port}/chat`;
+            }
+            return '/api/chat';
+        }
+
+        function chatDictLine(key) {
+            const lang = localStorage.getItem(LANG_KEY) || 'zh';
+            const dict = i18nDict[lang] || i18nDict.zh;
+            return dict[key] || i18nDict.zh[key] || key;
+        }
+
+        function appendChatBubble(text, isUser) {
+            const area = document.getElementById('chatMessages');
+            if (!area) return;
+            const div = document.createElement('div');
+            div.className = isUser
+                ? 'bg-neon-cyan/10 p-3 rounded-xl text-sm text-white border border-neon-cyan/25 ml-6 text-right'
+                : 'bg-white/5 p-3 rounded-xl text-sm text-gray-300 border border-white/5';
+            div.textContent = text;
+            area.appendChild(div);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const btn = document.getElementById('chatSendBtn');
+            const text = (input && input.value || '').trim();
+            if (!text) return;
+            if (input) input.value = '';
+            appendChatBubble(text, true);
+
+            const area = document.getElementById('chatMessages');
+            const typing = document.createElement('div');
+            typing.className = 'bg-white/5 p-3 rounded-xl text-sm text-gray-400 border border-white/5 chat-typing';
+            typing.textContent = chatDictLine('chat.thinking');
+            area.appendChild(typing);
+            area.scrollTop = area.scrollHeight;
+            if (btn) btn.disabled = true;
+
+            const url = getChatApiUrl();
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                const rawText = await res.text();
+                let data = {};
+                try {
+                    data = rawText ? JSON.parse(rawText) : {};
+                } catch (_) {
+                    typing.remove();
+                    appendChatBubble(
+                        chatDictLine('chat.errApi') + '\n\n' + rawText.slice(0, 600),
+                        false
+                    );
+                    return;
+                }
+                typing.remove();
+                if (!res.ok) {
+                    const msg =
+                        data.hint ||
+                        data.error ||
+                        (data.detail != null
+                            ? (typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail, null, 2))
+                            : null) ||
+                        (data.raw ? String(data.raw) : null) ||
+                        (data.status ? 'HTTP ' + data.status : null) ||
+                        chatDictLine('chat.errApi');
+                    appendChatBubble(typeof msg === 'string' ? msg : JSON.stringify(msg), false);
+                    return;
+                }
+                appendChatBubble(data.reply != null ? String(data.reply) : chatDictLine('chat.errApi'), false);
+            } catch (e) {
+                typing.remove();
+                appendChatBubble(chatDictLine('chat.errNetwork'), false);
+            } finally {
+                if (btn) btn.disabled = false;
+                if (input) input.focus();
+            }
+        }
+
+        function shouldWarnOverseasLink(urlStr) {
+            try {
+                const u = new URL(urlStr, location.href);
+                if (u.protocol !== 'http:' && u.protocol !== 'https:') return false;
+                const h = u.hostname.toLowerCase();
+                const here = (location.hostname || '').toLowerCase();
+                if (h === here) return false;
+                if (h === 'localhost' || h === '127.0.0.1') return false;
+                if (h.endsWith('.cn') || h.endsWith('.com.cn')) return false;
+                if (h.includes('kdocs.cn')) return false;
+                if (/\.volces\.com$/i.test(h) && /cn-|beijing|shanghai|guangzhou/i.test(h)) return false;
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        let abroadPending = { href: null, target: null };
+        function openAbroadModal(href, target) {
+            abroadPending = { href, target: target || '_blank' };
+            const modal = document.getElementById('abroadModal');
+            const preview = document.getElementById('abroadUrlPreview');
+            if (preview) preview.textContent = href;
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.setAttribute('aria-hidden', 'false');
+            }
+        }
+        function closeAbroadModal() {
+            const modal = document.getElementById('abroadModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+            }
+            abroadPending = { href: null, target: null };
+        }
+        function confirmAbroadOpen() {
+            const { href, target } = abroadPending;
+            closeAbroadModal();
+            if (!href) return;
+            if (target === '_blank') {
+                window.open(href, '_blank', 'noopener,noreferrer');
+            } else {
+                location.href = href;
+            }
+        }
+
+        document.addEventListener('click', function (e) {
+            const a = e.target.closest('a[href]');
+            if (!a) return;
+            if (a.hasAttribute('data-no-abroad-warn')) return;
+            const href = a.getAttribute('href');
+            if (!href || !/^https?:/i.test(href)) return;
+            if (!shouldWarnOverseasLink(href)) return;
+            e.preventDefault();
+            e.stopPropagation();
+            openAbroadModal(href, a.getAttribute('target') || '_blank');
+        }, true);
+
+        (function initAbroadModal() {
+            const cancel = document.getElementById('abroadCancel');
+            const ok = document.getElementById('abroadOk');
+            const modal = document.getElementById('abroadModal');
+            if (cancel) cancel.addEventListener('click', closeAbroadModal);
+            if (ok) ok.addEventListener('click', confirmAbroadOpen);
+            if (modal) {
+                modal.addEventListener('click', function (e) {
+                    if (e.target === modal) closeAbroadModal();
+                });
+            }
+        })();
+
+        function copyEmail(event) {
+            event.preventDefault();
+            const email = 'yingnan24@yeah.net';
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(email)
+                    .then(() => alert('邮箱已复制：' + email))
+                    .catch(() => fallbackCopyEmail(email));
+            } else {
+                fallbackCopyEmail(email);
+            }
+        }
+
+        function fallbackCopyEmail(email) {
+            const textArea = document.createElement('textarea');
+            textArea.value = email;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            textArea.style.pointerEvents = 'none';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const success = document.execCommand('copy');
+                if (success) {
+                    alert('邮箱地址已复制，粘贴即可给本人发送邮件：' + email);
+                } else {
+                    alert('复制失败，请手动复制：' + email);
+                }
+            } catch (err) {
+                alert('复制失败，请手动复制：' + email);
+            } finally {
+                document.body.removeChild(textArea);
             }
         }
     </script>
