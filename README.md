@@ -109,7 +109,7 @@ npm run verify-chat
 
 ## 部署到 Vercel（确保 AI 分身可用）
 
-### 0) 部署前先确认两件事（1 分钟）
+### 0) 部署前先确认
 
 1. 你的代码要推送到 GitHub 的 `main` 分支（Vercel 默认看 `main`）
 2. GitHub 仓库里能看到这些路径（在仓库页面左侧/文件列表能打开即可）
@@ -170,7 +170,7 @@ npm run verify-chat
 2. 部署完成后回到项目详情页
 3. 如果你之前已经部署过，现在只是改了环境变量，也要点该 deployment 的 **Redeploy**
 
-### 4) 部署后自检（必须做，2 分钟）
+### 4) 部署后自检
 
 1. 打开：
    - `https://你的域名/api/health`
@@ -183,7 +183,7 @@ npm run verify-chat
 1. 点击页面里的“AI 分身”输入一句话
 2. 如果对话报错（503/502），不要猜，直接把页面上报错内容（或控制台网络返回的 JSON）发我
 
-## 本地与线上请求的对应关系（帮助你理解）
+## 本地与线上请求的对应关系
 
 - 本地：主页会对 `http://127.0.0.1:8790/chat` 发请求（你运行 `npm run chat-proxy`）
 - 线上：主页（非 localhost）会对同域的 `/api/chat` 发请求
@@ -220,7 +220,7 @@ npm run verify-chat
 - `docs/`：说明文档
 - `README.md`：项目介绍（就是本文件）
 
-### Step 1.5：添加图片（头像 / 项目图 / favicon）——按这一步做不容易踩坑
+### Step 1.5：添加图片（头像 / 项目图 / favicon）
 
 #### A. 把图片放进 `images/` 目录
 
@@ -329,7 +329,7 @@ git push -u origin main
 
 提交后 Pages 会自动更新。
 
-### Step 5：notes.html 基础模板（可直接用）
+### Step 5：notes.html 基础模板
 
 如果你的 `notes.html` 还很空，可以先用一个与主页风格统一的基本模板，然后再持续填内容。
 
