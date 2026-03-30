@@ -383,3 +383,10 @@ git push -u origin main
 2. 提交（commit）到 `main`
 3. 等 1–2 分钟再刷新 `notes.html`
 
+​
+网站链接：Vienne-AI Site
+
+项目链接：https://github.com/vienne53/vienne-ai-site
+
+​
+
