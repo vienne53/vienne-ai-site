@@ -1,5 +1,5 @@
 # vienne-ai-site
-
+https://vienne-ai-site-fa9ylhiho-vienne53s-projects.vercel.app/
 个人主页静态站 +「AI 分身」对话（Vercel Serverless / 本地代理）。
 
 这份 README 写成 **新手友好、按步骤照做就能复刻** 的版本，覆盖：
