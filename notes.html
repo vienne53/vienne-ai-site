@@ -2,52 +2,546 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>学习笔记 · Vienne.AI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Vienne.AI 学习笔记：从 LLM 到 AI Agent 系统课程，以及 AI 产品实战大纲。" />
-    <!-- 已上线：9 章系统课 -->
-    <section class="space-y-5">
-      <h2 class="text-xl md:text-2xl font-extrabold text-white flex items-center gap-2">
-        <span class="text-neon-cyan">●</span> 已上线 · 系统课程
-      </h2>
+  <title>学习笔记 · Vienne.AI</title>
+  <meta name="description" content="Vienne.AI 学习笔记大纲：从 LLM 到 AI Agent 系统课 + AI 产品实战 12 章。" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            neon: { cyan: '#00f3ff', purple: '#bf00ff', pink: '#ff00aa' }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    .toc-link.active { color: #00f3ff; border-left-color: #00f3ff; background: rgba(0,243,255,.06); }
+  </style>
+</head>
+<body class="bg-black text-slate-200 font-sans antialiased min-h-screen">
 
-      <a href="learn/llm-agent/present-hub.html"
-         class="block rounded-2xl border border-cyan-500/40 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 p-6 md:p-8 hover:border-cyan-400/70 hover:shadow-[0_0_40px_rgba(0,243,255,0.15)] transition-all group">
-        <div class="flex flex-wrap gap-2 mb-3">
-          <span class="px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-xs font-mono">9 章完整路径</span>
-          <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs">LLM · RAG · Agent · LangGraph · MCP</span>
-        </div>
-        <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
-          从 LLM 到 AI Agent
-        </h3>
-        <p class="text-gray-300 text-sm md:text-base mb-4 max-w-2xl">
-          ① LLM → ② RAG → ③ Agent Core → ④ Retrieval → ⑤ LangChain/LangGraph →
-          ⑥ MCP/A2A → ⑦ OpenClaw/Hermes → ⑧ Multi-agent/KG → ⑨ Multimodal
-        </p>
-        <div class="flex flex-wrap gap-3 text-sm font-medium">
-          <span class="text-cyan-400 group-hover:underline">进入课程中心 →</span>
-          <span class="text-gray-500">|</span>
-          <span class="text-gray-400" onclick="event.preventDefault(); event.stopPropagation();">每章：16:9 幻灯 + Scroll 长文</span>
-        </div>
+  <!-- Nav -->
+  <nav class="fixed top-0 inset-x-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <a href="index.html#about" class="flex items-center gap-2 shrink-0">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center font-bold text-black text-sm">V</div>
+        <span class="font-bold tracking-wide">Vienne.AI</span>
       </a>
-
-      <div class="grid sm:grid-cols-2 gap-3 text-sm">
-        <a href="learn/llm-agent/course-present.html" class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 hover:border-cyan-500/40 transition">
-          <span class="text-cyan-400 font-mono text-xs">①</span> LLM 基础 · 幻灯
-        </a>
-        <a href="learn/llm-agent/course-full-llm.html" class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 hover:border-cyan-500/40 transition">
-          <span class="text-cyan-400 font-mono text-xs">①</span> LLM 基础 · 长文
-        </a>
-        <a href="learn/llm-agent/course-present-rag.html" class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 hover:border-pink-500/40 transition">
-          <span class="text-pink-400 font-mono text-xs">②</span> RAG · 幻灯
-        </a>
-        <a href="learn/llm-agent/course-full-eval.html" class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 hover:border-purple-500/40 transition">
-          <span class="text-purple-400 font-mono text-xs">Eval</span> 跨章评估指南
-        </a>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="flex rounded-full border border-white/15 overflow-hidden text-[11px] font-medium" id="langSwitch">
+          <button type="button" data-lang="zh" class="lang-btn px-2.5 py-1 bg-cyan-500/20 text-cyan-300">中</button>
+          <button type="button" data-lang="en" class="lang-btn px-2.5 py-1 text-gray-400 hover:text-white">EN</button>
+          <button type="button" data-lang="yue" class="lang-btn px-2.5 py-1 text-gray-400 hover:text-white">粵</button>
+        </div>
+        <a href="index.html#learning" class="text-sm text-gray-400 hover:text-cyan-400 transition whitespace-nowrap" data-i18n="nav.home">返回主页</a>
       </div>
-    </section>
-      </p>
-    </section>
-  </main>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto px-4 pt-24 pb-20 lg:grid lg:grid-cols-[220px_1fr] lg:gap-10">
+
+    <!-- Sidebar TOC -->
+    <aside class="hidden lg:block">
+      <div class="sticky top-24 space-y-1 text-sm border-l border-white/10 pl-4">
+        <p class="text-cyan-400 font-mono text-[10px] mb-3 tracking-wider" data-i18n="toc.label">// OUTLINE</p>
+        <a href="#hero" class="toc-link block py-1.5 pl-3 border-l-2 border-transparent text-gray-400 hover:text-cyan-300 transition" data-i18n="toc.hero">概览</a>
+        <a href="#course-tech" class="toc-link block py-1.5 pl-3 border-l-2 border-transparent text-gray-400 hover:text-cyan-300 transition" data-i18n="toc.tech">系统课 · 9 章</a>
+        <a href="#course-product" class="toc-link block py-1.5 pl-3 border-l-2 border-transparent text-gray-400 hover:text-cyan-300 transition" data-i18n="toc.product">产品实战 · 12 章</a>
+      </div>
+    </aside>
+
+    <main class="min-w-0 space-y-14">
+
+      <!-- Hero -->
+      <header id="hero" class="space-y-4 scroll-mt-28">
+        <p class="text-cyan-400 font-mono text-xs tracking-widest" data-i18n="hero.tag">// KNOWLEDGE_BASE</p>
+        <h1 class="text-3xl md:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400" data-i18n="hero.title">
+          学习笔记 · 课程大纲
+        </h1>
+        <p class="text-gray-400 text-sm md:text-base leading-relaxed max-w-2xl" data-i18n="hero.desc">
+          两条学习路径：技术系统课（已上线可阅读）与 AI 产品实战大纲（持续更新）。点击章节标题进入对应内容。
+        </p>
+      </header>
+
+      <!-- ═══ Part A: Technical System Course ═══ -->
+      <section id="course-tech" class="scroll-mt-28 space-y-6">
+        <div class="flex flex-wrap items-end justify-between gap-3 border-b border-white/10 pb-4">
+          <div>
+            <h2 class="text-xl md:text-2xl font-extrabold text-white" data-i18n="tech.title">一、从 LLM 到 AI Agent · 系统课</h2>
+            <p class="text-sm text-gray-500 mt-1" data-i18n="tech.sub">9 章 · 每章 16:9 幻灯 + Scroll 长文</p>
+          </div>
+          <a href="learn/llm-agent/present-hub.html"
+             class="text-sm font-medium text-cyan-400 hover:underline" data-i18n="tech.hub">进入课程中心 →</a>
+        </div>
+
+        <ol class="space-y-3 list-none counter-reset-none">
+          <!-- Ch 1 -->
+          <li class="rounded-xl border border-white/10 bg-white/[.03] p-4 md:p-5 hover:border-cyan-500/30 transition">
+            <div class="flex flex-wrap items-start gap-2 mb-2">
+              <span class="font-mono text-xs text-cyan-400 shrink-0">01</span>
+              <h3 class="font-bold text-white flex-1" data-i18n="tech.ch1.title">LLM 基础</h3>
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30" data-i18n="badge.live">已上线</span>
+            </div>
+            <p class="text-sm text-gray-400 mb-3" data-i18n="tech.ch1.desc">Transformer、推理与采样、Pretrain / SFT / RLHF、模型选型。</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <a href="learn/llm-agent/course-present.html" class="px-3 py-1.5 rounded-lg bg-cyan-600/80 text-white hover:bg-cyan-500" data-i18n="link.slides">幻灯</a>
+              <a href="learn/llm-agent/course-full-llm.html" class="px-3 py-1.5 rounded-lg border border-white/15 text-gray-300 hover:border-cyan-500/40" data-i18n="link.scroll">长文</a>
+            </div>
+          </li>
+          <!-- Ch 2 -->
+          <li class="rounded-xl border border-white/10 bg-white/[.03] p-4 md:p-5 hover:border-pink-500/30 transition">
+            <div class="flex flex-wrap items-start gap-2 mb-2">
+              <span class="font-mono text-xs text-pink-400 shrink-0">02</span>
+              <h3 class="font-bold text-white flex-1" data-i18n="tech.ch2.title">RAG · 外部知识</h3>
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30" data-i18n="badge.live">已上线</span>
+            </div>
+            <p class="text-sm text-gray-400 mb-3" data-i18n="tech.ch2.desc">先检索再生成：幻觉、时效、私有文档三类问题与 RAG 流水线。</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <a href="learn/llm-agent/course-present-rag.html" class="px-3 py-1.5 rounded-lg bg-pink-600/70 text-white hover:bg-pink-500" data-i18n="link.slides">幻灯</a>
+              <a href="learn/llm-agent/course-full-rag.html" class="px-3 py-1.5 rounded-lg border border-white/15 text-gray-300 hover:border-pink-500/40" data-i18n="link.scroll">长文</a>
+            </div>
+          </li>
+          <!-- Ch 3 -->
+          <li class="rounded-xl border border-white/10 bg-white/[.03] p-4 md:p-5 hover:border-purple-500/30 transition">
+            <div class="flex flex-wrap items-start gap-2 mb-2">
+              <span class="font-mono text-xs text-purple-400 shrink-0">03</span>
+              <h3 class="font-bold text-white flex-1" data-i18n="tech.ch3.title">Agent Core</h3>
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30" data-i18n="badge.live">已上线</span>
+            </div>
+            <p class="text-sm text-gray-400 mb-3" data-i18n="tech.ch3.desc">ReAct 循环、Tool Calling、意图路由、多轮上下文。</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <a href="learn/llm-agent/course-present-agent.html" class="px-3 py-1.5 rounded-lg bg-purple-600/70 text-white hover:bg-purple-500" data-i18n="link.slides">幻灯</a>
+              <a href="learn/llm-agent/course-full-agent.html" class="px-3 py-1.5 rounded-lg border border-white/15 text-gray-300 hover:border-purple-500/40" data-i18n="link.scroll">长文</a>
+            </div>
+          </li>
+          <!-- Ch 4 -->
+          <li class="rounded-xl border border-white/10 bg-white/[.03] p-4 md:p-5 hover:border-cyan-500/30 transition">
+            <div class="flex flex-wrap items-start gap-2 mb-2">
+              <span class="font-mono text-xs text-cyan-400 shrink-0">04</span>
+              <h3 class="font-bold text-white flex-1" data-i18n="tech.ch4.title">Retrieval 工程</h3>
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30" data-i18n="badge.live">已上线</span>
+            </div>
+            <p class="text-sm text-gray-400 mb-3" data-i18n="tech.ch4.desc">BM25、Dense、Hybrid、Rerank、召回评估指标。</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <a href="learn/llm-agent/course-present-retrieval.html" class="px-3 py-1.5 rounded-lg bg-cyan-600/80 text-white hover:bg-cyan-500" data-i18n="link.slides">幻灯</a>
+              <a href="learn/llm-agent/course-full-retrieval.html" class="px-3 py-1.5 rounded-lg border border-white/15 text-gray-300 hover:border-cyan-500/40" data-i18n="link.scroll">长文</a>
+            </div>
+          </li>
+          <!-- Ch 5 -->
+          <li class="rounded-xl border border-white/10 bg-white/[.03] p-4 md:p-5 hover:border-cyan-500/30 transition">
+            <div class="flex flex-wrap items-start gap-2 mb-2">
+              <span class="font-mono text-xs text-cyan-400 shrink-0">05</span>
+              <h3 class="font-bold text-white flex-1" data-i18n="tech.ch5.title">LangChain &amp; LangGraph</h3>
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30" data-i18n="badge.live">已上线</span>
+            </div>
+            <p class="text-sm text-gray-400 mb-3" data-i18n="tech.ch5.desc">框架对比、RAG Chain、LangGraph ReAct、Memory / Store。</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <a href="learn/llm-agent/course-present-framework.html" class="px-3 py-1.5 rounded-lg bg-cyan-600/80 text-white hover:bg-cyan-500" data-i18n="link.slides">幻灯</a>
+              <a href="learn/llm-agent/course-full-framework.html" class="px-3 py-1.5 rounded-lg border border-white/15 text-gray-300 hover:border-cyan-500/40" data-i18n="link.scroll">长文</a>
+            </div>
+          </li>
+          <!-- Ch 6 -->
+          <li class="rounded-xl border border-white/10 bg-white/[.03] p-4 md:p-5 hover:border-cyan-500/30 transition">
+            <div class="flex flex-wrap items-start gap-2 mb-2">
+              <span class="font-mono text-xs text-cyan-400 shrink-0">06</span>
+              <h3 class="font-bold text-white flex-1" data-i18n="tech.ch6.title">MCP &amp; A2A</h3>
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30" data-i18n="badge.live">已上线</span>
+            </div>
+            <p class="text-sm text-gray-400 mb-3" data-i18n="tech.ch6.desc">Model Context Protocol、自建 MCP Server、Agent 间协作。</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <a href="learn/llm-agent/course-present-protocols.html" class="px-3 py-1.5 rounded-lg bg-cyan-600/80 text-white hover:bg-cyan-500" data-i18n="link.slides">幻灯</a>
+              <a href="learn/llm-agent/course-full-protocols.html" class="px-3 py-1.5 rounded-lg border border-white/15 text-gray-300 hover:border-cyan-500/40" data-i18n="link.scroll">长文</a>
+            </div>
+          </li>
+          <!-- Ch 7 -->
+          <li class="rounded-xl border border-white/10 bg-white/[.03] p-4 md:p-5 hover:border-cyan-500/30 transition">
+            <div class="flex flex-wrap items-start gap-2 mb-2">
+              <span class="font-mono text-xs text-cyan-400 shrink-0">07</span>
+              <h3 class="font-bold text-white flex-1" data-i18n="tech.ch7.title">OpenClaw &amp; Hermes</h3>
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30" data-i18n="badge.live">已上线</span>
+            </div>
+            <p class="text-sm text-gray-400 mb-3" data-i18n="tech.ch7.desc">Tool-calling 模型、OpenClaw Agent OS、Skills、自托管实验。</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <a href="learn/llm-agent/course-present-openclaw.html" class="px-3 py-1.5 rounded-lg bg-cyan-600/80 text-white hover:bg-cyan-500" data-i18n="link.slides">幻灯</a>
+              <a href="learn/llm-agent/course-full-openclaw.html" class="px-3 py-1.5 rounded-lg border border-white/15 text-gray-300 hover:border-cyan-500/40" data-i18n="link.scroll">长文</a>
+            </div>
+          </li>
+          <!-- Ch 8 -->
+          <li class="rounded-xl border border-white/10 bg-white/[.03] p-4 md:p-5 hover:border-cyan-500/30 transition">
+            <div class="flex flex-wrap items-start gap-2 mb-2">
+              <span class="font-mono text-xs text-cyan-400 shrink-0">08</span>
+              <h3 class="font-bold text-white flex-1" data-i18n="tech.ch8.title">Multi-agent &amp; 知识图谱</h3>
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30" data-i18n="badge.live">已上线</span>
+            </div>
+            <p class="text-sm text-gray-400 mb-3" data-i18n="tech.ch8.desc">Supervisor / Handoff / Critic、GraphRAG vs Vector RAG。</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <a href="learn/llm-agent/course-present-multiagent.html" class="px-3 py-1.5 rounded-lg bg-cyan-600/80 text-white hover:bg-cyan-500" data-i18n="link.slides">幻灯</a>
+              <a href="learn/llm-agent/course-full-multiagent.html" class="px-3 py-1.5 rounded-lg border border-white/15 text-gray-300 hover:border-cyan-500/40" data-i18n="link.scroll">长文</a>
+            </div>
+          </li>
+          <!-- Ch 9 -->
+          <li class="rounded-xl border border-white/10 bg-white/[.03] p-4 md:p-5 hover:border-cyan-500/30 transition">
+            <div class="flex flex-wrap items-start gap-2 mb-2">
+              <span class="font-mono text-xs text-cyan-400 shrink-0">09</span>
+              <h3 class="font-bold text-white flex-1" data-i18n="tech.ch9.title">Multimodal · CV / ASR / TTS</h3>
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30" data-i18n="badge.live">已上线</span>
+            </div>
+            <p class="text-sm text-gray-400 mb-3" data-i18n="tech.ch9.desc">ViT、SAM、Stable Diffusion、Whisper、Neural TTS。</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <a href="learn/llm-agent/course-present-multimodal.html" class="px-3 py-1.5 rounded-lg bg-cyan-600/80 text-white hover:bg-cyan-500" data-i18n="link.slides">幻灯</a>
+              <a href="learn/llm-agent/course-full-multimodal.html" class="px-3 py-1.5 rounded-lg border border-white/15 text-gray-300 hover:border-cyan-500/40" data-i18n="link.scroll">长文</a>
+            </div>
+          </li>
+          <!-- Eval -->
+          <li class="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4 md:p-5">
+            <div class="flex flex-wrap items-start gap-2 mb-2">
+              <span class="font-mono text-xs text-purple-400 shrink-0">+</span>
+              <h3 class="font-bold text-white flex-1" data-i18n="tech.eval.title">跨章评估指南</h3>
+            </div>
+            <p class="text-sm text-gray-400 mb-3" data-i18n="tech.eval.desc">Golden Set、分章 Eval、调试决策树。</p>
+            <a href="learn/llm-agent/course-full-eval.html" class="inline-block text-xs px-3 py-1.5 rounded-lg border border-purple-500/40 text-purple-300 hover:bg-purple-500/10" data-i18n="link.scroll">长文</a>
+          </li>
+        </ol>
+      </section>
+
+      <!-- ═══ Part B: Product Practice Course ═══ -->
+      <section id="course-product" class="scroll-mt-28 space-y-8">
+        <div class="border-b border-white/10 pb-4">
+          <h2 class="text-xl md:text-2xl font-extrabold text-white" data-i18n="prod.title">二、AI Agent 产品实战 · 大纲</h2>
+          <p class="text-sm text-gray-500 mt-1" data-i18n="prod.sub">12 章 · 定位、验证、构建、交付与商业化</p>
+        </div>
+
+        <!-- Part I -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold text-cyan-300" data-i18n="prod.p1">第一部分 · 启动：找到值得做的 AI 项目</h3>
+
+          <article class="rounded-xl border border-white/10 bg-white/[.03] p-5 space-y-3">
+            <h4 class="font-bold text-white" data-i18n="prod.ch1.title">第 1 章 · 项目定位与赛道筛选</h4>
+            <dl class="grid sm:grid-cols-3 gap-3 text-sm">
+              <div><dt class="text-cyan-400 font-mono text-[10px] mb-1" data-i18n="label.learn">学习内容</dt><dd class="text-gray-400" data-i18n="prod.ch1.learn">机会判断、痛点强度、商业化潜力、竞品差异</dd></div>
+              <div><dt class="text-cyan-400 font-mono text-[10px] mb-1" data-i18n="label.practice">实战内容</dt><dd class="text-gray-400" data-i18n="prod.ch1.practice">选定垂直场景，明确用户价值与投入优先级</dd></div>
+              <div><dt class="text-cyan-400 font-mono text-[10px] mb-1" data-i18n="label.tools">效率工具</dt><dd class="text-gray-400" data-i18n="prod.ch1.tools">Kimi、ChatGPT、百度指数、小红书/知乎调研</dd></div>
+            </dl>
+            <p class="text-xs text-gray-600" data-i18n="badge.soon">内容更新中，敬请期待</p>
+          </article>
+
+          <article class="rounded-xl border border-white/10 bg-white/[.03] p-5 space-y-3">
+            <h4 class="font-bold text-white" data-i18n="prod.ch2.title">第 2 章 · 极速需求验证与伪需求排除</h4>
+            <dl class="grid sm:grid-cols-3 gap-3 text-sm">
+              <div><dt class="text-cyan-400 font-mono text-[10px] mb-1" data-i18n="label.learn">学习内容</dt><dd class="text-gray-400" data-i18n="prod.ch2.learn">MVP 验证、真伪痛点识别、市场规模测算</dd></div>
+              <div><dt class="text-cyan-400 font-mono text-[10px] mb-1" data-i18n="label.practice">实战内容</dt><dd class="text-gray-400" data-i18n="prod.ch2.practice">AI 辅助访谈与问卷，输出可行性结论</dd></div>
+              <div><dt class="text-cyan-400 font-mono text-[10px] mb-1" data-i18n="label.tools">效率工具</dt><dd class="text-gray-400" data-i18n="prod.ch2.tools">问卷生成、验证模板、飞书文档</dd></div>
+            </dl>
+            <p class="text-xs text-gray-600" data-i18n="badge.soon">内容更新中，敬请期待</p>
+          </article>
+
+          <article class="rounded-xl border border-white/10 bg-white/[.03] p-5 space-y-3">
+            <h4 class="font-bold text-white" data-i18n="prod.ch3.title">第 3 章 · 用户画像与付费需求挖掘</h4>
+            <dl class="grid sm:grid-cols-3 gap-3 text-sm">
+              <div><dt class="text-cyan-400 font-mono text-[10px] mb-1" data-i18n="label.learn">学习内容</dt><dd class="text-gray-400" data-i18n="prod.ch3.learn">核心任务、需求分层、付费意愿判断</dd></div>
+              <div><dt class="text-cyan-400 font-mono text-[10px] mb-1" data-i18n="label.practice">实战内容</dt><dd class="text-gray-400" data-i18n="prod.ch3.practice">用户画像、典型场景、变现需求锁定</dd></div>
+              <div><dt class="text-cyan-400 font-mono text-[10px] mb-1" data-i18n="label.tools">效率工具</dt><dd class="text-gray-400" data-i18n="prod.ch3.tools">画像模板、AI 需求分析、Notion</dd></div>
+            </dl>
+            <p class="text-xs text-gray-600" data-i18n="badge.soon">内容更新中，敬请期待</p>
+          </article>
+        </div>
+
+        <!-- Part II -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold text-purple-300" data-i18n="prod.p2">第二部分 · 构建：从架构到落地</h3>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <article class="rounded-xl border border-white/10 bg-white/[.03] p-4">
+              <h4 class="font-bold text-white text-sm mb-2" data-i18n="prod.ch4.title">第 4 章 · 商业闭环与价值定位</h4>
+              <p class="text-xs text-gray-500" data-i18n="badge.soon">内容更新中，敬请期待</p>
+            </article>
+            <article class="rounded-xl border border-white/10 bg-white/[.03] p-4">
+              <h4 class="font-bold text-white text-sm mb-2" data-i18n="prod.ch5.title">第 5 章 · AI 应用架构与 Agent 设计</h4>
+              <p class="text-xs text-gray-500" data-i18n="badge.soon">内容更新中，敬请期待</p>
+            </article>
+            <article class="rounded-xl border border-white/10 bg-white/[.03] p-4">
+              <h4 class="font-bold text-white text-sm mb-2" data-i18n="prod.ch6.title">第 6 章 · 前后端开发实战</h4>
+              <p class="text-xs text-gray-500" data-i18n="badge.soon">内容更新中，敬请期待</p>
+            </article>
+            <article class="rounded-xl border border-white/10 bg-white/[.03] p-4">
+              <h4 class="font-bold text-white text-sm mb-2" data-i18n="prod.ch7.title">第 7 章 · 大模型接入与 Prompt 工程</h4>
+              <p class="text-xs text-gray-500" data-i18n="badge.soon">内容更新中，敬请期待</p>
+            </article>
+          </div>
+        </div>
+
+        <!-- Part III -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold text-pink-300" data-i18n="prod.p3">第三部分 · 交付：质量、部署与增长</h3>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <article class="rounded-xl border border-white/10 bg-white/[.03] p-4">
+              <h4 class="font-bold text-white text-sm mb-2" data-i18n="prod.ch8.title">第 8 章 · 知识库与 RAG 落地</h4>
+              <p class="text-xs text-gray-500" data-i18n="badge.soon">内容更新中，敬请期待</p>
+            </article>
+            <article class="rounded-xl border border-white/10 bg-white/[.03] p-4">
+              <h4 class="font-bold text-white text-sm mb-2" data-i18n="prod.ch9.title">第 9 章 · 测试、评估与质量管控</h4>
+              <p class="text-xs text-gray-500" data-i18n="badge.soon">内容更新中，敬请期待</p>
+            </article>
+            <article class="rounded-xl border border-white/10 bg-white/[.03] p-4">
+              <h4 class="font-bold text-white text-sm mb-2" data-i18n="prod.ch10.title">第 10 章 · 部署运维与成本控制</h4>
+              <p class="text-xs text-gray-500" data-i18n="badge.soon">内容更新中，敬请期待</p>
+            </article>
+            <article class="rounded-xl border border-white/10 bg-white/[.03] p-4">
+              <h4 class="font-bold text-white text-sm mb-2" data-i18n="prod.ch11.title">第 11 章 · 商业化与增长策略</h4>
+              <p class="text-xs text-gray-500" data-i18n="badge.soon">内容更新中，敬请期待</p>
+            </article>
+          </div>
+          <article class="rounded-xl border border-white/10 bg-white/[.03] p-4">
+            <h4 class="font-bold text-white text-sm mb-2" data-i18n="prod.ch12.title">第 12 章 · 产品迭代与复盘闭环</h4>
+            <p class="text-xs text-gray-500" data-i18n="badge.soon">内容更新中，敬请期待</p>
+          </article>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    const LANG_KEY = 'vienne-lang';
+
+    const i18n = {
+      zh: {
+        'nav.home': '返回主页',
+        'toc.label': '// OUTLINE',
+        'toc.hero': '概览',
+        'toc.tech': '系统课 · 9 章',
+        'toc.product': '产品实战 · 12 章',
+        'hero.tag': '// KNOWLEDGE_BASE',
+        'hero.title': '学习笔记 · 课程大纲',
+        'hero.desc': '两条学习路径：技术系统课（已上线可阅读）与 AI 产品实战大纲（持续更新）。点击章节标题进入对应内容。',
+        'tech.title': '一、从 LLM 到 AI Agent · 系统课',
+        'tech.sub': '9 章 · 每章 16:9 幻灯 + Scroll 长文',
+        'tech.hub': '进入课程中心 →',
+        'tech.ch1.title': 'LLM 基础',
+        'tech.ch1.desc': 'Transformer、推理与采样、Pretrain / SFT / RLHF、模型选型。',
+        'tech.ch2.title': 'RAG · 外部知识',
+        'tech.ch2.desc': '先检索再生成：幻觉、时效、私有文档三类问题与 RAG 流水线。',
+        'tech.ch3.title': 'Agent Core',
+        'tech.ch3.desc': 'ReAct 循环、Tool Calling、意图路由、多轮上下文。',
+        'tech.ch4.title': 'Retrieval 工程',
+        'tech.ch4.desc': 'BM25、Dense、Hybrid、Rerank、召回评估指标。',
+        'tech.ch5.title': 'LangChain & LangGraph',
+        'tech.ch5.desc': '框架对比、RAG Chain、LangGraph ReAct、Memory / Store。',
+        'tech.ch6.title': 'MCP & A2A',
+        'tech.ch6.desc': 'Model Context Protocol、自建 MCP Server、Agent 间协作。',
+        'tech.ch7.title': 'OpenClaw & Hermes',
+        'tech.ch7.desc': 'Tool-calling 模型、OpenClaw Agent OS、Skills、自托管实验。',
+        'tech.ch8.title': 'Multi-agent & 知识图谱',
+        'tech.ch8.desc': 'Supervisor / Handoff / Critic、GraphRAG vs Vector RAG。',
+        'tech.ch9.title': 'Multimodal · CV / ASR / TTS',
+        'tech.ch9.desc': 'ViT、SAM、Stable Diffusion、Whisper、Neural TTS。',
+        'tech.eval.title': '跨章评估指南',
+        'tech.eval.desc': 'Golden Set、分章 Eval、调试决策树。',
+        'prod.title': '二、AI Agent 产品实战 · 大纲',
+        'prod.sub': '12 章 · 定位、验证、构建、交付与商业化',
+        'prod.p1': '第一部分 · 启动：找到值得做的 AI 项目',
+        'prod.p2': '第二部分 · 构建：从架构到落地',
+        'prod.p3': '第三部分 · 交付：质量、部署与增长',
+        'prod.ch1.title': '第 1 章 · 项目定位与赛道筛选',
+        'prod.ch1.learn': '机会判断、痛点强度、商业化潜力、竞品差异',
+        'prod.ch1.practice': '选定垂直场景，明确用户价值与投入优先级',
+        'prod.ch1.tools': 'Kimi、ChatGPT、百度指数、小红书/知乎调研',
+        'prod.ch2.title': '第 2 章 · 极速需求验证与伪需求排除',
+        'prod.ch2.learn': 'MVP 验证、真伪痛点识别、市场规模测算',
+        'prod.ch2.practice': 'AI 辅助访谈与问卷，输出可行性结论',
+        'prod.ch2.tools': '问卷生成、验证模板、飞书文档',
+        'prod.ch3.title': '第 3 章 · 用户画像与付费需求挖掘',
+        'prod.ch3.learn': '核心任务、需求分层、付费意愿判断',
+        'prod.ch3.practice': '用户画像、典型场景、变现需求锁定',
+        'prod.ch3.tools': '画像模板、AI 需求分析、Notion',
+        'prod.ch4.title': '第 4 章 · 商业闭环与价值定位',
+        'prod.ch5.title': '第 5 章 · AI 应用架构与 Agent 设计',
+        'prod.ch6.title': '第 6 章 · 前后端开发实战',
+        'prod.ch7.title': '第 7 章 · 大模型接入与 Prompt 工程',
+        'prod.ch8.title': '第 8 章 · 知识库与 RAG 落地',
+        'prod.ch9.title': '第 9 章 · 测试、评估与质量管控',
+        'prod.ch10.title': '第 10 章 · 部署运维与成本控制',
+        'prod.ch11.title': '第 11 章 · 商业化与增长策略',
+        'prod.ch12.title': '第 12 章 · 产品迭代与复盘闭环',
+        'label.learn': '学习内容',
+        'label.practice': '实战内容',
+        'label.tools': '效率工具',
+        'badge.live': '已上线',
+        'badge.soon': '内容更新中，敬请期待',
+        'link.slides': '幻灯',
+        'link.scroll': '长文',
+        'page.title': '学习笔记 · Vienne.AI'
+      },
+      en: {
+        'nav.home': 'Home',
+        'toc.label': '// OUTLINE',
+        'toc.hero': 'Overview',
+        'toc.tech': 'System Course · 9 Ch.',
+        'toc.product': 'Product Track · 12 Ch.',
+        'hero.tag': '// KNOWLEDGE_BASE',
+        'hero.title': 'Study Notes · Course Outline',
+        'hero.desc': 'Two tracks: the technical system course (live) and the AI product playbook outline (updating). Click a chapter to open content.',
+        'tech.title': 'I. From LLM to AI Agent · System Course',
+        'tech.sub': '9 chapters · 16:9 slides + scroll doc each',
+        'tech.hub': 'Open course hub →',
+        'tech.ch1.title': 'LLM Fundamentals',
+        'tech.ch1.desc': 'Transformer, inference & sampling, Pretrain / SFT / RLHF, model selection.',
+        'tech.ch2.title': 'RAG · External Knowledge',
+        'tech.ch2.desc': 'Retrieve first, then generate — hallucination, freshness, private docs.',
+        'tech.ch3.title': 'Agent Core',
+        'tech.ch3.desc': 'ReAct loop, tool calling, intent routing, multi-turn context.',
+        'tech.ch4.title': 'Retrieval Engineering',
+        'tech.ch4.desc': 'BM25, dense, hybrid, rerank, recall metrics.',
+        'tech.ch5.title': 'LangChain & LangGraph',
+        'tech.ch5.desc': 'Framework comparison, RAG chain, LangGraph ReAct, memory & store.',
+        'tech.ch6.title': 'MCP & A2A',
+        'tech.ch6.desc': 'Model Context Protocol, custom MCP server, agent-to-agent handoffs.',
+        'tech.ch7.title': 'OpenClaw & Hermes',
+        'tech.ch7.desc': 'Tool-calling models, OpenClaw agent OS, skills, self-host lab.',
+        'tech.ch8.title': 'Multi-agent & Knowledge Graph',
+        'tech.ch8.desc': 'Supervisor / handoff / critic, GraphRAG vs vector RAG.',
+        'tech.ch9.title': 'Multimodal · CV / ASR / TTS',
+        'tech.ch9.desc': 'ViT, SAM, Stable Diffusion, Whisper, neural TTS.',
+        'tech.eval.title': 'Cross-chapter Eval Guide',
+        'tech.eval.desc': 'Golden set, per-chapter eval, debug decision tree.',
+        'prod.title': 'II. AI Agent Product Playbook · Outline',
+        'prod.sub': '12 chapters · discovery, build, delivery & monetization',
+        'prod.p1': 'Part I · Launch: find a project worth building',
+        'prod.p2': 'Part II · Build: architecture to implementation',
+        'prod.p3': 'Part III · Deliver: quality, deploy & growth',
+        'prod.ch1.title': 'Ch.1 · Positioning & niche selection',
+        'prod.ch1.learn': 'Opportunity scan, pain intensity, monetization, differentiation',
+        'prod.ch1.practice': 'Pick a vertical, define user value & go/no-go',
+        'prod.ch1.tools': 'Kimi, ChatGPT, Baidu Index, social research',
+        'prod.ch2.title': 'Ch.2 · Rapid validation & fake-demand filter',
+        'prod.ch2.learn': 'MVP tests, real vs fake pain, market sizing',
+        'prod.ch2.practice': 'AI-assisted interviews & surveys, feasibility report',
+        'prod.ch2.tools': 'Survey generators, validation templates, Lark docs',
+        'prod.ch3.title': 'Ch.3 · Personas & paid-demand mining',
+        'prod.ch3.learn': 'Core jobs, demand tiers, willingness to pay',
+        'prod.ch3.practice': 'Personas, scenarios, monetizable needs',
+        'prod.ch3.tools': 'Persona templates, AI analysis, Notion',
+        'prod.ch4.title': 'Ch.4 · Business loop & value proposition',
+        'prod.ch5.title': 'Ch.5 · AI app architecture & agent design',
+        'prod.ch6.title': 'Ch.6 · Full-stack development in practice',
+        'prod.ch7.title': 'Ch.7 · LLM integration & prompt engineering',
+        'prod.ch8.title': 'Ch.8 · Knowledge base & RAG in production',
+        'prod.ch9.title': 'Ch.9 · Testing, eval & quality control',
+        'prod.ch10.title': 'Ch.10 · Deployment, ops & cost control',
+        'prod.ch11.title': 'Ch.11 · Monetization & growth',
+        'prod.ch12.title': 'Ch.12 · Iteration & retrospective loop',
+        'label.learn': 'Learn',
+        'label.practice': 'Practice',
+        'label.tools': 'Tools',
+        'badge.live': 'Live',
+        'badge.soon': 'Coming soon',
+        'link.slides': 'Slides',
+        'link.scroll': 'Scroll',
+        'page.title': 'Study Notes · Vienne.AI'
+      },
+      yue: {
+        'nav.home': '返回主頁',
+        'toc.label': '// OUTLINE',
+        'toc.hero': '概覽',
+        'toc.tech': '系統課 · 9 章',
+        'toc.product': '產品實戰 · 12 章',
+        'hero.tag': '// KNOWLEDGE_BASE',
+        'hero.title': '學習筆記 · 課程大綱',
+        'hero.desc': '兩條學習路徑：技術系統課（已上線可閱讀）同 AI 產品實戰大綱（持續更新）。撳章節標題進入對應內容。',
+        'tech.title': '一、從 LLM 到 AI Agent · 系統課',
+        'tech.sub': '9 章 · 每章 16:9 幻灯 + Scroll 長文',
+        'tech.hub': '進入課程中心 →',
+        'tech.ch1.title': 'LLM 基礎',
+        'tech.ch1.desc': 'Transformer、推理同採樣、Pretrain / SFT / RLHF、模型選型。',
+        'tech.ch2.title': 'RAG · 外部知識',
+        'tech.ch2.desc': '先檢索再生成：幻覺、時效、私有文檔同 RAG 流水線。',
+        'tech.ch3.title': 'Agent Core',
+        'tech.ch3.desc': 'ReAct 循環、Tool Calling、意圖路由、多輪上下文。',
+        'tech.ch4.title': 'Retrieval 工程',
+        'tech.ch4.desc': 'BM25、Dense、Hybrid、Rerank、召回評估指標。',
+        'tech.ch5.title': 'LangChain & LangGraph',
+        'tech.ch5.desc': '框架對比、RAG Chain、LangGraph ReAct、Memory / Store。',
+        'tech.ch6.title': 'MCP & A2A',
+        'tech.ch6.desc': 'Model Context Protocol、自建 MCP Server、Agent 協作。',
+        'tech.ch7.title': 'OpenClaw & Hermes',
+        'tech.ch7.desc': 'Tool-calling 模型、OpenClaw Agent OS、Skills、自託管實驗。',
+        'tech.ch8.title': 'Multi-agent & 知識圖譜',
+        'tech.ch8.desc': 'Supervisor / Handoff / Critic、GraphRAG vs Vector RAG。',
+        'tech.ch9.title': 'Multimodal · CV / ASR / TTS',
+        'tech.ch9.desc': 'ViT、SAM、Stable Diffusion、Whisper、Neural TTS。',
+        'tech.eval.title': '跨章評估指南',
+        'tech.eval.desc': 'Golden Set、分章 Eval、調試決策樹。',
+        'prod.title': '二、AI Agent 產品實戰 · 大綱',
+        'prod.sub': '12 章 · 定位、驗證、構建、交付同商業化',
+        'prod.p1': '第一部分 · 啟動：搵到值得做嘅 AI 項目',
+        'prod.p2': '第二部分 · 構建：從架構到落地',
+        'prod.p3': '第三部分 · 交付：質量、部署同增長',
+        'prod.ch1.title': '第 1 章 · 項目定位同賽道篩選',
+        'prod.ch1.learn': '機會判斷、痛點強度、商業化潛力、競品差異',
+        'prod.ch1.practice': '揀垂直場景，明確用戶價值同投入優先級',
+        'prod.ch1.tools': 'Kimi、ChatGPT、百度指數、小紅書/知乎調研',
+        'prod.ch2.title': '第 2 章 · 極速需求驗證同偽需求排除',
+        'prod.ch2.learn': 'MVP 驗證、真偽痛點識別、市場規模測算',
+        'prod.ch2.practice': 'AI 輔助訪談同問卷，輸出可行性結論',
+        'prod.ch2.tools': '問卷生成、驗證模板、飛書文檔',
+        'prod.ch3.title': '第 3 章 · 用戶畫像同付費需求挖掘',
+        'prod.ch3.learn': '核心任務、需求分層、付費意願判斷',
+        'prod.ch3.practice': '用戶畫像、典型場景、變現需求鎖定',
+        'prod.ch3.tools': '畫像模板、AI 需求分析、Notion',
+        'prod.ch4.title': '第 4 章 · 商業閉環同價值定位',
+        'prod.ch5.title': '第 5 章 · AI 應用架構同 Agent 設計',
+        'prod.ch6.title': '第 6 章 · 前後端開發實戰',
+        'prod.ch7.title': '第 7 章 · 大模型接入同 Prompt 工程',
+        'prod.ch8.title': '第 8 章 · 知識庫同 RAG 落地',
+        'prod.ch9.title': '第 9 章 · 測試、評估同質量管控',
+        'prod.ch10.title': '第 10 章 · 部署運維同成本控制',
+        'prod.ch11.title': '第 11 章 · 商業化同增長策略',
+        'prod.ch12.title': '第 12 章 · 產品迭代同復盤閉環',
+        'label.learn': '學習內容',
+        'label.practice': '實戰內容',
+        'label.tools': '效率工具',
+        'badge.live': '已上線',
+        'badge.soon': '內容更新中，敬請期待',
+        'link.slides': '幻灯',
+        'link.scroll': '長文',
+        'page.title': '學習筆記 · Vienne.AI'
+      }
+    };
+
+    function applyLang(lang) {
+      const dict = i18n[lang] || i18n.zh;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.getAttribute('data-i18n');
+        if (dict[k]) el.textContent = dict[k];
+      });
+      document.title = dict['page.title'] || 'Vienne.AI';
+      document.documentElement.lang = lang === 'en' ? 'en' : (lang === 'yue' ? 'zh-HK' : 'zh-CN');
+
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        const active = btn.dataset.lang === lang;
+        btn.classList.toggle('bg-cyan-500/20', active);
+        btn.classList.toggle('text-cyan-300', active);
+        btn.classList.toggle('text-gray-400', !active);
+      });
+    }
+
+    document.getElementById('langSwitch').addEventListener('click', e => {
+      const btn = e.target.closest('.lang-btn');
+      if (!btn) return;
+      const lang = btn.dataset.lang;
+      localStorage.setItem(LANG_KEY, lang);
+      applyLang(lang);
+    });
+
+    applyLang(localStorage.getItem(LANG_KEY) || 'zh');
+  </script>
 </body>
 </html>
