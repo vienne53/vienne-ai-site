@@ -66,7 +66,8 @@ foreach ($pat in $patterns) {
 $hub = Join-Path $Dest "present-hub.html"
 if (Test-Path -LiteralPath $hub) {
     $html = Get-Content -LiteralPath $hub -Raw -Encoding UTF8
-    if ($html -notmatch '返回 Vienne.AI') {
+    # HTML entities avoid PowerShell/console encoding corrupting Chinese on Windows
+    if ($html -notmatch 'href="../../notes.html"') {
         if ($html -notmatch '\.back \{') {
             $html = $html -replace '(</style>)', @'
   .back { display:inline-block; margin-bottom:20px; font-size:.9rem; color:#0369a1; text-decoration:none; }
@@ -76,8 +77,8 @@ $1
         }
         $html = $html -replace '(<div class="wrap">)', @'
 $1
-  <a class="back" href="../../notes.html">&larr; 返回 Vienne.AI 学习笔记</a>
-  <a class="back" href="../../index.html#learning" style="margin-left:16px">主页</a>
+  <a class="back" href="../../notes.html">&larr; &#36820;&#22238; Vienne.AI &#23398;&#20064;&#31508;&#35760;</a>
+  <a class="back" href="../../index.html#learning" style="margin-left:16px">&#20027;&#39029;</a>
 '@
         [System.IO.File]::WriteAllText($hub, $html, [System.Text.UTF8Encoding]::new($false))
         Write-Host "Patched present-hub.html back links"
