@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multimodal: CV, ASR, TTS</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root { --bg:#fff; --text:#1e293b; --muted:#64748b; --accent:#0369a1; --accent2:#0c4a6e; --hi:#b45309; --border:#e2e8f0; --chip:#f0f9ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:#f8fafc; color:var(--text); line-height:1.6; }
+  .topbar { position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .topbar h1 { font-size:1rem; color:var(--accent2); }
+  .topbar nav { display:flex; gap:8px; flex-wrap:wrap; }
+  .topbar a { font-size:.72rem; color:var(--accent); text-decoration:none; padding:4px 10px; border-radius:999px; background:var(--chip); border:1px solid #bae6fd; }
+  .page { max-width:1100px; margin:0 auto 32px; background:var(--bg); border:1px solid var(--border); border-radius:12px; box-shadow:0 4px 24px rgba(15,23,42,.06); padding:48px 56px; }
+  .page-title { font-size:2rem; color:var(--accent2); margin-bottom:8px; }
+  .page-sub { color:var(--muted); font-size:1.1rem; margin-bottom:28px; }
+  .tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); background:var(--chip); padding:4px 10px; border-radius:999px; border:1px solid #bae6fd; margin-bottom:16px; }
+  h2 { font-size:1.35rem; color:var(--accent); margin:28px 0 12px; border-bottom:2px solid #e0f2fe; padding-bottom:6px; }
+  h3 { font-size:1.05rem; color:#0f766e; margin:18px 0 8px; }
+  p,li { font-size:1rem; margin:8px 0; }
+  ul,ol { margin-left:1.4em; }
+  strong { color:var(--hi); }
+  .callout { background:var(--chip); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:20px 0; }
+  .roadmap { background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:16px 0; font-size:.92rem; }
+  .roadmap ol { margin:8px 0 0 1.2em; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:16px 0; }
+  .card { border:1px solid var(--border); border-radius:10px; padding:16px; background:#f8fafc; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:.92rem; }
+  th,td { border:1px solid var(--border); padding:8px 10px; text-align:left; }
+  th { background:#e0f2fe; color:var(--accent2); }
+  .mono { font-family:Consolas,monospace; font-size:.88rem; background:#f1f5f9; padding:2px 8px; border-radius:4px; }
+  pre { padding:14px; background:#f8fafc; border:1px solid var(--border); border-radius:8px; font-size:.85rem; overflow-x:auto; }
+  .react { padding:10px 14px; border-radius:8px; margin:8px 0; font-size:.92rem; }
+  .react-t { background:#f0f9ff; border:1px solid #bae6fd; }
+  .react-a { background:#fef3c7; border:1px solid #fcd34d; }
+  .react-o { background:#ecfdf5; border:1px solid #a7f3d0; }
+  .fig { margin:20px 0; text-align:center; }
+  .fig svg { max-width:100%; height:auto; border:1px solid var(--border); border-radius:8px; }
+  .fig-cap { font-size:.85rem; color:var(--muted); margin-top:8px; }
+  .steps { counter-reset:step; list-style:none; margin-left:0; padding:0; }
+  .steps li { counter-increment:step; padding:12px 12px 12px 48px; position:relative; border-left:3px solid #bae6fd; margin:8px 0; background:#f8fafc; border-radius:0 8px 8px 0; }
+  .steps li::before { content:counter(step); position:absolute; left:12px; top:12px; width:24px; height:24px; background:var(--accent); color:#fff; border-radius:50%; font-size:.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  pre code { font-family:Consolas,monospace; }
+  .flow-v { display:flex; flex-direction:column; align-items:center; gap:0; margin:20px 0; }
+  .flow-box { border:2px solid var(--border); border-radius:8px; padding:12px 20px; min-width:280px; text-align:center; font-size:.9rem; background:#fff; }
+  .flow-arrow { color:var(--muted); font-size:1.2rem; padding:4px 0; }
+  .eq { margin:14px 0; overflow-x:auto; }
+
+</style></head><body>
+<div class="topbar"><h1>⑨ Multimodal</h1><nav><a href="present-hub.html">Hub</a><a href="#intro">Intro</a><a href="#overview">Overview</a><a href="#cv-vit">ViT</a><a href="#cv-sam">SAM/SD</a><a href="#asr">ASR</a><a href="#tts">TTS</a><a href="#vlm">VLM</a><a href="#multimodal-eval">Eval</a><a href="#multimodal-practice">Lab</a><a href="course-full-multiagent.html">&larr; Multi</a><a href="course-full-eval.html">Eval guide</a></nav></div>
+
+<div class="roadmap"><strong>Course path (9 chapters)</strong>
+<ol>
+<li><a href="course-full-llm.html">LLM</a></li>
+<li><a href="course-full-rag.html">RAG</a></li>
+<li><a href="course-full-agent.html">Agent Core</a></li>
+<li><a href="course-full-retrieval.html">Retrieval Engineering</a></li>
+<li><a href="course-full-framework.html">LangChain &amp; LangGraph</a></li>
+<li><a href="course-full-protocols.html">MCP &amp; A2A</a></li>
+<li><a href="course-full-openclaw.html">OpenClaw &amp; Hermes</a></li>
+<li><a href="course-full-multiagent.html">Multi-agent &amp; KG</a></li>
+<li><a href="course-full-multimodal.html">Multimodal</a></li>
+</ol></div>
+<section class="page" id="intro"><span class="tag">Chapter 9</span>
+<h1 class="page-title">Multimodal: CV, ASR, TTS</h1>
+<p class="page-sub">Same Transformer idea &mdash; predict next unit over patches, frames, or latents</p>
+<div class="callout">Pretraining &rarr; knowledge &middot; RAG &rarr; retrieval &middot; Agents &rarr; action &middot; <strong>Multimodal &rarr; perception + speech</strong></div>
+</section>
+
+<section class="page" id="overview"><span class="tag">Overview</span>
+<h1 class="page-title">Modality comparison</h1>
+<table>
+<tr><th>Modality</th><th>Input unit</th><th>Predicts</th><th>Example</th><th>Key metric</th></tr>
+<tr><td>Text (LLM)</td><td>Token</td><td>Next text token</td><td>GPT-4, Llama</td><td>Perplexity, MMLU</td></tr>
+<tr><td>Vision (LVM)</td><td>Image patch</td><td>Class / mask token</td><td>ViT, SAM</td><td>Top-1 acc, IoU</td></tr>
+<tr><td>Image gen</td><td>Latent noise</td><td>Less noisy latent</td><td>Stable Diffusion</td><td>FID, CLIP score</td></tr>
+<tr><td>ASR</td><td>Audio frames</td><td>Text token</td><td>Whisper</td><td>WER</td></tr>
+<tr><td>TTS</td><td>Text token</td><td>Mel / waveform</td><td>ChatTTS, ElevenLabs</td><td>MOS, SIM</td></tr>
+<tr><td>Multimodal LLM</td><td>Fused tokens</td><td>Text (+ optional gen)</td><td>GPT-4o, LLaVA</td><td>MMMU, VQA acc</td></tr>
+</table>
+</section>
+
+<section class="page" id="cv-vit"><span class="tag">Vision</span>
+<h1 class="page-title">ViT: Vision Transformer</h1>
+<div class="flow-v">
+<div class="flow-box">Image 224&times;224</div><div class="flow-arrow">&darr;</div>
+<div class="flow-box">Patchify 16&times;16 &rarr; 196 patch tokens</div><div class="flow-arrow">&darr;</div>
+<div class="flow-box">Transformer encoder (same self-attention as NLP)</div><div class="flow-arrow">&darr;</div>
+<div class="flow-box">[CLS] token &rarr; class label</div>
+</div>
+
+<h2>Inference code (HuggingFace)</h2>
+<pre><code>from transformers import AutoImageProcessor, AutoModelForImageClassification
+from PIL import Image
+
+processor = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224")
+model = AutoModelForImageClassification.from_pretrained("google/vit-base-patch16-224")
+
+image = Image.open("cat.jpg")
+inputs = processor(images=image, return_tensors="pt")
+logits = model(**inputs).logits
+label = model.config.id2label[logits.argmax(-1).item()]
+print(label)  # e.g. "Egyptian cat"</code></pre>
+<p><strong>Eval:</strong> ImageNet top-1 / top-5 accuracy. Fine-tune on your dataset if domain shift (medical, industrial).</p>
+</section>
+
+<section class="page" id="cv-sam"><span class="tag">Vision</span>
+<h1 class="page-title">SAM &amp; Stable Diffusion</h1>
+
+<h2>SAM: promptable segmentation</h2>
+<pre><code># pip install segment-anything
+from segment_anything import sam_model_registry, SamPredictor
+import numpy as np
+
+sam = sam_model_registry["vit_h"](checkpoint="sam_vit_h.pth")
+predictor = SamPredictor(sam)
+predictor.set_image(image_rgb)
+
+# Click prompt (x, y) on object
+masks, scores, _ = predictor.predict(
+    point_coords=np.array([[520, 375]]),
+    point_labels=np.array([1]),
+    multimask_output=True,
+)
+best_mask = masks[scores.argmax()]  # pixel-level segmentation</code></pre>
+<p><strong>Eval:</strong> IoU (Intersection over Union) on held-out objects; zero-shot on new categories.</p>
+
+<h2>Stable Diffusion: text-to-image</h2>
+<pre><code>from diffusers import StableDiffusionPipeline
+import torch
+
+pipe = StableDiffusionPipeline.from_pretrained(
+    "runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16)
+pipe = pipe.to("cuda")
+
+image = pipe(
+    prompt="a cat sitting on the moon, watercolor",
+    num_inference_steps=30,
+    guidance_scale=7.5,
+).images[0]</code></pre>
+<p><strong>Eval:</strong> FID (distribution vs real images), CLIP score (text-image alignment), human preference A/B.</p>
+</section>
+
+<section class="page" id="asr"><span class="tag">ASR</span>
+<h1 class="page-title">Whisper: speech to text</h1>
+
+<pre><code>import whisper
+
+model = whisper.load_model("base")  # tiny/base/small/medium/large
+result = model.transcribe("meeting.wav", language="en")
+print(result["text"])
+
+# With word timestamps
+for seg in result["segments"]:
+    print(seg["start"], seg["end"], seg["text"])</code></pre>
+
+<h2>WER calculation</h2>
+<p>$$\text{WER} = \frac{S + D + I}{N}$$</p>
+<p>S = substitutions, D = deletions, I = insertions, N = words in reference transcript.</p>
+<pre><code>import jiwer
+
+reference = "the cat sat on the mat"
+hypothesis = "the cat sit on mat"
+wer = jiwer.wer(reference, hypothesis)
+print(f"WER = {wer:.2%}")  # lower is better; &lt;5% = strong ASR</code></pre>
+
+<h2>Preprocessing pipeline</h2>
+<ol>
+<li>Resample to 16 kHz mono</li>
+<li>Compute 80-bin log-mel spectrogram</li>
+<li>Encoder (bidirectional over time) &rarr; decoder (autoregressive text tokens)</li>
+</ol>
+</section>
+
+<section class="page" id="tts"><span class="tag">TTS</span>
+<h1 class="page-title">Text-to-Speech pipeline</h1>
+
+<pre><code># OpenAI TTS API (simplest production path)
+from openai import OpenAI
+client = OpenAI()
+
+response = client.audio.speech.create(
+    model="tts-1-hd",
+    voice="nova",
+    input="Hello, welcome to the multimodal course.",
+)
+response.stream_to_file("welcome.mp3")
+
+# Open-source: ChatTTS / Coqui TTS / edge-tts for local dev</code></pre>
+
+<h2>Neural TTS stages</h2>
+<table>
+<tr><th>Stage</th><th>Output</th></tr>
+<tr><td>Text encoder</td><td>Phoneme / token embeddings</td></tr>
+<tr><td>Acoustic model</td><td>Mel spectrogram frames</td></tr>
+<tr><td>Vocoder (HiFi-GAN)</td><td>Raw waveform</td></tr>
+</table>
+<p><strong>Eval:</strong> MOS 1&ndash;5 (human listeners), speaker similarity (SIM), character error rate for intelligibility tests.</p>
+</section>
+
+<section class="page" id="vlm"><span class="tag">VLM</span>
+<h1 class="page-title">Vision-Language Models (GPT-4o, LLaVA)</h1>
+<p>Fuse image encoder + LLM via projection layer. User sends image + text; model predicts text tokens.</p>
+<pre><code>from openai import OpenAI
+import base64
+
+client = OpenAI()
+with open("chart.png", "rb") as f:
+    b64 = base64.standard_b64encode(f.read()).decode()
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "What trend does this chart show?"},
+            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}},
+        ],
+    }],
+)
+print(response.choices[0].message.content)</code></pre>
+<div class="callout"><strong>Agent + multimodal:</strong> expose <span class="mono">describe_image</span> and <span class="mono">transcribe_audio</span> as tools in your ReAct loop.</div>
+</section>
+
+<section class="page" id="multimodal-eval"><span class="tag">Evaluation</span>
+<h1 class="page-title">Multimodal evaluation</h1>
+<table>
+<tr><th>Task</th><th>Metric</th><th>Good target</th><th>Tool</th></tr>
+<tr><td>Classification</td><td>Top-1 accuracy</td><td>&gt;90% in-domain</td><td>sklearn, torchmetrics</td></tr>
+<tr><td>Segmentation</td><td>IoU / mIoU</td><td>&gt;0.7</td><td>pycocotools</td></tr>
+<tr><td>Image gen</td><td>FID, CLIP score</td><td>Lower FID</td><td>clean-fid</td></tr>
+<tr><td>ASR</td><td>WER</td><td>&lt;5% clean speech</td><td>jiwer</td></tr>
+<tr><td>TTS</td><td>MOS</td><td>&gt;4.0</td><td>Human study</td></tr>
+<tr><td>VLM</td><td>VQA accuracy, MMMU</td><td>Benchmark-specific</td><td>lmms-eval</td></tr>
+</table>
+<p>Cross-course eval matrix: <a href="course-full-eval.html">Evaluation Guide</a>.</p>
+</section>
+
+<section class="page" id="multimodal-practice"><span class="tag">Lab</span>
+<h1 class="page-title">Hands-on lab: multimodal mini pipeline</h1>
+<pre><code>pip install openai-whisper jiwer transformers diffusers pillow openai</code></pre>
+<ol class="steps">
+<li><strong>CV:</strong> Run ViT on 10 images; record top-1 labels; manually score 10/10 plausibility.</li>
+<li><strong>ASR:</strong> Record 5 short clips (or use LibriSpeech samples); transcribe with Whisper; compute WER vs reference.</li>
+<li><strong>TTS:</strong> Generate 3 sentences; rate MOS 1&ndash;5 yourself (naturalness + intelligibility).</li>
+<li><strong>VLM:</strong> Send 3 images + questions to GPT-4o or LLaVA; check answer faithfulness to image content.</li>
+<li><strong>Agent hook:</strong> Wrap Whisper + ViT as tools in Agent Core lab; one query: &quot;Describe this image and read aloud.&quot;</li>
+</ol>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body></html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluation Guide</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root { --bg:#fff; --text:#1e293b; --muted:#64748b; --accent:#0369a1; --accent2:#0c4a6e; --hi:#b45309; --border:#e2e8f0; --chip:#f0f9ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:#f8fafc; color:var(--text); line-height:1.6; }
+  .topbar { position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .topbar h1 { font-size:1rem; color:var(--accent2); }
+  .topbar nav { display:flex; gap:8px; flex-wrap:wrap; }
+  .topbar a { font-size:.72rem; color:var(--accent); text-decoration:none; padding:4px 10px; border-radius:999px; background:var(--chip); border:1px solid #bae6fd; }
+  .page { max-width:1100px; margin:0 auto 32px; background:var(--bg); border:1px solid var(--border); border-radius:12px; box-shadow:0 4px 24px rgba(15,23,42,.06); padding:48px 56px; }
+  .page-title { font-size:2rem; color:var(--accent2); margin-bottom:8px; }
+  .page-sub { color:var(--muted); font-size:1.1rem; margin-bottom:28px; }
+  .tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); background:var(--chip); padding:4px 10px; border-radius:999px; border:1px solid #bae6fd; margin-bottom:16px; }
+  h2 { font-size:1.35rem; color:var(--accent); margin:28px 0 12px; border-bottom:2px solid #e0f2fe; padding-bottom:6px; }
+  h3 { font-size:1.05rem; color:#0f766e; margin:18px 0 8px; }
+  p,li { font-size:1rem; margin:8px 0; }
+  ul,ol { margin-left:1.4em; }
+  strong { color:var(--hi); }
+  .callout { background:var(--chip); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:20px 0; }
+  .roadmap { background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:16px 0; font-size:.92rem; }
+  .roadmap ol { margin:8px 0 0 1.2em; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:16px 0; }
+  .card { border:1px solid var(--border); border-radius:10px; padding:16px; background:#f8fafc; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:.92rem; }
+  th,td { border:1px solid var(--border); padding:8px 10px; text-align:left; }
+  th { background:#e0f2fe; color:var(--accent2); }
+  .mono { font-family:Consolas,monospace; font-size:.88rem; background:#f1f5f9; padding:2px 8px; border-radius:4px; }
+  pre { padding:14px; background:#f8fafc; border:1px solid var(--border); border-radius:8px; font-size:.85rem; overflow-x:auto; }
+  .react { padding:10px 14px; border-radius:8px; margin:8px 0; font-size:.92rem; }
+  .react-t { background:#f0f9ff; border:1px solid #bae6fd; }
+  .react-a { background:#fef3c7; border:1px solid #fcd34d; }
+  .react-o { background:#ecfdf5; border:1px solid #a7f3d0; }
+  .fig { margin:20px 0; text-align:center; }
+  .fig svg { max-width:100%; height:auto; border:1px solid var(--border); border-radius:8px; }
+  .fig-cap { font-size:.85rem; color:var(--muted); margin-top:8px; }
+  .steps { counter-reset:step; list-style:none; margin-left:0; padding:0; }
+  .steps li { counter-increment:step; padding:12px 12px 12px 48px; position:relative; border-left:3px solid #bae6fd; margin:8px 0; background:#f8fafc; border-radius:0 8px 8px 0; }
+  .steps li::before { content:counter(step); position:absolute; left:12px; top:12px; width:24px; height:24px; background:var(--accent); color:#fff; border-radius:50%; font-size:.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  pre code { font-family:Consolas,monospace; }
+  .flow-v { display:flex; flex-direction:column; align-items:center; gap:0; margin:20px 0; }
+  .flow-box { border:2px solid var(--border); border-radius:8px; padding:12px 20px; min-width:280px; text-align:center; font-size:.9rem; background:#fff; }
+  .flow-arrow { color:var(--muted); font-size:1.2rem; padding:4px 0; }
+  .eq { margin:14px 0; overflow-x:auto; }
+
+</style></head><body>
+<div class="topbar"><h1>Evaluation Guide</h1><nav><a href="present-hub.html">Hub</a><a href="#matrix">Matrix</a><a href="#rag-eval">RAG</a><a href="#agent-eval">Agent</a><a href="#retrieval-eval">Retrieval</a><a href="#framework-eval">Framework</a><a href="#protocols-eval">MCP</a><a href="#openclaw-eval">OpenClaw</a><a href="#multiagent-eval">Multi</a><a href="#multimodal-eval">Multimodal</a><a href="#workflow">Workflow</a></nav></div>
+
+<div class="roadmap"><strong>Course path (9 chapters)</strong>
+<ol>
+<li><a href="course-full-llm.html">LLM</a></li>
+<li><a href="course-full-rag.html">RAG</a></li>
+<li><a href="course-full-agent.html">Agent Core</a></li>
+<li><a href="course-full-retrieval.html">Retrieval Engineering</a></li>
+<li><a href="course-full-framework.html">LangChain &amp; LangGraph</a></li>
+<li><a href="course-full-protocols.html">MCP &amp; A2A</a></li>
+<li><a href="course-full-openclaw.html">OpenClaw &amp; Hermes</a></li>
+<li><a href="course-full-multiagent.html">Multi-agent &amp; KG</a></li>
+<li><a href="course-full-multimodal.html">Multimodal</a></li>
+</ol></div>
+<section class="page" id="matrix"><span class="tag">Cross-chapter</span>
+<h1 class="page-title">Evaluation Guide: all 9 chapters</h1>
+<p class="page-sub">What to measure, when, and where to find depth</p>
+
+<table>
+<tr><th>Chapter</th><th>Primary metrics</th><th>Golden set?</th><th>Deep dive</th></tr>
+<tr><td>① LLM</td><td>Perplexity, MMLU, human preference</td><td>Benchmark suites</td><td><a href="course-full-llm.html#ch4-eval">LLM eval</a></td></tr>
+<tr><td>② RAG</td><td>Faithfulness, citation hit rate</td><td>Q + gold doc IDs</td><td><a href="#rag-eval">Below</a> &middot; <a href="course-full-rag.html">RAG</a></td></tr>
+<tr><td>③ Agent Core</td><td>Tool accuracy, task success, steps</td><td>20 labeled queries</td><td><a href="#agent-eval">Below</a> &middot; <a href="course-full-agent.html#agent-eval">Agent</a></td></tr>
+<tr><td>④ Retrieval</td><td>Recall@k, MRR, context recall</td><td>30+ Q + doc IDs</td><td><a href="#retrieval-eval">Below</a> &middot; <a href="course-full-retrieval.html#eval">Retrieval</a></td></tr>
+<tr><td>⑤ LangChain &amp; LangGraph</td><td>Resume rate, store recall</td><td>Session scripts</td><td><a href="#framework-eval">Below</a> &middot; <a href="course-full-framework.html#lab">Lab</a></td></tr>
+<tr><td>⑥ MCP &amp; A2A</td><td>Tool latency, handoff success</td><td>Integration tests</td><td><a href="#protocols-eval">Below</a> &middot; <a href="course-full-protocols.html#lab">Lab</a></td></tr>
+<tr><td>⑦ OpenClaw &amp; Hermes</td><td>Tool JSON validity</td><td>5 prompt suite</td><td><a href="#openclaw-eval">Below</a> &middot; <a href="course-full-openclaw.html#lab">Lab</a></td></tr>
+<tr><td>⑧ Multi-agent</td><td>Handoff accuracy, critic pass, KG hop recall</td><td>Multi-hop Q set</td><td><a href="#multiagent-eval">Below</a> &middot; <a href="course-full-multiagent.html#eval">Multi eval</a></td></tr>
+<tr><td>⑨ Multimodal</td><td>WER, IoU, FID, MOS, VQA</td><td>Modality-specific</td><td><a href="#multimodal-eval">Below</a> &middot; <a href="course-full-multimodal.html#multimodal-eval">Multimodal</a></td></tr>
+</table>
+</section>
+
+<section class="page" id="rag-eval"><span class="tag">Chapter 2</span>
+<h1 class="page-title">RAG evaluation</h1>
+<ul>
+<li><strong>Faithfulness</strong> &mdash; answer supported by retrieved chunks (RAGAS)</li>
+<li><strong>Citation hit rate</strong> &mdash; cited chunk IDs match gold doc IDs</li>
+<li><strong>Golden set</strong> &mdash; question + expected doc IDs + answer snippet</li>
+</ul>
+<p>Component eval: measure retrieval Recall@k before end-to-end faithfulness.</p>
+</section>
+
+<section class="page" id="agent-eval"><span class="tag">Chapter 3</span>
+<h1 class="page-title">Agent evaluation</h1>
+<ul>
+<li><strong>Tool accuracy</strong> &mdash; correct tool + valid JSON args</li>
+<li><strong>Task success</strong> &mdash; final state matches expected outcome</li>
+<li><strong>Steps to success</strong> &mdash; penalize unnecessary loops</li>
+<li><strong>Golden set</strong> &mdash; 20 queries with expected tool sequence</li>
+</ul>
+</section>
+
+<section class="page" id="retrieval-eval"><span class="tag">Chapter 4</span>
+<h1 class="page-title">Retrieval evaluation</h1>
+<ul>
+<li><strong>Recall@k / MRR</strong> &mdash; gold doc in top-k?</li>
+<li><strong>Context recall</strong> &mdash; gold answer inferable from retrieved text</li>
+<li><strong>Ablation table</strong> &mdash; dense vs BM25 vs hybrid vs +rerank</li>
+</ul>
+</section>
+
+<section class="page" id="framework-eval"><span class="tag">Chapter 5</span>
+<h1 class="page-title">LangGraph / memory evaluation</h1>
+<ul>
+<li><strong>Resume rate</strong> &mdash; same thread_id continues without re-asking facts</li>
+<li><strong>Store recall</strong> &mdash; new thread_id still loads user preferences</li>
+<li><strong>Interrupt compliance</strong> &mdash; dangerous tools pause until approved</li>
+</ul>
+</section>
+
+<section class="page" id="protocols-eval"><span class="tag">Chapter 6</span>
+<h1 class="page-title">MCP &amp; A2A evaluation</h1>
+<ul>
+<li><strong>MCP tool latency</strong> &mdash; p95 call time per tool</li>
+<li><strong>Schema adherence</strong> &mdash; args match inputSchema</li>
+<li><strong>A2A handoff success</strong> &mdash; Task completes with valid Artifact</li>
+</ul>
+</section>
+
+<section class="page" id="openclaw-eval"><span class="tag">Chapter 7</span>
+<h1 class="page-title">OpenClaw &amp; Hermes evaluation</h1>
+<ul>
+<li><strong>Tool JSON validity rate</strong> &mdash; Hermes vs base model on 5 prompts</li>
+<li><strong>Skill trigger accuracy</strong> &mdash; right skill for user intent</li>
+<li><strong>End-to-end latency</strong> &mdash; message to Telegram reply</li>
+</ul>
+</section>
+
+<section class="page" id="multiagent-eval"><span class="tag">Chapter 8</span>
+<h1 class="page-title">Multi-agent &amp; KG evaluation</h1>
+<ul>
+<li><strong>Handoff accuracy</strong> &mdash; supervisor routed to correct worker</li>
+<li><strong>Critic pass rate</strong> &mdash; reviewer accepted output without rewrite</li>
+<li><strong>KG hop recall</strong> &mdash; multi-hop question answered via Cypher path</li>
+<li><strong>Token cost</strong> &mdash; multi-agent vs single agent on same task</li>
+</ul>
+</section>
+
+<section class="page" id="multimodal-eval"><span class="tag">Chapter 9</span>
+<h1 class="page-title">Multimodal evaluation</h1>
+<ul>
+<li><strong>WER</strong> (ASR) &middot; <strong>IoU</strong> (segmentation) &middot; <strong>FID</strong> (generation)</li>
+<li><strong>MOS</strong> (TTS quality) &middot; <strong>VQA accuracy</strong> (vision-language)</li>
+</ul>
+</section>
+
+<section class="page" id="workflow"><span class="tag">Workflow</span>
+<h1 class="page-title">Recommended eval workflow</h1>
+<ol class="steps">
+<li><strong>Define task</strong> &mdash; one sentence user goal per test case.</li>
+<li><strong>Build golden set</strong> &mdash; 20&ndash;50 cases with expected outcome (doc ID, tool, answer snippet).</li>
+<li><strong>Component eval first</strong> &mdash; retrieval before end-to-end RAG; tools before full agent.</li>
+<li><strong>Automate</strong> &mdash; RAGAS, jiwer, custom scripts in CI on every index/model change.</li>
+<li><strong>Human spot-check</strong> &mdash; 10% sample weekly; focus on failures.</li>
+<li><strong>Regression gate</strong> &mdash; block deploy if Recall@5 or task success drops &gt;2%.</li>
+</ol>
+
+<h2>Decision tree: where is the bug?</h2>
+<table>
+<tr><th>Symptom</th><th>Likely layer</th><th>Fix</th></tr>
+<tr><td>Wrong facts, no source</td><td>Retrieval miss</td><td>Hybrid + rerank (<a href="course-full-retrieval.html">④</a>)</td></tr>
+<tr><td>Right docs, wrong answer</td><td>Generation</td><td>Prompt, smaller chunks, cite-only mode</td></tr>
+<tr><td>Wrong tool called</td><td>Agent routing</td><td>Tool descriptions, intent router (<a href="course-full-agent.html">③</a>)</td></tr>
+<tr><td>Forgets prior turn</td><td>Memory</td><td>Checkpoint / Store (<a href="course-full-framework.html">⑤</a>)</td></tr>
+<tr><td>Multi-hop relation miss</td><td>Graph</td><td>KG + Cypher tool (<a href="course-full-multiagent.html">⑧</a>)</td></tr>
+<tr><td>Bad transcription</td><td>ASR</td><td>Larger Whisper, domain fine-tune (<a href="course-full-multimodal.html">⑨</a>)</td></tr>
+</table>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body></html>

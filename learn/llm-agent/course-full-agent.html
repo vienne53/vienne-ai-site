@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Core</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root { --bg:#fff; --text:#1e293b; --muted:#64748b; --accent:#0369a1; --accent2:#0c4a6e; --hi:#b45309; --border:#e2e8f0; --chip:#f0f9ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:#f8fafc; color:var(--text); line-height:1.6; }
+  .topbar { position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .topbar h1 { font-size:1rem; color:var(--accent2); }
+  .topbar nav { display:flex; gap:8px; flex-wrap:wrap; }
+  .topbar a { font-size:.72rem; color:var(--accent); text-decoration:none; padding:4px 10px; border-radius:999px; background:var(--chip); border:1px solid #bae6fd; }
+  .page { max-width:1100px; margin:0 auto 32px; background:var(--bg); border:1px solid var(--border); border-radius:12px; box-shadow:0 4px 24px rgba(15,23,42,.06); padding:48px 56px; }
+  .page-title { font-size:2rem; color:var(--accent2); margin-bottom:8px; }
+  .page-sub { color:var(--muted); font-size:1.1rem; margin-bottom:28px; }
+  .tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); background:var(--chip); padding:4px 10px; border-radius:999px; border:1px solid #bae6fd; margin-bottom:16px; }
+  h2 { font-size:1.35rem; color:var(--accent); margin:28px 0 12px; border-bottom:2px solid #e0f2fe; padding-bottom:6px; }
+  h3 { font-size:1.05rem; color:#0f766e; margin:18px 0 8px; }
+  p,li { font-size:1rem; margin:8px 0; }
+  ul,ol { margin-left:1.4em; }
+  strong { color:var(--hi); }
+  .callout { background:var(--chip); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:20px 0; }
+  .roadmap { background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:16px 0; font-size:.92rem; }
+  .roadmap ol { margin:8px 0 0 1.2em; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:16px 0; }
+  .card { border:1px solid var(--border); border-radius:10px; padding:16px; background:#f8fafc; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:.92rem; }
+  th,td { border:1px solid var(--border); padding:8px 10px; text-align:left; }
+  th { background:#e0f2fe; color:var(--accent2); }
+  .mono { font-family:Consolas,monospace; font-size:.88rem; background:#f1f5f9; padding:2px 8px; border-radius:4px; }
+  pre { padding:14px; background:#f8fafc; border:1px solid var(--border); border-radius:8px; font-size:.85rem; overflow-x:auto; }
+  .react { padding:10px 14px; border-radius:8px; margin:8px 0; font-size:.92rem; }
+  .react-t { background:#f0f9ff; border:1px solid #bae6fd; }
+  .react-a { background:#fef3c7; border:1px solid #fcd34d; }
+  .react-o { background:#ecfdf5; border:1px solid #a7f3d0; }
+  .fig { margin:20px 0; text-align:center; }
+  .fig svg { max-width:100%; height:auto; border:1px solid var(--border); border-radius:8px; }
+  .fig-cap { font-size:.85rem; color:var(--muted); margin-top:8px; }
+  .steps { counter-reset:step; list-style:none; margin-left:0; padding:0; }
+  .steps li { counter-increment:step; padding:12px 12px 12px 48px; position:relative; border-left:3px solid #bae6fd; margin:8px 0; background:#f8fafc; border-radius:0 8px 8px 0; }
+  .steps li::before { content:counter(step); position:absolute; left:12px; top:12px; width:24px; height:24px; background:var(--accent); color:#fff; border-radius:50%; font-size:.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  pre code { font-family:Consolas,monospace; }
+  .flow-v { display:flex; flex-direction:column; align-items:center; gap:0; margin:20px 0; }
+  .flow-box { border:2px solid var(--border); border-radius:8px; padding:12px 20px; min-width:280px; text-align:center; font-size:.9rem; background:#fff; }
+  .flow-arrow { color:var(--muted); font-size:1.2rem; padding:4px 0; }
+  .eq { margin:14px 0; overflow-x:auto; }
+
+</style></head><body>
+<div class="topbar"><h1>③ Agent Core</h1><nav><a href="present-hub.html">Hub</a><a href="#intro">Intro</a><a href="#why">Why</a><a href="#react">ReAct</a><a href="#react-example">Example</a><a href="#tools">Tools</a><a href="#intent">Intent</a><a href="#context">Context</a><a href="#agent-practice">Lab</a><a href="#agent-eval">Eval</a><a href="course-full-rag.html">&larr; RAG</a><a href="course-full-retrieval.html">Retrieval &rarr;</a></nav></div>
+
+<div class="roadmap"><strong>Course path (9 chapters)</strong>
+<ol>
+<li><a href="course-full-llm.html">LLM</a></li>
+<li><a href="course-full-rag.html">RAG</a></li>
+<li><a href="course-full-agent.html">Agent Core</a></li>
+<li><a href="course-full-retrieval.html">Retrieval Engineering</a></li>
+<li><a href="course-full-framework.html">LangChain &amp; LangGraph</a></li>
+<li><a href="course-full-protocols.html">MCP &amp; A2A</a></li>
+<li><a href="course-full-openclaw.html">OpenClaw &amp; Hermes</a></li>
+<li><a href="course-full-multiagent.html">Multi-agent &amp; KG</a></li>
+<li><a href="course-full-multimodal.html">Multimodal</a></li>
+</ol></div>
+<section class="page" id="intro"><span class="tag">Chapter 3</span>
+<h1 class="page-title">Agent Core</h1>
+<p class="page-sub">From chatbot to acting agent &mdash; before MCP, before LangGraph</p>
+<p>Prerequisites: <a href="course-full-llm.html">LLM</a> + <a href="course-full-rag.html">RAG</a>.</p>
+<div class="callout"><strong>Agents teach action.</strong> RAG gives memory; Agent loop gives <em>behavior</em>.</div>
+</section>
+
+<section class="page" id="why"><span class="tag">Why Agent</span>
+<h1 class="page-title">Why LLM alone is not an Agent</h1>
+<div class="cols">
+<div class="card"><h3>Chatbot (1 pass)</h3>
+<p>User &rarr; LLM &rarr; text reply. No side effects. May hallucinate facts not in weights.</p></div>
+<div class="card"><h3>Agent (N cycles)</h3>
+<p>User &rarr; plan &rarr; tool/RAG &rarr; observe &rarr; plan &rarr; &hellip; &rarr; answer. Grounded + actionable.</p></div>
+</div>
+<ul>
+<li><strong>No action</strong> &mdash; only emits text unless given tools</li>
+<li><strong>No persistent memory</strong> &mdash; need RAG + store (<a href="course-full-framework.html">LangGraph memory</a>)</li>
+<li><strong>No multi-step plan</strong> &mdash; one generation pass vs loops</li>
+</ul>
+<div class="fig">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 120" width="640" height="120">
+  <rect x="10" y="40" width="90" height="40" rx="6" fill="#e0f2fe" stroke="#0369a1"/><text x="55" y="65" text-anchor="middle" font-size="11">User</text>
+  <rect x="130" y="40" width="90" height="40" rx="6" fill="#fef3c7" stroke="#b45309"/><text x="175" y="65" text-anchor="middle" font-size="11">LLM</text>
+  <rect x="250" y="40" width="90" height="40" rx="6" fill="#ecfdf5" stroke="#0f766e"/><text x="295" y="65" text-anchor="middle" font-size="11">Tools</text>
+  <rect x="370" y="40" width="90" height="40" rx="6" fill="#f0f9ff" stroke="#0369a1"/><text x="415" y="65" text-anchor="middle" font-size="11">RAG</text>
+  <rect x="490" y="40" width="90" height="40" rx="6" fill="#fce7f3" stroke="#be185d"/><text x="535" y="65" text-anchor="middle" font-size="11">Env</text>
+  <text x="320" y="105" text-anchor="middle" font-size="11" fill="#64748b">Agent = LLM orchestrating Memory + Tools + Environment feedback</text>
+</svg>
+</div>
+</section>
+
+<section class="page" id="react"><span class="tag">ReAct</span>
+<h1 class="page-title">ReAct framework</h1>
+<p class="page-sub">Reason + Act &mdash; paper: Yao et al., 2022</p>
+<div class="react react-t"><strong>Thought:</strong> Decompose task; decide if a tool is needed</div>
+<div class="react react-a"><strong>Action:</strong> Emit tool name + JSON arguments (or final answer)</div>
+<div class="react react-o"><strong>Observation:</strong> Tool result appended to message history</div>
+<p>Loop until the model emits a final answer (no more tool_calls). Typical max iterations: 5&ndash;15.</p>
+<table>
+<tr><th>Chat</th><th>ReAct Agent</th></tr>
+<tr><td>1 LLM call</td><td>1&ndash;N LLM calls</td></tr>
+<tr><td>Static context</td><td>Context grows with observations</td></tr>
+<tr><td>Cannot verify</td><td>Can look up, compute, call APIs</td></tr>
+</table>
+</section>
+
+<section class="page" id="react-example"><span class="tag">Worked example</span>
+<h1 class="page-title">ReAct trace: book a flight</h1>
+<div class="react react-t"><strong>Thought:</strong> User wants NYC&rarr;LON next Friday. I need flight search, not memory.</div>
+<div class="react react-a"><strong>Action:</strong> search_flights(origin=&quot;NYC&quot;, dest=&quot;LON&quot;, date=&quot;2025-06-06&quot;)</div>
+<div class="react react-o"><strong>Observation:</strong> [{&quot;id&quot;:&quot;BA112&quot;,&quot;price&quot;:620,&quot;dep&quot;:&quot;18:30&quot;}, ...]</div>
+<div class="react react-t"><strong>Thought:</strong> Cheapest reasonable option is BA112. Confirm with user policy (economy only).</div>
+<div class="react react-a"><strong>Action:</strong> book_flight(flight_id=&quot;BA112&quot;, passenger=&quot;Alice&quot;)</div>
+<div class="react react-o"><strong>Observation:</strong> {&quot;pnr&quot;:&quot;X7K9P2&quot;,&quot;status&quot;:&quot;confirmed&quot;}</div>
+<div class="react react-a"><strong>Action:</strong> Reply: &quot;Booked BA112, confirmation X7K9P2.&quot;</div>
+
+<h2>Minimal loop (pure Python)</h2>
+<pre><code>MAX_STEPS = 10
+messages = [{"role": "user", "content": user_query}]
+
+for step in range(MAX_STEPS):
+    response = client.chat.completions.create(
+        model="gpt-4o-mini", messages=messages, tools=TOOLS)
+    msg = response.choices[0].message
+    messages.append(msg)
+
+    if not msg.tool_calls:
+        return msg.content  # final answer
+
+    for call in msg.tool_calls:
+        result = run_tool(call.function.name, json.loads(call.function.arguments))
+        messages.append({"role": "tool", "tool_call_id": call.id, "content": result})</code></pre>
+</section>
+
+<section class="page" id="tools"><span class="tag">Tools</span>
+<h1 class="page-title">Tool calling in practice</h1>
+
+<h2>1. Define JSON Schema (OpenAI format)</h2>
+<pre><code>tools = [{
+  "type": "function",
+  "function": {
+    "name": "search_docs",
+    "description": "Search internal knowledge base",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {"type": "string"},
+        "top_k": {"type": "integer", "default": 5}
+      },
+      "required": ["query"]
+    }
+  }
+}]</code></pre>
+
+<h2>2. Tool design checklist</h2>
+<table>
+<tr><th>Rule</th><th>Why</th></tr>
+<tr><td>One job per tool</td><td>Model picks correctly</td></tr>
+<tr><td>Clear description</td><td>When to use vs other tools</td></tr>
+<tr><td>Return structured JSON</td><td>Easy for model to parse</td></tr>
+<tr><td>Handle errors gracefully</td><td>Return error string as Observation, don&apos;t crash</td></tr>
+<tr><td>Idempotent when possible</td><td>Safe if model retries</td></tr>
+</table>
+
+<h2>3. Connect RAG as a tool (not inline)</h2>
+<pre><code>def search_docs(query: str, top_k: int = 5) -> str:
+    chunks = retriever.invoke(query)[:top_k]
+    return json.dumps([{"id": c.metadata["id"], "text": c.page_content} for c in chunks])</code></pre>
+<p>Agent decides <em>when</em> to retrieve &mdash; useful for multi-step tasks (&quot;compare refund vs exchange policy&quot; &rarr; two searches).</p>
+</section>
+
+<section class="page" id="intent"><span class="tag">Intent</span>
+<h1 class="page-title">Intent recognition &amp; routing</h1>
+<p class="page-sub">First gate: send query to the right subsystem</p>
+
+<table>
+<tr><th>Intent</th><th>Signals</th><th>Route</th></tr>
+<tr><td>Knowledge QA</td><td>&quot;what is&quot;, &quot;explain&quot;, policy questions</td><td><a href="course-full-rag.html">RAG</a></td></tr>
+<tr><td>Transaction</td><td>&quot;book&quot;, &quot;cancel&quot;, &quot;update order&quot;</td><td>Tool agent</td></tr>
+<tr><td>Chitchat</td><td>greetings, off-topic</td><td>Direct LLM (no tools)</td></tr>
+<tr><td>Escalation</td><td>angry, &quot;speak to human&quot;</td><td>Handoff tool</td></tr>
+</table>
+
+<h2>Router implementation (LLM classifier)</h2>
+<pre><code>ROUTER_PROMPT = '''Classify intent. Reply JSON only: {"intent": "...", "confidence": 0.0-1.0}
+Intents: knowledge_qa | transaction | chitchat | escalation'''
+
+def route(user_msg: str) -> str:
+    r = llm.invoke(ROUTER_PROMPT + "\nUser: " + user_msg)
+    intent = json.loads(r.content)["intent"]
+    if intent == "knowledge_qa":
+        return rag_chain.invoke(user_msg)
+    if intent == "transaction":
+        return agent_loop.invoke(user_msg)
+    return llm.invoke(user_msg)  # chitchat</code></pre>
+
+<h2>Alternative routers</h2>
+<ul>
+<li><strong>Embedding classifier</strong> &mdash; cheap, fast; train on labeled intents</li>
+<li><strong>Rules + regex</strong> &mdash; order IDs, &quot;track shipment&quot;</li>
+<li><strong>LangGraph conditional edge</strong> &mdash; see <a href="course-full-framework.html">LangChain &amp; LangGraph</a></li>
+</ul>
+<div class="callout"><strong>Fallback:</strong> if confidence &lt; 0.7, ask clarifying question instead of wrong route.</div>
+</section>
+
+<section class="page" id="context"><span class="tag">Context</span>
+<h1 class="page-title">Multi-turn context management</h1>
+
+<h2>Token budget assembly (priority order)</h2>
+<ol>
+<li>System rules &amp; safety instructions (never drop)</li>
+<li>Current task state JSON (slots, pending tool results)</li>
+<li>Retrieved docs / RAG chunks (top-k by relevance)</li>
+<li>Recent conversation turns (newest first until budget full)</li>
+<li>Summary of older turns (if summarize strategy)</li>
+</ol>
+
+<h2>Sliding window + summarize pattern</h2>
+<pre><code>TOKEN_BUDGET = 12000
+
+def build_context(history, retrieved, system):
+    msgs = [system]
+    msgs += retrieved  # RAG chunks as system or tool messages
+    recent, old = split_at_token_limit(history, TOKEN_BUDGET * 0.6)
+    if old:
+        summary = llm.invoke(f"Summarize this conversation:\n{old}")
+        msgs.append({"role": "system", "content": f"Earlier summary: {summary}"})
+    msgs += recent
+    return trim_to_budget(msgs, TOKEN_BUDGET)</code></pre>
+
+<table>
+<tr><th>Strategy</th><th>Best for</th><th>Tradeoff</th></tr>
+<tr><td>Sliding window</td><td>Short support chats</td><td>Forgets old facts</td></tr>
+<tr><td>Summarize</td><td>Long sessions</td><td>Summary loss</td></tr>
+<tr><td>Retrieve history</td><td>&quot;What did I say Tuesday?&quot;</td><td>Needs vector index of turns</td></tr>
+<tr><td>Structured state</td><td>Forms, booking flows</td><td>Requires schema design</td></tr>
+</table>
+</section>
+
+<section class="page" id="agent-practice"><span class="tag">Lab</span>
+<h1 class="page-title">Hands-on lab: build a ReAct agent</h1>
+<p class="page-sub">~60 min &mdash; no LangGraph required</p>
+
+<pre><code>pip install openai python-dotenv</code></pre>
+
+<ol class="steps">
+<li><strong>Two tools:</strong> <span class="mono">search_faq</span> (hard-coded dict or RAG) + <span class="mono">create_ticket</span> (append to JSON file).</li>
+<li><strong>Implement the loop</strong> from #react-example; cap at 8 steps; log each Thought/Action/Observation.</li>
+<li><strong>Add router:</strong> chitchat bypasses tools; FAQ questions must call <span class="mono">search_faq</span> first.</li>
+<li><strong>Test cases:</strong> (a) &quot;Hi&quot; &rarr; no tool; (b) &quot;Refund policy?&quot; &rarr; search; (c) &quot;File ticket for broken item&quot; &rarr; create_ticket after confirm.</li>
+<li><strong>Context test:</strong> 10-turn conversation; verify turn 11 still knows order ID from turn 3 (sliding window or summary).</li>
+<li><strong>Failure injection:</strong> return tool error &mdash; agent should recover and explain to user.</li>
+</ol>
+
+<h2>Success criteria</h2>
+<table>
+<tr><th>Metric</th><th>Target</th></tr>
+<tr><td>Tool selection accuracy</td><td>&ge; 90% on 10 labeled queries</td></tr>
+<tr><td>Grounded answers</td><td>FAQ answers cite retrieved chunk</td></tr>
+<tr><td>Loop termination</td><td>No infinite tool loops</td></tr>
+</table>
+<p>Next: tune retrieval in <a href="course-full-retrieval.html">Retrieval Engineering</a>; frameworks in <a href="course-full-framework.html">LangChain &amp; LangGraph</a>.</p>
+</section>
+
+<section class="page" id="agent-eval"><span class="tag">Evaluation</span>
+<h1 class="page-title">Agent evaluation</h1>
+
+<h2>Offline eval (before deploy)</h2>
+<table>
+<tr><th>Metric</th><th>How to measure</th><th>Target</th></tr>
+<tr><td>Tool selection accuracy</td><td>Label 20 queries; check correct tool chosen</td><td>&ge; 90%</td></tr>
+<tr><td>Argument validity</td><td>JSON schema parse + business rules</td><td>100% parseable</td></tr>
+<tr><td>Task success rate</td><td>Human or LLM judge: goal met?</td><td>Domain-specific</td></tr>
+<tr><td>Steps to completion</td><td>Avg ReAct iterations</td><td>Lower = cheaper</td></tr>
+</table>
+
+<pre><code># Simple tool accuracy eval
+def eval_tool_choice(test_cases, agent_fn):
+    correct = 0
+    for case in test_cases:
+        trace = agent_fn(case["query"], return_trace=True)
+        if trace["tools_called"] == case["expected_tools"]:
+            correct += 1
+    return correct / len(test_cases)</code></pre>
+
+<h2>Online eval (production)</h2>
+<ul>
+<li><strong>Human thumbs up/down</strong> on completed tasks</li>
+<li><strong>Escalation rate</strong> &mdash; % handed to human support</li>
+<li><strong>Tool error rate</strong> &mdash; API failures / bad args</li>
+<li><strong>Latency P95</strong> &mdash; total loop time including tools</li>
+</ul>
+<p>Benchmarks: SWE-bench (code), WebArena (web), AgentBench. Cross-course matrix: <a href="course-full-eval.html">Evaluation Guide</a>.</p>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body></html>

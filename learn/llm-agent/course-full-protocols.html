@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCP & A2A</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root { --bg:#fff; --text:#1e293b; --muted:#64748b; --accent:#0369a1; --accent2:#0c4a6e; --hi:#b45309; --border:#e2e8f0; --chip:#f0f9ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:#f8fafc; color:var(--text); line-height:1.6; }
+  .topbar { position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .topbar h1 { font-size:1rem; color:var(--accent2); }
+  .topbar nav { display:flex; gap:8px; flex-wrap:wrap; }
+  .topbar a { font-size:.72rem; color:var(--accent); text-decoration:none; padding:4px 10px; border-radius:999px; background:var(--chip); border:1px solid #bae6fd; }
+  .page { max-width:1100px; margin:0 auto 32px; background:var(--bg); border:1px solid var(--border); border-radius:12px; box-shadow:0 4px 24px rgba(15,23,42,.06); padding:48px 56px; }
+  .page-title { font-size:2rem; color:var(--accent2); margin-bottom:8px; }
+  .page-sub { color:var(--muted); font-size:1.1rem; margin-bottom:28px; }
+  .tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); background:var(--chip); padding:4px 10px; border-radius:999px; border:1px solid #bae6fd; margin-bottom:16px; }
+  h2 { font-size:1.35rem; color:var(--accent); margin:28px 0 12px; border-bottom:2px solid #e0f2fe; padding-bottom:6px; }
+  h3 { font-size:1.05rem; color:#0f766e; margin:18px 0 8px; }
+  p,li { font-size:1rem; margin:8px 0; }
+  ul,ol { margin-left:1.4em; }
+  strong { color:var(--hi); }
+  .callout { background:var(--chip); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:20px 0; }
+  .roadmap { background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:16px 0; font-size:.92rem; }
+  .roadmap ol { margin:8px 0 0 1.2em; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:16px 0; }
+  .card { border:1px solid var(--border); border-radius:10px; padding:16px; background:#f8fafc; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:.92rem; }
+  th,td { border:1px solid var(--border); padding:8px 10px; text-align:left; }
+  th { background:#e0f2fe; color:var(--accent2); }
+  .mono { font-family:Consolas,monospace; font-size:.88rem; background:#f1f5f9; padding:2px 8px; border-radius:4px; }
+  pre { padding:14px; background:#f8fafc; border:1px solid var(--border); border-radius:8px; font-size:.85rem; overflow-x:auto; }
+  .react { padding:10px 14px; border-radius:8px; margin:8px 0; font-size:.92rem; }
+  .react-t { background:#f0f9ff; border:1px solid #bae6fd; }
+  .react-a { background:#fef3c7; border:1px solid #fcd34d; }
+  .react-o { background:#ecfdf5; border:1px solid #a7f3d0; }
+  .fig { margin:20px 0; text-align:center; }
+  .fig svg { max-width:100%; height:auto; border:1px solid var(--border); border-radius:8px; }
+  .fig-cap { font-size:.85rem; color:var(--muted); margin-top:8px; }
+  .steps { counter-reset:step; list-style:none; margin-left:0; padding:0; }
+  .steps li { counter-increment:step; padding:12px 12px 12px 48px; position:relative; border-left:3px solid #bae6fd; margin:8px 0; background:#f8fafc; border-radius:0 8px 8px 0; }
+  .steps li::before { content:counter(step); position:absolute; left:12px; top:12px; width:24px; height:24px; background:var(--accent); color:#fff; border-radius:50%; font-size:.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  pre code { font-family:Consolas,monospace; }
+  .flow-v { display:flex; flex-direction:column; align-items:center; gap:0; margin:20px 0; }
+  .flow-box { border:2px solid var(--border); border-radius:8px; padding:12px 20px; min-width:280px; text-align:center; font-size:.9rem; background:#fff; }
+  .flow-arrow { color:var(--muted); font-size:1.2rem; padding:4px 0; }
+  .eq { margin:14px 0; overflow-x:auto; }
+
+</style></head><body>
+<div class="topbar"><h1>⑥ MCP & A2A</h1><nav><a href="present-hub.html">Hub</a><a href="#intro">Intro</a><a href="#why">Why</a><a href="#mcp-arch">MCP</a><a href="#mcp-build">Build</a><a href="#a2a">A2A</a><a href="#compare">Compare</a><a href="#lab">Lab</a><a href="course-full-framework.html">&larr; Framework</a><a href="course-full-openclaw.html">OpenClaw &rarr;</a></nav></div>
+
+<div class="roadmap"><strong>Course path (9 chapters)</strong>
+<ol>
+<li><a href="course-full-llm.html">LLM</a></li>
+<li><a href="course-full-rag.html">RAG</a></li>
+<li><a href="course-full-agent.html">Agent Core</a></li>
+<li><a href="course-full-retrieval.html">Retrieval Engineering</a></li>
+<li><a href="course-full-framework.html">LangChain &amp; LangGraph</a></li>
+<li><a href="course-full-protocols.html">MCP &amp; A2A</a></li>
+<li><a href="course-full-openclaw.html">OpenClaw &amp; Hermes</a></li>
+<li><a href="course-full-multiagent.html">Multi-agent &amp; KG</a></li>
+<li><a href="course-full-multimodal.html">Multimodal</a></li>
+</ol></div>
+<section class="page" id="intro"><span class="tag">Chapter 6</span>
+<h1 class="page-title">MCP &amp; A2A</h1>
+<p class="page-sub">How agents connect to tools (vertical) and to other agents (horizontal)</p>
+<p>Prev: <a href="course-full-framework.html">LangChain &amp; LangGraph</a>. Next: <a href="course-full-openclaw.html">OpenClaw &amp; Hermes</a>.</p>
+</section>
+
+<section class="page" id="why"><span class="tag">Problem</span>
+<h1 class="page-title">Why protocols exist</h1>
+<p>Before MCP: every IDE, every chat app, every agent framework wrote custom integrations for GitHub, Postgres, filesystem...</p>
+<p>Before A2A: Agent A could not hand off a subtask to Agent B from another vendor.</p>
+</section>
+
+<section class="page" id="mcp-arch"><span class="tag">MCP</span>
+<h1 class="page-title">MCP architecture (Model Context Protocol)</h1>
+<p>By Anthropic. Standard wire format between <strong>host</strong> (app with LLM) and <strong>servers</strong> (tool providers).</p>
+
+<table>
+<tr><th>Role</th><th>Examples</th><th>Job</th></tr>
+<tr><td><strong>Host</strong></td><td>Claude Desktop, Cursor, IDE</td><td>Runs LLM, shows UI</td></tr>
+<tr><td><strong>Client</strong></td><td>Inside host</td><td>1:1 connection to a server</td></tr>
+<tr><td><strong>Server</strong></td><td>filesystem, postgres, github</td><td>Exposes tools/resources/prompts</td></tr>
+</table>
+
+<h2>Three primitives MCP servers expose</h2>
+<table>
+<tr><th>Primitive</th><th>LLM sees</th><th>Example</th></tr>
+<tr><td><strong>tools/list</strong></td><td>Callable functions</td><td>read_file(path), query(sql)</td></tr>
+<tr><td><strong>resources/list</strong></td><td>Readable URIs</td><td>file:///project/README.md</td></tr>
+<tr><td><strong>prompts/list</strong></td><td>Template names</td><td>code-review, summarize-diff</td></tr>
+</table>
+</section>
+
+<section class="page" id="mcp-build"><span class="tag">MCP</span>
+<h1 class="page-title">Build an MCP server (Python)</h1>
+<pre><code>pip install mcp
+
+from mcp.server import Server
+from mcp.types import Tool, TextContent
+import mcp.server.stdio
+
+app = Server("demo-server")
+
+@app.list_tools()
+async def list_tools():
+    return [Tool(
+        name="get_policy",
+        description="Get refund policy text",
+        inputSchema={"type":"object","properties":{"sku":{"type":"string"}},"required":["sku"]},
+    )]
+
+@app.call_tool()
+async def call_tool(name: str, arguments: dict):
+    if name == "get_policy":
+        return [TextContent(type="text", text=f"Refund for {arguments['sku']}: 30 days")]
+
+async def main():
+    async with mcp.server.stdio.stdio_server() as (read, write):
+        await app.run(read, write, app.create_initialization_options())
+
+# Run: python server.py — host connects via stdio or HTTP</code></pre>
+
+<h2>Connect in Claude Desktop</h2>
+<pre><code>// ~/.claude/claude_desktop_config.json (Windows: %APPDATA%\Claude\)
+{
+  "mcpServers": {
+    "demo": {
+      "command": "python",
+      "args": ["C:/path/to/server.py"]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "C:/allowed/folder"]
+    }
+  }
+}</code></pre>
+
+<h2>Step-by-step: filesystem MCP (class demo)</h2>
+<ol class="steps">
+<li><strong>Install Node.js</strong> (for <span class="mono">npx</span>).</li>
+<li>Create folder e.g. <span class="mono">C:/demo-docs</span> with one <span class="mono">README.md</span>.</li>
+<li>Edit <span class="mono">claude_desktop_config.json</span> — add filesystem server block above; use your folder path.</li>
+<li><strong>Quit Claude Desktop completely</strong> (tray icon → Exit), then reopen.</li>
+<li>Settings &rarr; Developer &rarr; confirm server shows green / connected.</li>
+<li>Ask: &quot;Summarize README.md in my demo folder&quot; — model should call <span class="mono">read_file</span>.</li>
+<li>If fail: check path slashes, restart again, read Claude Desktop logs.</li>
+</ol>
+
+<h2>Transport: stdio vs HTTP (SSE)</h2>
+<table>
+<tr><th>Transport</th><th>How host starts server</th><th>Typical use</th></tr>
+<tr><td><strong>stdio</strong></td><td>Spawns child process; JSON-RPC over stdin/stdout</td><td>Claude Desktop, local dev</td></tr>
+<tr><td><strong>SSE / HTTP</strong></td><td>Server runs separately; host connects to URL</td><td>Remote team servers, Docker</td></tr>
+</table>
+<p>Most tutorials use stdio because zero networking setup. Production often wraps the same server in HTTP for auth + scaling.</p>
+
+<h2>Use MCP tools inside LangGraph (your product)</h2>
+<pre><code># langchain-mcp-adapters (conceptual flow)
+from langchain_mcp_adapters.client import MultiServerMCPClient
+
+client = MultiServerMCPClient({
+    "policy": {"command": "python", "args": ["policy_server.py"]},
+})
+tools = await client.get_tools()  # LangChain Tool objects from MCP list_tools
+llm_with_mcp = llm.bind_tools(tools)
+# Feed into your LangGraph ToolNode — same as native @tool</code></pre>
+<p>Pattern: MCP for <em>shared infra plugins</em>; native @tool for business logic only your app needs.</p>
+
+<h2>Troubleshooting checklist</h2>
+<ul>
+<li><strong>Server not listed</strong> — restart host after editing config JSON; check absolute paths on Windows.</li>
+<li><strong>Tool call fails</strong> — validate inputSchema matches what model emits; log arguments server-side.</li>
+<li><strong>Permission denied</strong> — filesystem server only sees paths you pass in args; narrow allowlist deliberately.</li>
+<li><strong>Timeout</strong> — long SQL/API in tool? Return progress via streaming or split into smaller tools.</li>
+</ul>
+</section>
+
+<section class="page" id="mcp-vs-tools"><span class="tag">MCP</span>
+<h1 class="page-title">MCP vs in-app tools</h1>
+<table>
+<tr><th></th><th>In-app Python @tool</th><th>MCP server</th></tr>
+<tr><td>Process</td><td>Same as agent</td><td>Separate process</td></tr>
+<tr><td>Reuse</td><td>This codebase only</td><td>Claude Desktop + Cursor + any MCP host</td></tr>
+<tr><td>Security boundary</td><td>Weaker</td><td>OS-level separation possible</td></tr>
+<tr><td>When</td><td>Your product backend</td><td>Developer tools, shared infra plugins</td></tr>
+</table>
+</section>
+
+<section class="page" id="a2a"><span class="tag">A2A</span>
+<h1 class="page-title">A2A (Agent-to-Agent Protocol)</h1>
+<p>By Google. Lets agents <strong>discover</strong> and <strong>delegate</strong> to other agents over HTTP.</p>
+
+<h2>Agent Card (like openapi.json for agents)</h2>
+<pre><code>{
+  "name": "HotelBookingAgent",
+  "description": "Books hotel rooms given city and dates",
+  "url": "https://hotels.example.com/a2a",
+  "skills": [{
+    "id": "book_hotel",
+    "name": "Book Hotel",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "city": {"type": "string"},
+        "check_in": {"type": "string", "format": "date"}
+      }
+    }
+  }]
+}</code></pre>
+
+<h2>Task lifecycle</h2>
+<ol>
+<li>Travel agent finds Hotel agent via Agent Card URL</li>
+<li>Sends <strong>Task</strong>: { skill: book_hotel, input: { city: "Paris", ... } }</li>
+<li>Hotel agent works async, streams status updates</li>
+<li>Returns <strong>Artifact</strong>: confirmation JSON</li>
+<li>Travel agent continues itinerary with artifact in context</li>
+</ol>
+
+<h2>Example HTTP messages (simplified)</h2>
+<pre><code>POST https://hotels.example.com/a2a/tasks
+{
+  "skill_id": "book_hotel",
+  "input": {"city": "Paris", "check_in": "2025-07-01", "nights": 3},
+  "context_id": "trip-abc-123"
+}
+
+# Response (in progress)
+{"task_id": "t-884", "state": "working", "status": "Searching availability..."}
+
+# Poll or webhook when done
+{"task_id": "t-884", "state": "completed", "artifacts": [{
+  "type": "application/json",
+  "data": {"confirmation": "HTL-991", "hotel": "Le Marais", "total_usd": 420}
+}]}</code></pre>
+
+<h2>When to use A2A vs in-process LangGraph</h2>
+<table>
+<tr><th>Situation</th><th>Pick</th></tr>
+<tr><td>All agents in your Python monolith</td><td>LangGraph supervisor subgraph</td></tr>
+<tr><td>Partner runs their agent; you only have URL + contract</td><td>A2A Agent Card + Task API</td></tr>
+<tr><td>Same company, different teams / languages</td><td>A2A or internal gRPC — A2A if you want standard discovery</td></tr>
+</table>
+</section>
+
+<section class="page" id="compare"><span class="tag">Compare</span>
+<h1 class="page-title">MCP vs A2A — when to use</h1>
+<table>
+<tr><th>Scenario</th><th>Protocol</th></tr>
+<tr><td>Read company wiki, query SQL, call REST API</td><td><strong>MCP</strong></td></tr>
+<tr><td>Delegate to legal-review agent at another company</td><td><strong>A2A</strong></td></tr>
+<tr><td>Cursor coding assistant + local filesystem</td><td><strong>MCP</strong></td></tr>
+<tr><td>Supervisor agent + specialist microservices</td><td><strong>A2A</strong> (or internal LangGraph)</td></tr>
+</table>
+<div class="callout"><strong>Analogy:</strong> MCP = USB devices plugged into one computer. A2A = two colleagues emailing task handoffs.</div>
+</section>
+
+<section class="page" id="lab"><span class="tag">Lab</span>
+<h1 class="page-title">Lab: MCP + mock A2A</h1>
+<ol class="steps">
+<li>Run official filesystem MCP server; connect Claude Desktop; ask to summarize a local file.</li>
+<li>Write minimal Python MCP server with one custom tool (get_policy).</li>
+<li>Sketch Agent Card JSON for a fake "WeatherAgent"; document what Task/Artifact would look like.</li>
+<li>Diagram your product: which capabilities are MCP (tools) vs A2A (remote agents).</li>
+</ol>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body></html>

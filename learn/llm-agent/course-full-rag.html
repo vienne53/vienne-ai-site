@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG: Look up first, then think</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root { --bg:#fff; --text:#1e293b; --muted:#64748b; --accent:#0369a1; --accent2:#0c4a6e; --hi:#b45309; --border:#e2e8f0; --chip:#f0f9ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:#f8fafc; color:var(--text); line-height:1.6; }
+  .topbar { position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .topbar h1 { font-size:1rem; color:var(--accent2); }
+  .topbar nav { display:flex; gap:8px; flex-wrap:wrap; }
+  .topbar a { font-size:.78rem; color:var(--accent); text-decoration:none; padding:4px 10px; border-radius:999px; background:var(--chip); border:1px solid #bae6fd; }
+  .page { max-width:1100px; margin:0 auto 32px; background:var(--bg); border:1px solid var(--border); border-radius:12px; box-shadow:0 4px 24px rgba(15,23,42,.06); padding:48px 56px; min-height:60vh; }
+  .page-title { font-size:2rem; color:var(--accent2); margin-bottom:8px; }
+  .page-sub { color:var(--muted); font-size:1.1rem; margin-bottom:28px; }
+  .tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); background:var(--chip); padding:4px 10px; border-radius:999px; border:1px solid #bae6fd; margin-bottom:16px; }
+  h2 { font-size:1.35rem; color:var(--accent); margin:28px 0 12px; border-bottom:2px solid #e0f2fe; padding-bottom:6px; }
+  h3 { font-size:1.05rem; color:#0f766e; margin:18px 0 8px; }
+  p,li { font-size:1rem; margin:8px 0; }
+  ul,ol { margin-left:1.4em; }
+  strong { color:var(--hi); }
+  .callout { background:var(--chip); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:20px 0; }
+  .callout.warn { background:#fef2f2; border-left-color:#ef4444; }
+  .callout.good { background:#ecfdf5; border-left-color:#10b981; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:16px 0; }
+  .card { border:1px solid var(--border); border-radius:10px; padding:16px; background:#f8fafc; }
+  .card.bad { background:#fef2f2; border-color:#fecaca; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:.92rem; }
+  th,td { border:1px solid var(--border); padding:8px 10px; text-align:left; }
+  th { background:#e0f2fe; color:var(--accent2); }
+  .fig { margin:20px 0; text-align:center; }
+  .fig svg { max-width:100%; height:auto; border:1px solid var(--border); border-radius:8px; }
+  .eq { margin:14px 0; overflow-x:auto; }
+  .flow-v { display:flex; flex-direction:column; align-items:center; gap:0; margin:20px 0; }
+  .flow-box { border:2px solid var(--border); border-radius:8px; padding:12px 20px; min-width:280px; text-align:center; font-size:.9rem; background:#fff; }
+  .flow-box.offline { background:#e0e7ff; border-color:#6366f1; }
+  .flow-box.online { background:#fce7f3; border-color:#db2777; }
+  .flow-box.eval { background:#fef3c7; border-color:#f59e0b; }
+  .flow-arrow { color:var(--muted); font-size:1.2rem; padding:4px 0; }
+  .phase-label { display:inline-block; font-size:.75rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:4px 12px; border-radius:999px; margin-bottom:12px; }
+  .phase-label.offline { background:#e0e7ff; color:#4338ca; border:1px solid #a5b4fc; }
+  .phase-label.online { background:#fce7f3; color:#be185d; border:1px solid #f9a8d4; }
+  pre { padding:14px; background:#f8fafc; border:1px solid var(--border); border-radius:8px; font-size:.85rem; overflow-x:auto; }
+  .summary-line { font-size:1.25rem; margin:12px 0; color:var(--accent2); }
+  @media print { .topbar{display:none;} .page{page-break-after:always;} }
+
+  .roadmap { background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:16px 0; font-size:.92rem; }
+  .roadmap ol { margin:8px 0 0 1.2em; }
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>RAG: Look up first, then think</h1>
+  <nav>
+    <a href="present-hub.html">Hub</a>
+    <a href="#intro">Intro</a>
+    <a href="#why">Why</a>
+    <a href="#before-after">Before/After</a>
+    <a href="#memory">Memory</a>
+    <a href="#architecture">Agent+RAG</a>
+    <a href="#summary">Summary</a>
+    <a href="#how">How</a>
+    <a href="#offline">Offline</a>
+    <a href="#online">Online</a>
+    <a href="#retrieval-advanced">Retrieval+</a>
+    <a href="course-full-agent.html">③ Agent &rarr;</a>
+    <a href="course-full-retrieval.html">④ Retrieval</a>
+    <a href="present-hub.html">Hub</a>
+  </nav>
+</div>
+
+<section class="page" id="intro">
+<div class="roadmap"><strong>Course path (9 chapters)</strong>
+<ol>
+<li><a href="course-full-llm.html">LLM</a></li>
+<li><a href="course-full-rag.html">RAG</a></li>
+<li><a href="course-full-agent.html">Agent Core</a></li>
+<li><a href="course-full-retrieval.html">Retrieval Engineering</a></li>
+<li><a href="course-full-framework.html">LangChain &amp; LangGraph</a></li>
+<li><a href="course-full-protocols.html">MCP &amp; A2A</a></li>
+<li><a href="course-full-openclaw.html">OpenClaw &amp; Hermes</a></li>
+<li><a href="course-full-multiagent.html">Multi-agent &amp; KG</a></li>
+<li><a href="course-full-multimodal.html">Multimodal</a></li>
+</ol></div>
+
+  <span class="tag">Chapter 2</span>
+  <h1 class="page-title">RAG</h1>
+  <p class="page-sub" style="font-size:1.35rem;color:var(--accent2)"><strong>Look up first, then think.</strong></p>
+  <div class="callout warn">
+    <p><strong>Teaching order (important):</strong> Do NOT open with Embedding, Vector DB, or Similarity Search. Students will be lost.</p>
+    <p>Start with three problems every user feels. Then show <em>why AI must plug in external memory</em>. Technical details come last.</p>
+  </div>
+  <p class="page-sub">Matches <strong>course-present-rag.html</strong> slide deck.</p>
+</section>
+
+<section class="page" id="why">
+  <span class="tag">Part 1 &middot; Why</span>
+  <h1 class="page-title">Why do we need RAG?</h1>
+  <p class="page-sub">Three questions &mdash; problem-driven, not definition-driven</p>
+
+  <h2>Question 1: Why does ChatGPT &quot;make things up&quot;?</h2>
+  <p>LLMs predict <strong>plausible</strong> next tokens. They are not fact-checkers.</p>
+  <div class="callout"><strong>Hallucination:</strong> fluent, confident answers with no grounding in verified sources.</div>
+
+  <h2>Question 2: Why doesn&apos;t GPT know your company documents?</h2>
+  <p>Internal PDFs, wikis, CRM exports, and policies were <strong>never in pretraining data</strong>.</p>
+  <div class="callout">Enterprise / private knowledge cannot (and should not) all be baked into model weights.</div>
+
+  <h2>Question 3: Why does GPT knowledge expire?</h2>
+  <p>Every model has a <strong>training cutoff</strong>. Weights freeze at train time.</p>
+  <div class="callout"><strong>Model parameters are not a real-time database.</strong> You cannot &quot;update&quot; facts by hoping the LLM remembers.</div>
+
+  <h2>Therefore</h2>
+  <div class="callout good">
+    <p style="font-size:1.15rem"><strong>RAG = give the LLM an external knowledge system.</strong></p>
+    <p>In class, say: <strong>&quot;Look up first, then think.&quot;</strong> &mdash; not the academic translation &quot;retrieval-augmented generation.&quot;</p>
+  </div>
+</section>
+
+<section class="page" id="before-after">
+  <span class="tag">Key diagram</span>
+  <h1 class="page-title">RAG: Before vs After</h1>
+  <p class="page-sub">You are not defining RAG &mdash; you are explaining <strong>why AI must have external memory</strong></p>
+
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 240" width="920" height="240">
+      <rect width="920" height="240" fill="#fff"/>
+      <text x="230" y="22" text-anchor="middle" fill="#b91c1c" font-weight="bold" font-size="13">BEFORE: LLM only</text>
+      <text x="690" y="22" text-anchor="middle" fill="#047857" font-weight="bold" font-size="13">AFTER: LLM + external memory</text>
+      <rect x="20" y="40" width="420" height="180" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+      <rect x="180" y="58" width="100" height="36" rx="6" fill="#f1f5f9" stroke="#64748b"/><text x="230" y="81" text-anchor="middle" font-size="10">User</text>
+      <text x="290" y="81" fill="#64748b">&rarr;</text>
+      <rect x="300" y="58" width="100" height="36" rx="6" fill="#fed7aa" stroke="#ea580c"/><text x="350" y="81" text-anchor="middle" font-size="10" font-weight="bold">LLM</text>
+      <rect x="320" y="110" width="120" height="36" rx="6" fill="#fecaca" stroke="#ef4444"/><text x="380" y="133" text-anchor="middle" font-size="9">Answer (?)</text>
+      <text x="230" y="165" text-anchor="middle" fill="#b91c1c" font-size="10">Hallucination &middot; no company data &middot; stale knowledge</text>
+      <rect x="480" y="40" width="420" height="180" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+      <rect x="640" y="58" width="100" height="36" rx="6" fill="#f1f5f9" stroke="#64748b"/><text x="690" y="81" text-anchor="middle" font-size="10">User</text>
+      <rect x="500" y="105" width="130" height="40" rx="6" fill="#e0e7ff" stroke="#6366f1"/><text x="565" y="122" text-anchor="middle" font-size="9" fill="#4338ca" font-weight="bold">Knowledge Store</text>
+      <text x="565" y="136" text-anchor="middle" font-size="8" fill="#64748b">docs, policies, wiki</text>
+      <path d="M630 125 L680 125" stroke="#6366f1" stroke-width="2"/>
+      <rect x="680" y="105" width="90" height="40" rx="6" fill="#fed7aa" stroke="#ea580c"/><text x="725" y="130" text-anchor="middle" font-size="10" font-weight="bold">LLM</text>
+      <rect x="780" y="105" width="100" height="40" rx="6" fill="#dcfce7" stroke="#16a34a"/><text x="830" y="122" text-anchor="middle" font-size="9" fill="#047857" font-weight="bold">Grounded</text>
+      <text x="830" y="136" text-anchor="middle" font-size="8" fill="#047857">Answer</text>
+      <text x="690" y="178" text-anchor="middle" fill="#047857" font-size="11" font-weight="bold">Look up first, then think</text>
+    </svg>
+  </div>
+</section>
+
+<section class="page" id="memory">
+  <span class="tag">Part 2 &middot; Cognitive upgrade</span>
+  <h1 class="page-title">RAG is not just &quot;searching documents&quot;</h1>
+  <p class="page-sub">It is the core of an <strong>Agent Memory System</strong></p>
+
+  <table>
+    <tr><th>Memory type</th><th>Role</th><th>Typical implementation</th></tr>
+    <tr><td><strong>Short-term memory</strong></td><td>Current conversation, recent turns</td><td>Context window (128K tokens)</td></tr>
+    <tr><td><strong>Long-term memory</strong></td><td>Retrievable knowledge at query time</td><td>Vector database (RAG index)</td></tr>
+    <tr><td><strong>Episodic memory</strong></td><td>What happened in past sessions / tasks</td><td>Session logs, task history store</td></tr>
+    <tr><td><strong>Semantic memory</strong></td><td>Stable facts about domain / user</td><td>Curated knowledge base, user profile</td></tr>
+  </table>
+  <div class="callout">This framing turns RAG from a &quot;search trick&quot; into a <strong>Cognitive AI</strong> topic &mdash; memory, not just retrieval.</div>
+</section>
+
+<section class="page" id="architecture">
+  <span class="tag">Key diagram</span>
+  <h1 class="page-title">Agent + RAG Architecture</h1>
+  <p class="page-sub">LLM + Memory + RAG + Agent &mdash; connected in one picture</p>
+
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 320" width="920" height="320">
+      <rect width="920" height="320" fill="#fff"/>
+      <text x="460" y="22" text-anchor="middle" fill="#0c4a6e" font-weight="bold" font-size="14">Agent + RAG Architecture</text>
+      <rect x="390" y="35" width="140" height="36" rx="8" fill="#f1f5f9" stroke="#64748b"/><text x="460" y="58" text-anchor="middle" font-size="11">User / Task</text>
+      <line x1="460" y1="71" x2="460" y2="88" stroke="#64748b" stroke-width="2"/>
+      <rect x="340" y="88" width="240" height="52" rx="10" fill="#fed7aa" stroke="#ea580c" stroke-width="2"/>
+      <text x="460" y="112" text-anchor="middle" fill="#9a3412" font-size="14" font-weight="bold">LLM (Reasoning Brain)</text>
+      <line x1="380" y1="140" x2="200" y2="175" stroke="#64748b" stroke-width="2"/>
+      <line x1="460" y1="140" x2="460" y2="175" stroke="#64748b" stroke-width="2"/>
+      <line x1="540" y1="140" x2="720" y2="175" stroke="#64748b" stroke-width="2"/>
+      <rect x="80" y="175" width="150" height="58" rx="8" fill="#dbeafe" stroke="#0284c7" stroke-width="2"/>
+      <text x="155" y="198" text-anchor="middle" fill="#0c4a6e" font-weight="bold" font-size="10">Planning</text>
+      <rect x="385" y="175" width="150" height="58" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+      <text x="460" y="198" text-anchor="middle" fill="#15803d" font-weight="bold" font-size="10">Tools</text>
+      <rect x="690" y="175" width="150" height="58" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+      <text x="765" y="198" text-anchor="middle" fill="#b45309" font-weight="bold" font-size="10">Action</text>
+      <text x="460" y="252" text-anchor="middle" fill="#4338ca" font-size="11" font-weight="bold">MEMORY SYSTEM</text>
+      <rect x="40" y="265" width="190" height="48" rx="6" fill="#f0f9ff" stroke="#0284c7"/>
+      <text x="135" y="285" text-anchor="middle" font-size="9" font-weight="bold">Short-term</text>
+      <text x="135" y="300" text-anchor="middle" font-size="8" fill="#64748b">Context window</text>
+      <rect x="250" y="265" width="190" height="48" rx="6" fill="#e0e7ff" stroke="#6366f1"/>
+      <text x="345" y="285" text-anchor="middle" font-size="9" font-weight="bold">Long-term</text>
+      <text x="345" y="300" text-anchor="middle" font-size="8" fill="#64748b">Vector DB (RAG)</text>
+      <rect x="480" y="265" width="190" height="48" rx="6" fill="#fce7f3" stroke="#db2777"/>
+      <text x="575" y="285" text-anchor="middle" font-size="9" font-weight="bold">Episodic</text>
+      <text x="575" y="300" text-anchor="middle" font-size="8" fill="#64748b">Task history</text>
+      <rect x="690" y="265" width="190" height="48" rx="6" fill="#ecfdf5" stroke="#10b981"/>
+      <text x="785" y="285" text-anchor="middle" font-size="9" font-weight="bold">Semantic</text>
+      <text x="785" y="300" text-anchor="middle" font-size="8" fill="#64748b">Domain knowledge</text>
+      <path d="M345 265 L345 248 L460 248 L460 140" stroke="#6366f1" stroke-width="2" fill="none"/>
+      <text x="400" y="242" fill="#6366f1" font-size="8">RAG retrieve</text>
+    </svg>
+  </div>
+</section>
+
+<section class="page" id="summary">
+  <span class="tag">One line each</span>
+  <h1 class="page-title">The big picture</h1>
+  <p class="summary-line"><strong>Pretraining</strong> teaches knowledge.</p>
+  <p class="summary-line"><strong>RAG</strong> teaches retrieval.</p>
+  <p class="summary-line"><strong>Agents</strong> teach action.</p>
+  <div class="callout good" style="margin-top:24px">
+    <p style="font-size:1.2rem"><strong>RAG essence: Look up first, then think.</strong></p>
+  </div>
+</section>
+
+<section class="page" id="how">
+  <span class="tag">Part 3 &middot; How (after WHY)</span>
+  <h1 class="page-title">How RAG works</h1>
+  <p class="page-sub">Introduce mechanics <em>only after</em> students understand the problem</p>
+
+  <h2>Two phases</h2>
+  <table>
+    <tr><th>Phase</th><th>When</th><th>Plain English</th></tr>
+    <tr><td><strong>Offline</strong></td><td>Before launch; on doc update</td><td>Build the library (index documents once)</td></tr>
+    <tr><td><strong>Online</strong></td><td>Every user question</td><td>Look up relevant passages, then LLM thinks</td></tr>
+  </table>
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 220" width="920" height="220">
+      <rect width="920" height="220" fill="#fff"/>
+      <text x="230" y="22" text-anchor="middle" fill="#4338ca" font-weight="bold">OFFLINE (build once)</text>
+      <text x="690" y="22" text-anchor="middle" fill="#be185d" font-weight="bold">ONLINE (per query)</text>
+      <rect x="20" y="40" width="420" height="160" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+      <text x="40" y="65" fill="#4338ca" font-size="11">Docs &rarr; chunk &rarr; embed &rarr; vector store</text>
+      <text x="40" y="90" fill="#64748b" font-size="10">No LLM generation &mdash; building memory</text>
+      <rect x="480" y="40" width="420" height="160" rx="8" fill="#fdf2f8" stroke="#db2777" stroke-width="2"/>
+      <text x="500" y="65" fill="#be185d" font-size="11">Query &rarr; retrieve &rarr; prompt + evidence &rarr; LLM</text>
+      <text x="500" y="90" fill="#64748b" font-size="10">Look up first, then think</text>
+      <path d="M440 120 L480 120" stroke="#64748b" stroke-width="2"/>
+    </svg>
+  </div>
+</section>
+
+<section class="page" id="offline">
+  <span class="phase-label offline">Phase 1</span>
+  <h1 class="page-title">Offline: build the knowledge index</h1>
+  <div class="flow-v">
+    <div class="flow-box offline">1. Load documents (PDF, HTML, wiki, DB export)</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box offline">2. Parse &amp; clean (OCR if scanned)</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box offline">3. Chunk into passages (~256&ndash;512 tokens, overlap)</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box offline">4. Embed text into vectors (searchable representation)</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box offline">5. Store in vector database</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box eval">6. Validate: Recall@k on sample queries</div>
+  </div>
+  <p>FAISS / ChromaDB / Milvus / Pinecone / pgvector</p>
+</section>
+
+<section class="page" id="online">
+  <span class="phase-label online">Phase 2</span>
+  <h1 class="page-title">Online: look up, then think</h1>
+  <div class="flow-v">
+    <div class="flow-box online">1. User asks a question</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box online">2. <strong>Look up</strong> &mdash; find Top-k relevant chunks in index</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box online">3. Build prompt: system + retrieved evidence + question</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box online">4. <strong>Think</strong> &mdash; LLM generates answer (next-token prediction)</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box eval">5. Return answer + citations</div>
+  </div>
+
+  <h2>Prompt template</h2>
+  <pre>System: Answer using ONLY the context below. Cite [doc_id].
+Context:
+[chunk_42] EU refunds allowed within 14 days...
+User: What is our EU refund policy?</pre>
+
+  <h2>Technical detail (teach last)</h2>
+  <div class="eq">$$\text{sim}(q, d) = \frac{\mathbf{v}_q \cdot \mathbf{v}_d}{\|\mathbf{v}_q\| \, \|\mathbf{v}_d\|}$$</div>
+  <p>Embedding maps text to vectors. Similar meaning &rarr; nearby vectors &rarr; retrieval finds the right passage.</p>
+
+  <h2>Evaluation</h2>
+  <table>
+    <tr><th>Phase</th><th>Metrics</th></tr>
+    <tr><td>Offline</td><td>Recall@k, chunk quality, index build latency</td></tr>
+    <tr><td>Online</td><td>Faithfulness, citation hit rate, end-to-end latency</td></tr>
+  </table>
+  <div class="callout warn"><strong>Common mistake:</strong> Teaching online flow only. Without offline index, RAG fails silently.</div>
+  <p style="margin-top:16px;color:var(--muted)">Advanced retrieval (BM25, hybrid, rerank, eval): <a href="course-full-retrieval.html">Retrieval Engineering course</a>.</p>
+</section>
+
+<section class="page" id="retrieval-advanced">
+  <span class="tag">Advanced (summary)</span>
+  <h1 class="page-title">Retrieval beyond naive vector search</h1>
+  <p class="page-sub">Full depth in <a href="course-full-retrieval.html">Retrieval Engineering course</a></p>
+  <table>
+    <tr><th>Method</th><th>When to use</th></tr>
+    <tr><td><strong>BM25</strong></td><td>Keywords, SKUs, exact terms</td></tr>
+    <tr><td><strong>Dense semantic</strong></td><td>Paraphrase, conceptual match</td></tr>
+    <tr><td><strong>Hybrid + RRF</strong></td><td>Production default</td></tr>
+    <tr><td><strong>Cross-encoder rerank</strong></td><td>Top-50 &rarr; Top-5 precision</td></tr>
+  </table>
+  <p>Metrics: Recall@k, MRR, NDCG, faithfulness, citation accuracy.</p>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

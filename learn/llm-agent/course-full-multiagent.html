@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-agent & Knowledge Graph</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root { --bg:#fff; --text:#1e293b; --muted:#64748b; --accent:#0369a1; --accent2:#0c4a6e; --hi:#b45309; --border:#e2e8f0; --chip:#f0f9ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:#f8fafc; color:var(--text); line-height:1.6; }
+  .topbar { position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .topbar h1 { font-size:1rem; color:var(--accent2); }
+  .topbar nav { display:flex; gap:8px; flex-wrap:wrap; }
+  .topbar a { font-size:.72rem; color:var(--accent); text-decoration:none; padding:4px 10px; border-radius:999px; background:var(--chip); border:1px solid #bae6fd; }
+  .page { max-width:1100px; margin:0 auto 32px; background:var(--bg); border:1px solid var(--border); border-radius:12px; box-shadow:0 4px 24px rgba(15,23,42,.06); padding:48px 56px; }
+  .page-title { font-size:2rem; color:var(--accent2); margin-bottom:8px; }
+  .page-sub { color:var(--muted); font-size:1.1rem; margin-bottom:28px; }
+  .tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); background:var(--chip); padding:4px 10px; border-radius:999px; border:1px solid #bae6fd; margin-bottom:16px; }
+  h2 { font-size:1.35rem; color:var(--accent); margin:28px 0 12px; border-bottom:2px solid #e0f2fe; padding-bottom:6px; }
+  h3 { font-size:1.05rem; color:#0f766e; margin:18px 0 8px; }
+  p,li { font-size:1rem; margin:8px 0; }
+  ul,ol { margin-left:1.4em; }
+  strong { color:var(--hi); }
+  .callout { background:var(--chip); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:20px 0; }
+  .roadmap { background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:16px 0; font-size:.92rem; }
+  .roadmap ol { margin:8px 0 0 1.2em; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:16px 0; }
+  .card { border:1px solid var(--border); border-radius:10px; padding:16px; background:#f8fafc; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:.92rem; }
+  th,td { border:1px solid var(--border); padding:8px 10px; text-align:left; }
+  th { background:#e0f2fe; color:var(--accent2); }
+  .mono { font-family:Consolas,monospace; font-size:.88rem; background:#f1f5f9; padding:2px 8px; border-radius:4px; }
+  pre { padding:14px; background:#f8fafc; border:1px solid var(--border); border-radius:8px; font-size:.85rem; overflow-x:auto; }
+  .react { padding:10px 14px; border-radius:8px; margin:8px 0; font-size:.92rem; }
+  .react-t { background:#f0f9ff; border:1px solid #bae6fd; }
+  .react-a { background:#fef3c7; border:1px solid #fcd34d; }
+  .react-o { background:#ecfdf5; border:1px solid #a7f3d0; }
+  .fig { margin:20px 0; text-align:center; }
+  .fig svg { max-width:100%; height:auto; border:1px solid var(--border); border-radius:8px; }
+  .fig-cap { font-size:.85rem; color:var(--muted); margin-top:8px; }
+  .steps { counter-reset:step; list-style:none; margin-left:0; padding:0; }
+  .steps li { counter-increment:step; padding:12px 12px 12px 48px; position:relative; border-left:3px solid #bae6fd; margin:8px 0; background:#f8fafc; border-radius:0 8px 8px 0; }
+  .steps li::before { content:counter(step); position:absolute; left:12px; top:12px; width:24px; height:24px; background:var(--accent); color:#fff; border-radius:50%; font-size:.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  pre code { font-family:Consolas,monospace; }
+  .flow-v { display:flex; flex-direction:column; align-items:center; gap:0; margin:20px 0; }
+  .flow-box { border:2px solid var(--border); border-radius:8px; padding:12px 20px; min-width:280px; text-align:center; font-size:.9rem; background:#fff; }
+  .flow-arrow { color:var(--muted); font-size:1.2rem; padding:4px 0; }
+  .eq { margin:14px 0; overflow-x:auto; }
+
+</style></head><body>
+<div class="topbar"><h1>⑧ Multi-agent & KG</h1><nav><a href="present-hub.html">Hub</a><a href="#intro">Intro</a><a href="#patterns">Patterns</a><a href="#supervisor">Supervisor</a><a href="#multi-practice">Multi lab</a><a href="#kg-basics">KG basics</a><a href="#kg-build">Build</a><a href="#kg-retrieval">Graph search</a><a href="#graphrag">GraphRAG</a><a href="#kg-practice">KG lab</a><a href="#eval">Eval</a><a href="course-full-openclaw.html">&larr; OpenClaw</a><a href="course-full-multimodal.html">Multi &rarr;</a></nav></div>
+
+<div class="roadmap"><strong>Course path (9 chapters)</strong>
+<ol>
+<li><a href="course-full-llm.html">LLM</a></li>
+<li><a href="course-full-rag.html">RAG</a></li>
+<li><a href="course-full-agent.html">Agent Core</a></li>
+<li><a href="course-full-retrieval.html">Retrieval Engineering</a></li>
+<li><a href="course-full-framework.html">LangChain &amp; LangGraph</a></li>
+<li><a href="course-full-protocols.html">MCP &amp; A2A</a></li>
+<li><a href="course-full-openclaw.html">OpenClaw &amp; Hermes</a></li>
+<li><a href="course-full-multiagent.html">Multi-agent &amp; KG</a></li>
+<li><a href="course-full-multimodal.html">Multimodal</a></li>
+</ol></div>
+<section class="page" id="intro"><span class="tag">Chapter 8</span>
+<h1 class="page-title">Multi-agent &amp; Knowledge Graph</h1>
+<p class="page-sub">Collaboration patterns + structured knowledge</p>
+</section>
+<section class="page" id="patterns"><span class="tag">Multi-agent</span>
+<h1 class="page-title">Multi-agent collaboration patterns</h1>
+<p class="page-sub">When one agent + many tools is not enough</p>
+
+<table>
+<tr><th>Pattern</th><th>Description</th><th>When to use</th></tr>
+<tr><td>Supervisor</td><td>Lead delegates to specialists</td><td>Distinct domains (research / write / code)</td></tr>
+<tr><td>Handoff</td><td>Specialist takes full control</td><td>Customer support tiers</td></tr>
+<tr><td>Critic-reviewer</td><td>Generator + validator loop</td><td>Quality-sensitive output</td></tr>
+<tr><td>Map-reduce</td><td>Parallel workers &rarr; merge</td><td>Long doc analysis, batch tasks</td></tr>
+<tr><td>A2A federation</td><td>Cross-org agent discovery</td><td>Partner APIs, external agents</td></tr>
+</table>
+
+<div class="fig">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 220" width="400" height="220">
+  <rect x="150" y="10" width="100" height="44" rx="8" fill="#fef3c7" stroke="#b45309"/>
+  <text x="200" y="38" text-anchor="middle" font-size="12" fill="#92400e">Supervisor</text>
+  <rect x="20" y="100" width="90" height="40" rx="6" fill="#e0f2fe" stroke="#0369a1"/>
+  <text x="65" y="125" text-anchor="middle" font-size="10">Researcher</text>
+  <rect x="155" y="100" width="90" height="40" rx="6" fill="#ecfdf5" stroke="#0f766e"/>
+  <text x="200" y="125" text-anchor="middle" font-size="10">Writer</text>
+  <rect x="290" y="100" width="90" height="40" rx="6" fill="#fce7f3" stroke="#be185d"/>
+  <text x="335" y="125" text-anchor="middle" font-size="10">Reviewer</text>
+  <line x1="200" y1="54" x2="65" y2="98" stroke="#64748b"/>
+  <line x1="200" y1="54" x2="200" y2="98" stroke="#64748b"/>
+  <line x1="200" y1="54" x2="335" y2="98" stroke="#64748b"/>
+  <text x="200" y="180" text-anchor="middle" font-size="11" fill="#64748b">Supervisor routes; workers return results upstream</text>
+</svg>
+</div>
+
+<p>Frameworks: LangGraph (recommended), AutoGen, CrewAI, OpenAI Agents SDK.</p>
+</section>
+
+<section class="page" id="supervisor"><span class="tag">Supervisor</span>
+<h1 class="page-title">Supervisor pattern in LangGraph</h1>
+
+<pre><code>from langgraph.graph import StateGraph, START, END
+
+class TeamState(TypedDict):
+    messages: Annotated[list, add_messages]
+    next: str  # which worker to call
+
+def supervisor(state: TeamState):
+    # LLM decides: researcher | writer | reviewer | FINISH
+    decision = llm.invoke(SUPERVISOR_PROMPT + str(state["messages"]))
+    return {"next": parse_next(decision)}
+
+def researcher(state): ...
+def writer(state): ...
+def reviewer(state): ...
+
+builder = StateGraph(TeamState)
+builder.add_node("supervisor", supervisor)
+builder.add_node("researcher", researcher)
+builder.add_node("writer", writer)
+builder.add_node("reviewer", reviewer)
+builder.add_edge(START, "supervisor")
+builder.add_conditional_edges("supervisor", lambda s: s["next"],
+    {"researcher": "researcher", "writer": "writer", "reviewer": "reviewer", "FINISH": END})
+for worker in ["researcher", "writer", "reviewer"]:
+    builder.add_edge(worker, "supervisor")  # report back</code></pre>
+
+<h2>Critic-reviewer loop (simpler variant)</h2>
+<div class="react react-a"><strong>Generator:</strong> draft answer</div>
+<div class="react react-o"><strong>Critic:</strong> {&quot;pass&quot;: false, &quot;issues&quot;: [&quot;missing citation&quot;]}</div>
+<div class="react react-a"><strong>Generator:</strong> revised draft with citation</div>
+<div class="react react-o"><strong>Critic:</strong> {&quot;pass&quot;: true}</div>
+<p>Max 3 critic rounds; else escalate to human.</p>
+</section>
+
+<section class="page" id="multi-practice"><span class="tag">Lab</span>
+<h1 class="page-title">Hands-on lab: supervisor team</h1>
+<ol class="steps">
+<li><strong>Task:</strong> &quot;Write a 1-page brief on Q2 sales trends&quot; with CSV data file.</li>
+<li><strong>Researcher agent:</strong> tool = run_python (pandas describe); returns stats JSON.</li>
+<li><strong>Writer agent:</strong> no tools; consumes stats; outputs markdown brief.</li>
+<li><strong>Reviewer agent:</strong> checks numbers match stats; returns pass/fail JSON.</li>
+<li><strong>Supervisor:</strong> routes until reviewer passes or 3 iterations.</li>
+<li><strong>Compare:</strong> single agent with all tools vs supervisor team on quality + token cost.</li>
+</ol>
+</section>
+<section class="page" id="kg-basics"><span class="tag">Knowledge Graph</span>
+<h1 class="page-title">Knowledge Graph fundamentals</h1>
+<p class="page-sub">Structured facts as nodes &amp; edges &mdash; not text chunks</p>
+
+<h2>Triple model (Subject &mdash; Predicate &mdash; Object)</h2>
+<pre><code>(Alice) --[REPORTS_TO]--> (Bob)
+(Project-X) --[OWNED_BY]--> (Alice)
+(Project-X) --[USES]--> (PostgreSQL)</code></pre>
+
+<div class="fig">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 220" width="520" height="220">
+  <circle cx="80" cy="110" r="36" fill="#e0f2fe" stroke="#0369a1"/>
+  <text x="80" y="115" text-anchor="middle" font-size="12" fill="#0c4a6e">Alice</text>
+  <circle cx="260" cy="50" r="36" fill="#fef3c7" stroke="#b45309"/>
+  <text x="260" y="55" text-anchor="middle" font-size="11" fill="#92400e">Project-X</text>
+  <circle cx="260" cy="170" r="36" fill="#ecfdf5" stroke="#0f766e"/>
+  <text x="260" y="175" text-anchor="middle" font-size="11" fill="#065f46">PostgreSQL</text>
+  <circle cx="440" cy="110" r="36" fill="#e0f2fe" stroke="#0369a1"/>
+  <text x="440" y="115" text-anchor="middle" font-size="12" fill="#0c4a6e">Bob</text>
+  <line x1="110" y1="95" x2="230" y2="60" stroke="#64748b"/>
+  <text x="165" y="68" font-size="10" fill="#64748b">OWNED_BY</text>
+  <line x1="110" y1="125" x2="405" y2="115" stroke="#64748b"/>
+  <text x="250" y="108" font-size="10" fill="#64748b">REPORTS_TO</text>
+  <line x1="260" y1="86" x2="260" y2="134" stroke="#64748b"/>
+  <text x="275" y="115" font-size="10" fill="#64748b">USES</text>
+</svg>
+<p class="fig-cap">Multi-hop question: &quot;What DB does my manager&apos;s project use?&quot; needs 2+ hops</p>
+</div>
+
+<h2>Vector RAG vs Graph retrieval</h2>
+<table>
+<tr><th>Question type</th><th>Vector RAG</th><th>Graph retrieval</th></tr>
+<tr><td>&quot;Summarize refund policy&quot;</td><td>Strong</td><td>Overkill</td></tr>
+<tr><td>&quot;Who owns the project that uses Kafka?&quot;</td><td>Often misses link</td><td>Strong (multi-hop)</td></tr>
+<tr><td>&quot;List all systems 2 hops from Payment API&quot;</td><td>Weak</td><td>Native (BFS / Cypher)</td></tr>
+<tr><td>Unstructured PDFs</td><td>Strong</td><td>Needs extraction first</td></tr>
+</table>
+
+<div class="callout"><strong>Rule of thumb:</strong> entities + relationships matter &rarr; KG. Only prose paragraphs matter &rarr; vector RAG. Production often uses <strong>both</strong>.</div>
+</section>
+
+<section class="page" id="kg-build"><span class="tag">Build KG</span>
+<h1 class="page-title">Building a knowledge graph from documents</h1>
+
+<h2>Offline pipeline</h2>
+<ol class="steps">
+<li><strong>Ingest</strong> &mdash; load PDFs, wikis, tickets into raw text.</li>
+<li><strong>Extract</strong> &mdash; LLM or NER model outputs triples per chunk.</li>
+<li><strong>Normalize</strong> &mdash; merge &quot;Bob Smith&quot; / &quot;Bob&quot; / &quot;b.smith@co.com&quot; into one entity ID.</li>
+<li><strong>Load</strong> &mdash; upsert nodes/edges into Neo4j, NebulaGraph, or NetworkX (dev).</li>
+<li><strong>Index</strong> (optional) &mdash; embed entity descriptions for hybrid entity search.</li>
+</ol>
+
+<h2>LLM extraction prompt (minimal)</h2>
+<pre><code>SYSTEM: Extract (subject, predicate, object) triples from the text.
+Return JSON array. Use UPPER_SNAKE predicates.
+
+TEXT: "Alice Chen leads Project Phoenix, which runs on PostgreSQL.
+       She reports to Bob, VP of Engineering."
+
+OUTPUT:
+[
+  {"s":"Alice Chen","p":"LEADS","o":"Project Phoenix"},
+  {"s":"Project Phoenix","p":"RUNS_ON","o":"PostgreSQL"},
+  {"s":"Alice Chen","p":"REPORTS_TO","o":"Bob"}
+]</code></pre>
+
+<h2>Load into Neo4j (Cypher)</h2>
+<pre><code>MERGE (a:Person {name: "Alice Chen"})
+MERGE (p:Project {name: "Project Phoenix"})
+MERGE (db:Tech {name: "PostgreSQL"})
+MERGE (b:Person {name: "Bob"})
+MERGE (a)-[:LEADS]->(p)
+MERGE (p)-[:RUNS_ON]->(db)
+MERGE (a)-[:REPORTS_TO]->(b)</code></pre>
+
+<p>Tools: <strong>LLMGraphTransformer</strong> (LangChain), <strong>GraphRAG indexer</strong> (Microsoft), <strong>Neo4j LLM KG Builder</strong>.</p>
+</section>
+
+<section class="page" id="kg-retrieval"><span class="tag">Graph search</span>
+<h1 class="page-title">Graph retrieval at query time</h1>
+<p class="page-sub">Agent chooses: vector search, graph traverse, or both</p>
+
+<h2>Pattern A: Text-to-Cypher</h2>
+<p>LLM converts natural language &rarr; Cypher query &rarr; execute on Neo4j &rarr; results as context.</p>
+<pre><code># User: "What database does Alice's project use?"
+
+Cypher:
+MATCH (a:Person {name:"Alice Chen"})-[:LEADS]->(p:Project)-[:RUNS_ON]->(db)
+RETURN p.name, db.name
+
+# Result → inject into LLM prompt → natural language answer</code></pre>
+
+<h2>Pattern B: Entity linking + subgraph</h2>
+<ol>
+<li>Detect entities in query (&quot;Alice&quot;, &quot;Project Phoenix&quot;)</li>
+<li>Link to graph node IDs (fuzzy match or embedding)</li>
+<li>Pull k-hop neighborhood as structured context</li>
+<li>LLM answers from subgraph JSON</li>
+</ol>
+
+<h2>Pattern C: Hybrid (recommended)</h2>
+<pre><code>async def retrieve(query: str):
+    vector_hits = await vector_db.similarity_search(query, k=5)
+    entities = extract_entities(query)
+    graph_hits = neo4j.run(subgraph_query(entities, hops=2))
+    return merge_and_deduplicate(vector_hits, graph_hits)</code></pre>
+
+<div class="callout"><strong>Agent tool design:</strong> expose <span class="mono">search_docs</span> (vector) and <span class="mono">query_knowledge_graph</span> (Cypher) as separate tools. Let the agent pick based on question shape.</div>
+</section>
+
+<section class="page" id="graphrag"><span class="tag">GraphRAG</span>
+<h1 class="page-title">GraphRAG (Microsoft pattern)</h1>
+<p class="page-sub">Community summaries + global/local search for corpus-scale graphs</p>
+
+<h2>Two-phase architecture</h2>
+<div class="cols">
+<div class="card"><h3>Index time (offline)</h3>
+<ol>
+<li>Chunk documents</li>
+<li>Extract entities &amp; relations</li>
+<li>Cluster into <strong>communities</strong> (Leiden)</li>
+<li>LLM summarizes each community</li>
+</ol></div>
+<div class="card"><h3>Query time (online)</h3>
+<ol>
+<li><strong>Local search:</strong> entity-centric subgraph + chunks</li>
+<li><strong>Global search:</strong> map over community summaries</li>
+<li>Merge &rarr; final LLM answer</li>
+</ol></div>
+</div>
+
+<h2>When GraphRAG beats naive vector RAG</h2>
+<ul>
+<li>&quot;What are the main themes across all compliance reports?&quot; &rarr; <strong>global</strong> community summaries</li>
+<li>&quot;How is Team A connected to the 2024 audit finding?&quot; &rarr; <strong>local</strong> subgraph + hops</li>
+<li>1000+ docs with repeating entity names &rarr; entity resolution + graph wins</li>
+</ul>
+</section>
+
+<section class="page" id="kg-practice"><span class="tag">Lab</span>
+<h1 class="page-title">Hands-on lab: graph-enhanced RAG</h1>
+
+<h2>Dataset (use any internal wiki export or sample)</h2>
+<p>10&ndash;20 short pages about people, projects, and systems. Enough for 3-hop questions.</p>
+
+<ol class="steps">
+<li><strong>Baseline vector RAG</strong> &mdash; chunk + embed + answer 5 test questions. Log failures on relationship questions.</li>
+<li><strong>Extract triples</strong> &mdash; run LLM extraction on each chunk; inspect JSON quality manually.</li>
+<li><strong>Load Neo4j</strong> (Docker: <span class="mono">neo4j:5</span>) &mdash; MERGE triples; visualize in Browser.</li>
+<li><strong>Add Cypher tool</strong> to your LangGraph agent from <a href="course-full-framework.html">LangChain &amp; LangGraph</a> lab.</li>
+<li><strong>Re-run same 5 questions</strong> &mdash; compare faithfulness on multi-hop queries.</li>
+<li><strong>Hybrid</strong> &mdash; combine vector + graph retrieval; measure Recall@5 on a labeled set.</li>
+</ol>
+
+<h2>Eval questions (example)</h2>
+<table>
+<tr><th>Question</th><th>Expected retrieval path</th></tr>
+<tr><td>Who leads Project Phoenix?</td><td>1-hop: Person&mdash;LEADS&mdash;Project</td></tr>
+<tr><td>What stack does my skip-level manager&apos;s team use?</td><td>2-hop: REPORTS_TO + RUNS_ON</td></tr>
+<tr><td>Summarize all security-related projects</td><td>GraphRAG global OR tag filter + vector</td></tr>
+</table>
+
+<div class="callout"><strong>Start small:</strong> 50&ndash;100 triples in Neo4j beats a million noisy auto-extracted edges. Human review of extracted relations is still normal in 2025.</div>
+</section>
+<section class="page" id="eval"><span class="tag">Agent eval</span>
+<h1 class="page-title">Multi-agent evaluation</h1>
+
+<h2>Team-level metrics</h2>
+<table>
+<tr><th>Metric</th><th>Meaning</th><th>How</th></tr>
+<tr><td>Task success rate</td><td>Final output meets spec</td><td>Human / LLM judge</td></tr>
+<tr><td>Handoff accuracy</td><td>Supervisor picked right worker</td><td>Label expected route</td></tr>
+<tr><td>Critic pass rate</td><td>First-draft vs after-review</td><td>Compare iterations</td></tr>
+<tr><td>Token cost</td><td>Total tokens vs single agent</td><td>Log per node</td></tr>
+<tr><td>Latency</td><td>Wall-clock with parallel workers</td><td>Trace timestamps</td></tr>
+</table>
+
+<h2>KG / GraphRAG eval</h2>
+<table>
+<tr><th>Metric</th><th>Meaning</th></tr>
+<tr><td>Triple precision</td><td>Extracted relations correct?</td></tr>
+<tr><td>Multi-hop recall</td><td>Gold entities in k-hop subgraph?</td></tr>
+<tr><td>Graph answer faithfulness</td><td>Answer supported by subgraph?</td></tr>
+</table>
+
+<pre><code># Multi-hop KG eval
+def multi_hop_recall(query_entities, gold_entities, subgraph_fn, hops=2):
+    nodes = subgraph_fn(query_entities, hops)
+    found = sum(1 for g in gold_entities if g in nodes)
+    return found / len(gold_entities)</code></pre>
+
+<p>Retrieval metrics: <a href="course-full-retrieval.html#eval">Retrieval Engineering</a>. Full matrix: <a href="course-full-eval.html">Evaluation Guide</a>.</p>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body></html>

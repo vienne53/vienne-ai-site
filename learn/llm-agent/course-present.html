@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>LLM Fundamentals &mdash; Presentation (16:9)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root {
+    --bg:#fff; --text:#1e293b; --muted:#64748b; --accent:#0369a1; --accent2:#0c4a6e;
+    --hi:#b45309; --border:#e2e8f0; --chip:#f0f9ff; --green:#047857; --red:#b91c1c;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { height:100%; overflow:hidden; background:#0f172a; font-family:"Segoe UI",system-ui,sans-serif; color:var(--text); }
+  #stage { width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; }
+  #deck {
+    width:min(100vw, calc(100vh * 16 / 9));
+    height:min(100vh, calc(100vw * 9 / 16));
+    position:relative; background:var(--bg); border-radius:4px;
+    box-shadow:0 12px 48px rgba(0,0,0,.35);
+  }
+  .slide {
+    position:absolute; inset:0; display:none; flex-direction:column;
+    padding:36px 48px 52px; overflow:hidden; background:var(--bg);
+  }
+  .slide.active { display:flex; animation:fadeIn .32s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:scale(.985)} to{opacity:1;transform:none} }
+  .fragment { opacity:0; transform:translateY(10px); transition:opacity .38s ease, transform .38s ease; pointer-events:none; }
+  .fragment.visible { opacity:1; transform:none; pointer-events:auto; }
+  .chapter-tag {
+    position:absolute; top:14px; left:18px; font-size:10px; font-weight:700;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--accent);
+    background:var(--chip); padding:3px 9px; border-radius:999px; border:1px solid #bae6fd;
+  }
+  .slide-num { position:absolute; bottom:12px; right:18px; font-size:12px; color:var(--muted); }
+  h1 { font-size:1.75rem; color:var(--accent2); line-height:1.2; margin-bottom:.35em; }
+  h2 { font-size:1.28rem; color:var(--accent); margin-bottom:.45em; line-height:1.25; }
+  h3 { font-size:.95rem; color:var(--green); margin:.4em 0 .25em; }
+  p, li { font-size:.92rem; line-height:1.45; margin:.28em 0; }
+  ul, ol { margin-left:1.2em; }
+  strong { color:var(--hi); }
+  .subtitle { font-size:1rem; color:var(--muted); margin-bottom:.6rem; }
+  .lead-center { text-align:center; justify-content:center; align-items:center; }
+  .lead-center h1 { font-size:2.1rem; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:16px; flex:1; align-content:start; }
+  .card { border:1px solid var(--border); border-radius:8px; padding:12px 14px; background:#f8fafc; }
+  .card.bad { background:#fef2f2; border-color:#fecaca; }
+  .card.good { background:#ecfdf5; border-color:#a7f3d0; }
+  .callout {
+    margin-top:auto; padding:10px 14px; border-left:4px solid var(--accent);
+    background:var(--chip); border-radius:0 6px 6px 0; font-size:.88rem;
+  }
+  .eq { margin:.35em 0; overflow-x:auto; font-size:.95rem; }
+  .fig { text-align:center; margin:6px 0; flex-shrink:0; }
+  .fig svg { max-width:100%; max-height:220px; height:auto; border:1px solid var(--border); border-radius:6px; }
+  .fig.tall svg { max-height:280px; }
+  table { width:100%; border-collapse:collapse; font-size:.78rem; margin:.35em 0; }
+  th, td { border:1px solid var(--border); padding:5px 7px; text-align:left; }
+  th { background:#e0f2fe; color:var(--accent2); }
+  .mono { font-family:Consolas,monospace; font-size:.78rem; background:#f1f5f9; padding:2px 6px; border-radius:4px; }
+  .compare-row { display:flex; gap:10px; margin:5px 0; font-size:.88rem; }
+  .compare-row span:first-child { min-width:90px; font-weight:700; color:var(--accent2); }
+  .react { padding:7px 11px; border-radius:6px; margin:5px 0; font-size:.82rem; }
+  .react-t { background:#f0f9ff; border:1px solid #bae6fd; }
+  .react-a { background:#fef3c7; border:1px solid #fcd34d; }
+  .react-o { background:#ecfdf5; border:1px solid #a7f3d0; }
+  .phase-label { display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:3px 10px; border-radius:999px; margin-bottom:8px; }
+  .phase-label.offline { background:#e0e7ff; color:#4338ca; border:1px solid #a5b4fc; }
+  .phase-label.online { background:#fce7f3; color:#be185d; border:1px solid #f9a8d4; }
+  pre { padding:10px; background:#f8fafc; border:1px solid var(--border); border-radius:6px; font-size:.72rem; overflow:hidden; line-height:1.35; }
+  kbd { background:#f1f5f9; border:1px solid #cbd5e1; border-radius:4px; padding:1px 5px; font-size:10px; }
+  #hud {
+    position:fixed; bottom:0; left:0; right:0; height:40px;
+    background:rgba(15,23,42,.92); color:#94a3b8;
+    display:flex; align-items:center; padding:0 16px; gap:12px; font-size:12px; z-index:100;
+  }
+  #progress { flex:1; height:3px; background:#334155; border-radius:2px; overflow:hidden; }
+  #progress-bar { height:100%; background:#38bdf8; width:0; transition:width .25s; }
+  #tap-zones { position:fixed; inset:0; bottom:40px; display:flex; z-index:50; pointer-events:none; }
+  #tap-zones div { flex:1; pointer-events:auto; }
+  /* SVG animations */
+  @keyframes drawPath { to { stroke-dashoffset:0; } }
+  @keyframes pulseGlow { 0%,100%{opacity:.35} 50%{opacity:1} }
+  @keyframes tokenPop { from{opacity:0;transform:scale(.6)} to{opacity:1;transform:scale(1)} }
+  .anim-draw { stroke-dasharray:600; stroke-dashoffset:600; }
+  .slide.active .anim-draw, .fragment.visible .anim-draw { animation:drawPath 1.1s ease forwards; }
+  .anim-pulse { animation:pulseGlow 1.6s ease-in-out infinite; }
+  .fragment.visible .anim-pulse { animation:pulseGlow 1.2s ease-in-out infinite; }
+  .token-step { opacity:0; transform:scale(.7); display:inline-block; }
+  .fragment.visible .token-step { animation:tokenPop .4s ease forwards; }
+  .fragment.visible .token-step.d1 { animation-delay:.1s; }
+  .fragment.visible .token-step.d2 { animation-delay:.25s; }
+  .fragment.visible .token-step.d3 { animation-delay:.4s; }
+  @media print { #hud,#tap-zones{display:none} .slide{position:relative;display:flex!important;page-break-after:always;height:720px;width:1280px} }
+</style>
+</head>
+<body>
+<div id="stage"><div id="deck">
+
+<!-- INTRO -->
+<section class="slide active lead-center" data-chapter="LLM" data-notes="LLM-only deck. RAG and Multimodal are separate HTML files. Tap right or Space. F for fullscreen.">
+  <span class="chapter-tag">Chapter 1</span>
+  <h1>LLM Fundamentals</h1>
+  <p class="subtitle">NLP &rarr; Transformer &rarr; training &rarr; applications</p>
+  <p class="fragment subtitle" style="margin-top:1.2rem;font-size:.88rem">
+    Full path: <a href="present-hub.html" style="color:var(--accent)">9-chapter hub</a> &middot;
+    <a href="course-present-rag.html" style="color:var(--accent)">? RAG</a>
+  </p>
+  <p class="fragment subtitle" style="margin-top:.8rem">Tap right &middot; <kbd>Space</kbd> &middot; <kbd>F</kbd> fullscreen</p>
+</section>
+
+<section class="slide" data-chapter="LLM" data-notes="Chapter 1 of 9-chapter path. See present-hub.html.">
+  <span class="chapter-tag">Scope</span>
+  <h2>Chapter 1 of 9</h2>
+  <ol style="font-size:.82rem">
+    <li class="fragment"><strong>? LLM</strong> &mdash; this deck</li>
+    <li class="fragment"><strong>? RAG</strong> &mdash; look up first, then think</li>
+    <li class="fragment"><strong>?—?</strong> Agent Core + Retrieval</li>
+    <li class="fragment"><strong>?—?</strong> LangGraph, MCP/A2A, OpenClaw</li>
+    <li class="fragment"><strong>?—?</strong> Multi-agent/KG, Multimodal</li>
+  </ol>
+  <p class="fragment subtitle" style="font-size:.82rem"><a href="present-hub.html">present-hub.html</a></p>
+  <span class="slide-num"></span>
+</section>
+
+<!-- CH1 -->
+<section class="slide lead-center" data-chapter="Ch 1" data-notes="Chapter 1 opener. Problem before architecture.">
+  <span class="chapter-tag">Chapter 1</span>
+  <h1>Why did LLMs emerge?</h1>
+  <p class="fragment subtitle">From NLP to LLM: why traditional AI was not enough</p>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 1" data-notes="Siri vs ChatGPT hook. Root cause is long-range context.">
+  <span class="chapter-tag">Ch 1</span>
+  <h2>Two questions to start</h2>
+  <div class="cols">
+    <div class="card bad fragment"><h3 style="color:var(--red)">Why did Siri feel dumb?</h3><p>Short replies, lost context, brittle rules</p></div>
+    <div class="card good fragment"><h3 style="color:var(--green)">Why did ChatGPT feel smart?</h3><p>Long context, fluent reasoning, general tasks</p></div>
+  </div>
+  <div class="callout fragment">Classical NLP: <strong>cannot model long-range context</strong></div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 1" data-notes="Everything is next-token prediction. Chat is still prediction.">
+  <span class="chapter-tag">Ch 1</span>
+  <h2>NLP = everything is prediction</h2>
+  <div class="callout fragment">
+    <p>A Language Model <strong>predicts the next token</strong> given all previous tokens.</p>
+    <p>ChatGPT &quot;understands&quot; &mdash; but under the hood: <strong>next-token prediction</strong>, one token at a time.</p>
+  </div>
+  <table class="fragment" style="margin-top:10px">
+    <tr><th>Task</th><th>What model predicts</th></tr>
+    <tr><td>Chat / QA</td><td>P(answer token | question + history)</td></tr>
+    <tr><td>Translation</td><td>P(target token | source + target so far)</td></tr>
+    <tr><td>ASR</td><td>P(text token | audio frames)</td></tr>
+  </table>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 1" data-notes="Walk the prediction loop. Animated feedback arrow on reveal.">
+  <span class="chapter-tag">Ch 1</span>
+  <h2>Prediction loop</h2>
+  <div class="fig fragment">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 130" width="880" height="130">
+      <rect width="880" height="130" fill="#fff"/>
+      <rect x="20" y="35" width="120" height="40" rx="6" fill="#f1f5f9" stroke="#64748b"/><text x="80" y="60" text-anchor="middle" font-size="10">Context</text>
+      <rect x="165" y="35" width="120" height="40" rx="6" fill="#dbeafe" stroke="#0284c7"/><text x="225" y="60" text-anchor="middle" font-size="10">Model</text>
+      <rect x="310" y="35" width="120" height="40" rx="6" fill="#fef3c7" stroke="#f59e0b"/><text x="370" y="60" text-anchor="middle" font-size="10">P(next)</text>
+      <rect x="455" y="35" width="100" height="40" rx="6" fill="#dcfce7" stroke="#16a34a"/><text x="505" y="60" text-anchor="middle" font-size="10">Pick</text>
+      <rect x="580" y="35" width="140" height="40" rx="6" fill="#fce7f3" stroke="#db2777"/><text x="650" y="60" text-anchor="middle" font-size="10">Append</text>
+      <line x1="140" y1="55" x2="165" y2="55" stroke="#64748b"/><line x1="285" y1="55" x2="310" y2="55" stroke="#64748b"/>
+      <line x1="430" y1="55" x2="455" y2="55" stroke="#64748b"/><line x1="555" y1="55" x2="580" y2="55" stroke="#64748b"/>
+      <path class="anim-draw" d="M650 75 L650 100 L80 100 L80 75" stroke="#0284c7" stroke-width="2.5" fill="none"/>
+      <text x="440" y="118" text-anchor="middle" fill="#64748b" font-size="10">Train: compare vs truth. Infer: loop until EOS.</text>
+    </svg>
+  </div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 1" data-notes="Four failures ending with Transformer preview.">
+  <span class="chapter-tag">Ch 1</span>
+  <h2>Four failures of traditional AI</h2>
+  <div class="compare-row fragment"><span>Rules</span> Infinite variation &mdash; rules break</div>
+  <div class="compare-row fragment"><span>ML</span> Hand-crafted features; not end-to-end</div>
+  <div class="compare-row fragment"><span>RNN</span> Serial, slow; distant tokens fade</div>
+  <div class="compare-row fragment"><span>CNN</span> Local window; many layers for global view</div>
+  <div class="callout fragment"><strong>Transformer (2017):</strong> any token &harr; any token &mdash; parallel &amp; global</div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 1" data-notes="Germany example. RNN forgets; Attention one hop.">
+  <span class="chapter-tag">Ch 1</span>
+  <h2>Long-range dependency</h2>
+  <p class="fragment" style="font-size:.85rem">I grew up in <strong>Germany</strong> ... (50 words) ... I speak fluent ______</p>
+  <div class="fig tall fragment">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 200" width="920" height="200">
+      <rect width="920" height="200" fill="#fff"/>
+      <rect x="30" y="30" width="400" height="150" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+      <text x="230" y="58" text-anchor="middle" fill="#b91c1c" font-weight="bold" font-size="13">RNN: 49 hops</text>
+      <text x="50" y="90" fill="#64748b" font-size="11">"Germany" signal fades</text>
+      <text x="50" y="120" fill="#b91c1c" font-size="12">May predict wrong language</text>
+      <rect x="490" y="30" width="400" height="150" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+      <text x="690" y="58" text-anchor="middle" fill="#047857" font-weight="bold" font-size="13">Attention: 1 hop</text>
+      <line class="anim-draw" x1="580" y1="100" x2="800" y2="100" stroke="#0284c7" stroke-width="4"/>
+      <text x="690" y="130" text-anchor="middle" fill="#047857" font-size="12">Correct: German / Deutsch</text>
+    </svg>
+  </div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 1" data-notes="Chain rule definition. GPT approximates conditional next token.">
+  <span class="chapter-tag">Ch 1 &middot; Math</span>
+  <h2>Language Model definition</h2>
+  <div class="eq fragment">$$\mathcal{P}(s_1 \ldots s_n) = \prod_{j=1}^{n} \mathcal{P}(s_j \mid s_1, \ldots, s_{j-1})$$</div>
+  <p class="fragment">Modeling language = modeling <strong>next-token</strong> probability, repeatedly.</p>
+  <div class="callout fragment">GPT approximates $\mathcal{P}(s_{t+1} \mid s_{1:t})$ with a Transformer.</div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 1" data-notes="Toy numeric multiply three conditionals.">
+  <span class="chapter-tag">Ch 1 &middot; Example</span>
+  <h2>Numeric example</h2>
+  <p class="fragment">Vocabulary {I, love, Paris}. Sentence &quot;I love Paris&quot;:</p>
+  <div class="eq fragment">$$\mathcal{P}(\text{I love Paris}) = \mathcal{P}(\text{I}) \cdot \mathcal{P}(\text{love}\mid\text{I}) \cdot \mathcal{P}(\text{Paris}\mid\text{I love})$$</div>
+  <p class="fragment">$0.02 \times 0.12 \times 0.09 = \mathbf{0.000216}$</p>
+  <div class="callout fragment"><strong>Generation</strong> reverses this: sample next token, append, repeat.</div>
+  <span class="slide-num"></span>
+</section>
+
+<!-- CH2 -->
+<section class="slide lead-center" data-chapter="Ch 2" data-notes="Chapter 2. Why Attention beats RNN/CNN.">
+  <span class="chapter-tag">Chapter 2</span>
+  <h1>Why Transformer changed the world</h1>
+  <p class="fragment subtitle">Before formulas &mdash; understand the revolution</p>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 2" data-notes="Three architecture comparison table.">
+  <span class="chapter-tag">Ch 2</span>
+  <h2>RNN vs CNN vs Attention</h2>
+  <table class="fragment">
+    <tr><th>Arch</th><th>Pattern</th><th>Problem</th></tr>
+    <tr><td><strong>RNN</strong></td><td>T1 &rarr; T2 &rarr; ... &rarr; T50</td><td>Serial; forgets distant tokens</td></tr>
+    <tr><td><strong>CNN</strong></td><td>Local windows</td><td>Cannot see global context in one layer</td></tr>
+    <tr><td><strong>Attention</strong></td><td>T1 &harr; T2 &harr; ... &harr; T50</td><td>Direct links; parallel; global</td></tr>
+  </table>
+  <div class="callout fragment">Token1 &harr; Token50 in <strong>one step</strong>, not 49 hops.</div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 2" data-notes="Coreference intuition. it refers to animal weight 0.84.">
+  <span class="chapter-tag">Ch 2</span>
+  <h2>Attention: &quot;Who matters most?&quot;</h2>
+  <div class="fig fragment">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 180" width="880" height="180">
+      <rect width="880" height="180" fill="#fff"/>
+      <text x="440" y="28" text-anchor="middle" fill="#334155" font-size="13">The animal did not cross the street because it was tired.</text>
+      <circle cx="720" cy="65" r="22" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/><text x="720" y="71" text-anchor="middle" fill="#b45309" font-weight="bold">it</text>
+      <circle cx="200" cy="95" r="26" fill="#dbeafe" stroke="#0284c7" stroke-width="2"/><text x="200" y="101" text-anchor="middle" fill="#0369a1">animal</text>
+      <circle cx="450" cy="95" r="20" fill="#f1f5f9" stroke="#94a3b8"/><text x="450" y="101" text-anchor="middle" fill="#64748b" font-size="11">street</text>
+      <path class="anim-draw" d="M698 78 Q450 145 230 110" stroke="#0284c7" stroke-width="5" fill="none"/>
+      <path d="M705 73 Q520 115 440 100" stroke="#cbd5e1" stroke-width="2" fill="none"/>
+      <text x="440" y="155" text-anchor="middle" fill="#0284c7" font-weight="bold" font-size="12">weight 0.84 &rarr; &quot;animal&quot;</text>
+    </svg>
+  </div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 2" data-notes="Present scaled dot-product attention formula.">
+  <span class="chapter-tag">Ch 2 &middot; Math</span>
+  <h2>Scaled dot-product attention</h2>
+  <div class="eq fragment">$$\text{Attention}(Q,K,V)=\text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$</div>
+  <ul class="fragment" style="font-size:.88rem">
+    <li><strong>Q</strong> Query &mdash; what am I looking for?</li>
+    <li><strong>K</strong> Key &mdash; how matchable is each token?</li>
+    <li><strong>V</strong> Value &mdash; what information do I take?</li>
+  </ul>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 2" data-notes="Self-attention with learned W matrices. Hand calc on next slide.">
+  <span class="chapter-tag">Ch 2 &middot; Math</span>
+  <h2>Self-attention with projections</h2>
+  <div class="eq fragment">$$\text{SelfAttn}(X)=\text{softmax}\!\left(\frac{XW_Q(XW_K)^\top}{\sqrt{d_k}}\right)XW_V$$</div>
+  <p class="fragment" style="font-size:.85rem">Mini example (cat, sat, mat) for &quot;sat&quot;: scores &rarr; softmax <strong>[0.26, 0.58, 0.16]</strong></p>
+  <div class="callout fragment">Multi-Head = several $(W_Q,W_K,W_V)$ in parallel &rarr; syntax, coreference, semantics.</div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 2" data-notes="Three model families. GPT path is decoder-only.">
+  <span class="chapter-tag">Ch 2 &middot; Architecture</span>
+  <h2>Three Transformer families</h2>
+  <table class="fragment">
+    <tr><th>Model</th><th>Stack</th><th>Examples</th></tr>
+    <tr><td><strong>Encoder-Decoder</strong></td><td>Both; cross-attention</td><td>Translation, Whisper</td></tr>
+    <tr><td><strong>Decoder-only</strong></td><td>Causal masked self-attn</td><td>ChatGPT, Llama</td></tr>
+    <tr><td><strong>Encoder-only</strong></td><td>Bidirectional</td><td>BERT, embeddings</td></tr>
+  </table>
+  <div class="callout fragment">ChatGPT path: <strong>GPT = decoder-only</strong>, autoregressive next-token loop.</div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 2" data-notes="GPT stack simplified. No encoder, no cross-attention.">
+  <span class="chapter-tag">Ch 2 &middot; GPT</span>
+  <h2>GPT = Decoder-only</h2>
+  <div class="fig tall fragment">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 280" width="360" height="280">
+      <rect width="360" height="280" fill="#fff"/>
+      <text x="180" y="20" text-anchor="middle" fill="#ea580c" font-weight="bold">GPT (Decoder-only)</text>
+      <rect x="40" y="30" width="280" height="24" rx="4" fill="#f1f5f9" stroke="#64748b"/><text x="180" y="47" text-anchor="middle" font-size="9">Prompt + generated tokens</text>
+      <rect x="40" y="60" width="280" height="24" rx="4" fill="#fed7aa" stroke="#ea580c"/><text x="180" y="77" text-anchor="middle" font-size="9">Embedding + RoPE</text>
+      <rect x="25" y="90" width="310" height="70" rx="5" fill="#fed7aa" stroke="#ea580c" stroke-width="2"/>
+      <text x="180" y="112" text-anchor="middle" font-size="9" font-weight="bold">Decoder Block x L</text>
+      <text x="180" y="130" text-anchor="middle" font-size="8">Causal Masked Multi-Head Self-Attention</text>
+      <text x="180" y="146" text-anchor="middle" font-size="8">FFN + LayerNorm (no cross-attn)</text>
+      <rect x="40" y="168" width="280" height="24" rx="4" fill="#fef3c7" stroke="#f59e0b"/><text x="180" y="185" text-anchor="middle" font-size="9">LM Head &rarr; Softmax</text>
+      <rect x="40" y="198" width="280" height="24" rx="4" fill="#dcfce7" stroke="#16a34a"/><text x="180" y="215" text-anchor="middle" font-size="9" font-weight="bold">Sample next token &rarr; append</text>
+      <path class="anim-draw anim-pulse" d="M180 222 L180 260" stroke="#0284c7" stroke-width="2" fill="none"/>
+      <text x="180" y="272" text-anchor="middle" font-size="8" fill="#64748b">Autoregressive loop</text>
+    </svg>
+  </div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 2" data-notes="Seven step inference. Autoregressive typewriter.">
+  <span class="chapter-tag">Ch 2 &middot; Inference</span>
+  <h2>How an LLM answers</h2>
+  <p class="fragment"><strong>Q:</strong> &quot;What is the capital of France?&quot;</p>
+  <ol class="fragment" style="font-size:.82rem">
+    <li>Tokenize &rarr; embed + positional encoding</li>
+    <li>Forward through L Transformer layers</li>
+    <li>LM Head &rarr; logits over vocabulary</li>
+    <li>Softmax &rarr; P(next token | context)</li>
+    <li>Pick token &rarr; <strong>&quot;Paris&quot;</strong></li>
+    <li>Append &rarr; repeat until &lt;EOS&gt;</li>
+  </ol>
+  <div class="callout fragment"><strong>Autoregressive:</strong> one token at a time.</div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 2" data-notes="Paris 77.9% softmax. Animated token reveal.">
+  <span class="chapter-tag">Ch 2 &middot; Example</span>
+  <h2>Decode: predicting &quot;Paris&quot;</h2>
+  <table class="fragment">
+    <tr><th>Token</th><th>Paris</th><th>London</th><th>the</th><th>&lt;EOS&gt;</th></tr>
+    <tr><td>logit</td><td>3.2</td><td>1.1</td><td>0.3</td><td>-1.0</td></tr>
+    <tr><td>softmax</td><td><strong>77.9%</strong></td><td>9.5%</td><td>4.3%</td><td>1.2%</td></tr>
+  </table>
+  <p class="fragment" style="margin-top:10px">
+    Context grows:
+    <span class="token-step d1">&quot;Paris&quot;</span>
+    <span class="token-step d2">&quot;.&quot;</span>
+    <span class="token-step d3">&lt;EOS&gt;</span>
+  </p>
+  <div class="eq fragment">$$\mathcal{P}_i=\frac{e^{z_i/T}}{\sum_j e^{z_j/T}} \quad (T=\text{temperature})$$</div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 2" data-notes="Sampling params table. Low T for facts, high for creative.">
+  <span class="chapter-tag">Ch 2 &middot; Sampling</span>
+  <h2>Inference parameters</h2>
+  <table class="fragment">
+    <tr><th>Param</th><th>Effect</th><th>Use when</th></tr>
+    <tr><td><strong>temperature</strong></td><td>Low = peaked; high = random</td><td>0 facts/code; 0.7 chat; &gt;1 creative</td></tr>
+    <tr><td><strong>top-p</strong></td><td>Sample from nucleus set</td><td>~0.9 default</td></tr>
+    <tr><td><strong>top-k</strong></td><td>Keep k highest tokens</td><td>k=1 greedy; 40-50 chat</td></tr>
+  </table>
+  <table class="fragment" style="margin-top:8px">
+    <tr><th>Token</th><th>T=0.1</th><th>T=1.0</th><th>T=2.0</th></tr>
+    <tr><td>Paris</td><td><strong>99.2%</strong></td><td><strong>77.9%</strong></td><td>52.1%</td></tr>
+  </table>
+  <span class="slide-num"></span>
+</section>
+
+<!-- CH3 -->
+<section class="slide lead-center" data-chapter="Ch 3" data-notes="Emergence at scale. Nonlinear capability jump.">
+  <span class="chapter-tag">Chapter 3</span>
+  <h1>Why intelligence emerges</h1>
+  <p class="fragment subtitle">Emergent abilities &amp; Scaling Laws</p>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 3" data-notes="Small vs large model behavior. Scaling law formula.">
+  <span class="chapter-tag">Ch 3</span>
+  <h2>Emergence &amp; scaling</h2>
+  <div class="cols">
+    <div class="card fragment"><h3>&lt; 1B params</h3><p>Advanced autocomplete. Weak reasoning.</p></div>
+    <div class="card good fragment"><h3>10B - 100B+</h3><p>CoT, coding, planning, translation jump.</p></div>
+  </div>
+  <div class="eq fragment">$$L(N,D) \approx \left(\frac{N_c}{N}\right)^{\alpha_N} + \left(\frac{D_c}{D}\right)^{\alpha_D}$$</div>
+  <p class="fragment" style="font-size:.85rem">Loss decreases predictably with params <strong>N</strong>, data <strong>D</strong>, compute <strong>C</strong>.</p>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 3" data-notes="LLM definition and five key techniques.">
+  <span class="chapter-tag">Ch 3</span>
+  <h2>What is an LLM?</h2>
+  <div class="callout fragment">
+    <p><strong>Definition:</strong> Transformer LM with <strong>10B+ parameters</strong>, trained on massive text.</p>
+    <p>Solves tasks via <strong>text generation</strong> (next-token prediction at scale).</p>
+  </div>
+  <table class="fragment" style="margin-top:8px">
+    <tr><th>Technique</th><th>Example</th></tr>
+    <tr><td>Scaling</td><td>GPT-1 117M &rarr; GPT-3 175B</td></tr>
+    <tr><td>Ability eliciting</td><td>CoT: &quot;Think step by step&quot;</td></tr>
+    <tr><td>Alignment</td><td>RLHF, DPO</td></tr>
+    <tr><td>Tool manipulation</td><td>API calls (see <strong>RAG course</strong>)</td></tr>
+  </table>
+  <span class="slide-num"></span>
+</section>
+
+<!-- CH4 -->
+<section class="slide lead-center" data-chapter="Ch 4" data-notes="Training pipeline chapter. Pretrain SFT RLHF.">
+  <span class="chapter-tag">Chapter 4</span>
+  <h1>Modern LLM Training</h1>
+  <p class="fragment subtitle">Pretrain &rarr; SFT &rarr; RLHF</p>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 4" data-notes="Pretrain objective next-token CE on internet text.">
+  <span class="chapter-tag">Ch 4 &middot; Pretrain</span>
+  <h2>Pretraining</h2>
+  <div class="eq fragment">$$\mathcal{L}_{\text{PT}} = -\frac{1}{N}\sum_{t=1}^{N} \log \mathcal{P}_\theta(x_t \mid x_{1:t-1})$$</div>
+  <p class="fragment" style="font-size:.85rem">Data: web crawl, books, Wikipedia, code. Distributed GPU training.</p>
+  <div class="callout fragment">After pretrain: model <strong>continues text</strong> &mdash; cannot follow instructions yet.</div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 4" data-notes="SFT teaches instruction following. Mask loss on prompt.">
+  <span class="chapter-tag">Ch 4 &middot; SFT</span>
+  <h2>Instruction tuning (SFT)</h2>
+  <div class="cols">
+    <div class="card bad fragment"><h3>After pretrain</h3><p>Q: 2+2=?<br>May ramble about math...</p></div>
+    <div class="card good fragment"><h3>After SFT</h3><p>Q: 2+2=?<br>Answer: 4.</p></div>
+  </div>
+  <p class="fragment" style="font-size:.82rem;margin-top:8px">Train only on <strong>assistant reply tokens</strong>. Methods: Full FT, LoRA, QLoRA.</p>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide" data-chapter="Ch 4" data-notes="RLHF three steps. DPO alternative.">
+  <span class="chapter-tag">Ch 4 &middot; RLHF</span>
+  <h2>RLHF alignment</h2>
+  <ol class="fragment" style="font-size:.85rem">
+    <li><strong>SFT</strong> &mdash; imitation on human-written answers</li>
+    <li><strong>Reward model</strong> &mdash; humans rank responses; train RM</li>
+    <li><strong>PPO</strong> &mdash; maximize reward + KL penalty vs SFT</li>
+  </ol>
+  <div class="eq fragment">$$\max_\theta \; \mathbb{E}[r(x,y)] - \beta\, D_{\text{KL}}(\pi_\theta \,\|\, \pi_{\text{SFT}})$$</div>
+  <div class="callout fragment"><strong>ChatGPT</strong> = Pretrain + SFT + RLHF. Eval: MMLU, win rate, TruthfulQA.</div>
+  <span class="slide-num"></span>
+</section>
+
+<section class="slide lead-center" data-chapter="End" data-notes="LLM deck ends. Point to RAG and multimodal separate files. Scroll: course-full-llm.html.">
+  <span class="chapter-tag">Chapter 1 complete</span>
+  <h1>LLM Fundamentals done</h1>
+  <p class="fragment subtitle">Scroll: <strong>course-full-llm.html</strong> (appendix sections for agent preview)</p>
+  <p class="fragment subtitle" style="margin-top:1rem;font-size:.9rem">
+    Next: <a href="course-present-rag.html" style="color:var(--accent)"><strong>? RAG</strong></a><br>
+    Full path: <a href="present-hub.html" style="color:var(--accent)">9-chapter hub</a>
+  </p>
+  <span class="slide-num"></span>
+</section>
+
+</div></div>
+
+<div id="tap-zones"><div id="tap-prev"></div><div id="tap-next"></div></div>
+<div id="hud">
+  <span id="chapter-label">Intro</span>
+  <div id="progress"><div id="progress-bar"></div></div>
+  <span id="slide-label">1 / 1</span>
+  <span><a href="present-hub.html" style="color:#38bdf8;text-decoration:none;margin-right:8px">Hub</a><kbd>&larr;</kbd><kbd>&rarr;</kbd> <kbd>Space</kbd> <kbd>F</kbd></span>
+</div>
+
+<script>
+(function () {
+  const slides = [...document.querySelectorAll('.slide')];
+  let idx = 0, fragIdx = -1;
+
+  function frags(i) { return [...slides[i].querySelectorAll('.fragment')]; }
+
+  function renderMath() {
+    if (window.renderMathInElement) {
+      renderMathInElement(slides[idx], {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  }
+
+  function updateHUD() {
+    const s = slides[idx];
+    document.getElementById('chapter-label').textContent = s.dataset.chapter || '';
+    document.getElementById('slide-label').textContent = (idx + 1) + ' / ' + slides.length;
+    document.getElementById('progress-bar').style.width = ((idx + 1) / slides.length * 100) + '%';
+    slides.forEach((sl, i) => {
+      const num = sl.querySelector('.slide-num');
+      if (num) num.textContent = (i + 1) + ' / ' + slides.length;
+    });
+    renderMath();
+  }
+
+  function showSlide(newIdx, resetFrag) {
+    if (resetFrag === undefined) resetFrag = true;
+    slides[idx].classList.remove('active');
+    idx = Math.max(0, Math.min(newIdx, slides.length - 1));
+    slides[idx].classList.add('active');
+    if (resetFrag) {
+      fragIdx = -1;
+      frags(idx).forEach(f => f.classList.remove('visible'));
+    }
+    updateHUD();
+  }
+
+  function nextStep() {
+    const fs = frags(idx);
+    if (fragIdx < fs.length - 1) {
+      fragIdx++;
+      fs[fragIdx].classList.add('visible');
+      return true;
+    }
+    return false;
+  }
+
+  function prevStep() {
+    const fs = frags(idx);
+    if (fragIdx >= 0) {
+      fs[fragIdx].classList.remove('visible');
+      fragIdx--;
+      return true;
+    }
+    return false;
+  }
+
+  function nextSlide() { if (!nextStep()) showSlide(idx + 1); updateHUD(); }
+  function prevSlide() { if (!prevStep()) showSlide(idx - 1, false); updateHUD(); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+    if (e.key === 'Home') { e.preventDefault(); showSlide(0); }
+    if (e.key === 'End') { e.preventDefault(); showSlide(slides.length - 1); }
+    if (e.key === 'f' || e.key === 'F') {
+      const el = document.documentElement;
+      if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen();
+      else if (document.exitFullscreen) document.exitFullscreen();
+    }
+  });
+
+  document.getElementById('tap-next').addEventListener('click', nextSlide);
+  document.getElementById('tap-prev').addEventListener('click', prevSlide);
+
+  let touchX = 0;
+  document.getElementById('deck').addEventListener('touchstart', e => { touchX = e.changedTouches[0].clientX; }, { passive: true });
+  document.getElementById('deck').addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) { if (dx < 0) nextSlide(); else prevSlide(); }
+  }, { passive: true });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    showSlide(0);
+    if (window.renderMathInElement) renderMath();
+  });
+})();
+</script>
+</body>
+</html>

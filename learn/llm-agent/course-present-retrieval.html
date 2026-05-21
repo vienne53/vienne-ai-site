@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Retrieval Engineering &mdash; Presentation (16:9)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root {
+    --bg:#fff; --text:#1e293b; --muted:#64748b; --accent:#0369a1; --accent2:#0c4a6e;
+    --hi:#b45309; --border:#e2e8f0; --chip:#f0f9ff; --green:#047857; --red:#b91c1c;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { height:100%; overflow:hidden; background:#0f172a; font-family:"Segoe UI",system-ui,sans-serif; color:var(--text); }
+  #stage { width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; }
+  #deck {
+    width:min(100vw, calc(100vh * 16 / 9));
+    height:min(100vh, calc(100vw * 9 / 16));
+    position:relative; background:var(--bg); border-radius:4px;
+    box-shadow:0 12px 48px rgba(0,0,0,.35);
+  }
+  .slide {
+    position:absolute; inset:0; display:none; flex-direction:column;
+    padding:36px 48px 52px; overflow:hidden; background:var(--bg);
+  }
+  .slide.active { display:flex; animation:fadeIn .32s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:scale(.985)} to{opacity:1;transform:none} }
+  .fragment { opacity:0; transform:translateY(10px); transition:opacity .38s ease, transform .38s ease; pointer-events:none; }
+  .fragment.visible { opacity:1; transform:none; pointer-events:auto; }
+  .chapter-tag {
+    position:absolute; top:14px; left:18px; font-size:10px; font-weight:700;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--accent);
+    background:var(--chip); padding:3px 9px; border-radius:999px; border:1px solid #bae6fd;
+  }
+  .slide-num { position:absolute; bottom:12px; right:18px; font-size:12px; color:var(--muted); }
+  h1 { font-size:1.75rem; color:var(--accent2); line-height:1.2; margin-bottom:.35em; }
+  h2 { font-size:1.28rem; color:var(--accent); margin-bottom:.45em; line-height:1.25; }
+  h3 { font-size:.95rem; color:var(--green); margin:.4em 0 .25em; }
+  p, li { font-size:.92rem; line-height:1.45; margin:.28em 0; }
+  ul, ol { margin-left:1.2em; }
+  strong { color:var(--hi); }
+  .subtitle { font-size:1rem; color:var(--muted); margin-bottom:.6rem; }
+  .lead-center { text-align:center; justify-content:center; align-items:center; }
+  .lead-center h1 { font-size:2.1rem; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:16px; flex:1; align-content:start; }
+  .card { border:1px solid var(--border); border-radius:8px; padding:12px 14px; background:#f8fafc; }
+  .card.bad { background:#fef2f2; border-color:#fecaca; }
+  .card.good { background:#ecfdf5; border-color:#a7f3d0; }
+  .callout {
+    margin-top:auto; padding:10px 14px; border-left:4px solid var(--accent);
+    background:var(--chip); border-radius:0 6px 6px 0; font-size:.88rem;
+  }
+  .eq { margin:.35em 0; overflow-x:auto; font-size:.95rem; }
+  .fig { text-align:center; margin:6px 0; flex-shrink:0; }
+  .fig svg { max-width:100%; max-height:220px; height:auto; border:1px solid var(--border); border-radius:6px; }
+  .fig.tall svg { max-height:280px; }
+  table { width:100%; border-collapse:collapse; font-size:.78rem; margin:.35em 0; }
+  th, td { border:1px solid var(--border); padding:5px 7px; text-align:left; }
+  th { background:#e0f2fe; color:var(--accent2); }
+  .mono { font-family:Consolas,monospace; font-size:.78rem; background:#f1f5f9; padding:2px 6px; border-radius:4px; }
+  .compare-row { display:flex; gap:10px; margin:5px 0; font-size:.88rem; }
+  .compare-row span:first-child { min-width:90px; font-weight:700; color:var(--accent2); }
+  .react { padding:7px 11px; border-radius:6px; margin:5px 0; font-size:.82rem; }
+  .react-t { background:#f0f9ff; border:1px solid #bae6fd; }
+  .react-a { background:#fef3c7; border:1px solid #fcd34d; }
+  .react-o { background:#ecfdf5; border:1px solid #a7f3d0; }
+  .phase-label { display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:3px 10px; border-radius:999px; margin-bottom:8px; }
+  .phase-label.offline { background:#e0e7ff; color:#4338ca; border:1px solid #a5b4fc; }
+  .phase-label.online { background:#fce7f3; color:#be185d; border:1px solid #f9a8d4; }
+  pre { padding:10px; background:#f8fafc; border:1px solid var(--border); border-radius:6px; font-size:.72rem; overflow:hidden; line-height:1.35; }
+  kbd { background:#f1f5f9; border:1px solid #cbd5e1; border-radius:4px; padding:1px 5px; font-size:10px; }
+  #hud {
+    position:fixed; bottom:0; left:0; right:0; height:40px;
+    background:rgba(15,23,42,.92); color:#94a3b8;
+    display:flex; align-items:center; padding:0 16px; gap:12px; font-size:12px; z-index:100;
+  }
+  #progress { flex:1; height:3px; background:#334155; border-radius:2px; overflow:hidden; }
+  #progress-bar { height:100%; background:#38bdf8; width:0; transition:width .25s; }
+  #tap-zones { position:fixed; inset:0; bottom:40px; display:flex; z-index:50; pointer-events:none; }
+  #tap-zones div { flex:1; pointer-events:auto; }
+  /* SVG animations */
+  @keyframes drawPath { to { stroke-dashoffset:0; } }
+  @keyframes pulseGlow { 0%,100%{opacity:.35} 50%{opacity:1} }
+  @keyframes tokenPop { from{opacity:0;transform:scale(.6)} to{opacity:1;transform:scale(1)} }
+  .anim-draw { stroke-dasharray:600; stroke-dashoffset:600; }
+  .slide.active .anim-draw, .fragment.visible .anim-draw { animation:drawPath 1.1s ease forwards; }
+  .anim-pulse { animation:pulseGlow 1.6s ease-in-out infinite; }
+  .fragment.visible .anim-pulse { animation:pulseGlow 1.2s ease-in-out infinite; }
+  .token-step { opacity:0; transform:scale(.7); display:inline-block; }
+  .fragment.visible .token-step { animation:tokenPop .4s ease forwards; }
+  .fragment.visible .token-step.d1 { animation-delay:.1s; }
+  .fragment.visible .token-step.d2 { animation-delay:.25s; }
+  .fragment.visible .token-step.d3 { animation-delay:.4s; }
+  @media print { #hud,#tap-zones{display:none} .slide{position:relative;display:flex!important;page-break-after:always;height:720px;width:1280px} }
+</style>
+</head>
+<body>
+<div id="stage"><div id="deck">
+
+
+<section class="slide active lead-center" data-chapter="④ Retrieval"><span class="chapter-tag">Chapter 4</span>
+<h1>Retrieval Engineering</h1><p class="subtitle">BM25 &middot; Hybrid &middot; Rerank &middot; Eval</p><span class="slide-num"></span></section>
+<section class="slide" data-chapter="BM25"><span class="chapter-tag">BM25</span><h2>Sparse / lexical</h2>
+<p class="fragment">SKUs, IDs, exact terms &middot; rank_bm25 code</p><span class="slide-num"></span></section>
+<section class="slide" data-chapter="Dense"><span class="chapter-tag">Dense</span><h2>Semantic</h2>
+<p class="fragment">BGE / E5 / OpenAI &middot; FAISS index</p><span class="slide-num"></span></section>
+<section class="slide" data-chapter="Hybrid"><span class="chapter-tag">Hybrid</span><h2>RRF merge</h2>
+<p class="fragment">BM25 + dense parallel &middot; $\\frac{1}{k+rank}$</p><span class="slide-num"></span></section>
+<section class="slide" data-chapter="Rerank"><span class="chapter-tag">Rerank</span><h2>Two-stage</h2>
+<p class="fragment">Top-50 recall &rarr; cross-encoder &rarr; Top-5</p><span class="slide-num"></span></section>
+<section class="slide" data-chapter="Pipeline"><span class="chapter-tag">Pipeline</span><h2>Production stack</h2>
+<p class="fragment">hybrid &rarr; rerank &rarr; dedupe &rarr; LLM</p><span class="slide-num"></span></section>
+<section class="slide" data-chapter="Eval"><span class="chapter-tag">Eval</span><h2>Golden set + RAGAS</h2>
+<p class="fragment">Recall@k &middot; MRR &middot; faithfulness &middot; context recall</p><span class="slide-num"></span></section>
+<section class="slide" data-chapter="Lab"><span class="chapter-tag">Lab</span><h2>Ablation study</h2>
+<p class="fragment">4 configs &times; 20 questions &rarr; pick winner</p><span class="slide-num"></span></section>
+<section class="slide lead-center" data-chapter="End"><h1>Retrieval done</h1>
+<p class="fragment subtitle">Scroll lab: <strong>course-full-retrieval.html#retrieval-practice</strong></p>
+<p class="fragment subtitle">Next: <a href="course-present-framework.html">⑤ LangChain &amp; LangGraph</a></p><span class="slide-num"></span></section>
+
+</div></div>
+
+<div id="tap-zones"><div id="tap-prev"></div><div id="tap-next"></div></div>
+<div id="hud">
+  <span id="chapter-label">Intro</span>
+  <div id="progress"><div id="progress-bar"></div></div>
+  <span id="slide-label">1 / 1</span>
+  <span><a href="present-hub.html" style="color:#38bdf8;text-decoration:none;margin-right:8px">Hub</a><kbd>&larr;</kbd><kbd>&rarr;</kbd> <kbd>Space</kbd> <kbd>F</kbd></span>
+</div>
+
+<script>
+(function () {
+  const slides = [...document.querySelectorAll('.slide')];
+  let idx = 0, fragIdx = -1;
+
+  function frags(i) { return [...slides[i].querySelectorAll('.fragment')]; }
+
+  function renderMath() {
+    if (window.renderMathInElement) {
+      renderMathInElement(slides[idx], {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  }
+
+  function updateHUD() {
+    const s = slides[idx];
+    document.getElementById('chapter-label').textContent = s.dataset.chapter || '';
+    document.getElementById('slide-label').textContent = (idx + 1) + ' / ' + slides.length;
+    document.getElementById('progress-bar').style.width = ((idx + 1) / slides.length * 100) + '%';
+    slides.forEach((sl, i) => {
+      const num = sl.querySelector('.slide-num');
+      if (num) num.textContent = (i + 1) + ' / ' + slides.length;
+    });
+    renderMath();
+  }
+
+  function showSlide(newIdx, resetFrag) {
+    if (resetFrag === undefined) resetFrag = true;
+    slides[idx].classList.remove('active');
+    idx = Math.max(0, Math.min(newIdx, slides.length - 1));
+    slides[idx].classList.add('active');
+    if (resetFrag) {
+      fragIdx = -1;
+      frags(idx).forEach(f => f.classList.remove('visible'));
+    }
+    updateHUD();
+  }
+
+  function nextStep() {
+    const fs = frags(idx);
+    if (fragIdx < fs.length - 1) {
+      fragIdx++;
+      fs[fragIdx].classList.add('visible');
+      return true;
+    }
+    return false;
+  }
+
+  function prevStep() {
+    const fs = frags(idx);
+    if (fragIdx >= 0) {
+      fs[fragIdx].classList.remove('visible');
+      fragIdx--;
+      return true;
+    }
+    return false;
+  }
+
+  function nextSlide() { if (!nextStep()) showSlide(idx + 1); updateHUD(); }
+  function prevSlide() { if (!prevStep()) showSlide(idx - 1, false); updateHUD(); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+    if (e.key === 'Home') { e.preventDefault(); showSlide(0); }
+    if (e.key === 'End') { e.preventDefault(); showSlide(slides.length - 1); }
+    if (e.key === 'f' || e.key === 'F') {
+      const el = document.documentElement;
+      if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen();
+      else if (document.exitFullscreen) document.exitFullscreen();
+    }
+  });
+
+  document.getElementById('tap-next').addEventListener('click', nextSlide);
+  document.getElementById('tap-prev').addEventListener('click', prevSlide);
+
+  let touchX = 0;
+  document.getElementById('deck').addEventListener('touchstart', e => { touchX = e.changedTouches[0].clientX; }, { passive: true });
+  document.getElementById('deck').addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) { if (dx < 0) nextSlide(); else prevSlide(); }
+  }, { passive: true });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    showSlide(0);
+    if (window.renderMathInElement) renderMath();
+  });
+})();
+</script>
+</body>
+</html>

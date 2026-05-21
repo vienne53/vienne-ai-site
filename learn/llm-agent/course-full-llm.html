@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Fundamentals</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root { --bg:#fff; --text:#1e293b; --muted:#64748b; --accent:#0369a1; --accent2:#0c4a6e; --hi:#b45309; --border:#e2e8f0; --chip:#f0f9ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:#f8fafc; color:var(--text); line-height:1.6; }
+  .topbar { position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .topbar h1 { font-size:1rem; color:var(--accent2); }
+  .topbar nav { display:flex; gap:8px; flex-wrap:wrap; }
+  .topbar a { font-size:.78rem; color:var(--accent); text-decoration:none; padding:4px 10px; border-radius:999px; background:var(--chip); border:1px solid #bae6fd; }
+  .topbar a:hover { background:#dbeafe; }
+  .page { max-width:1100px; margin:0 auto 32px; background:var(--bg); border:1px solid var(--border); border-radius:12px; box-shadow:0 4px 24px rgba(15,23,42,.06); padding:48px 56px; min-height:80vh; }
+  .page-title { font-size:2rem; color:var(--accent2); margin-bottom:8px; }
+  .page-sub { color:var(--muted); font-size:1.1rem; margin-bottom:28px; }
+  .tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); background:var(--chip); padding:4px 10px; border-radius:999px; border:1px solid #bae6fd; margin-bottom:16px; }
+  h2 { font-size:1.35rem; color:var(--accent); margin:28px 0 12px; border-bottom:2px solid #e0f2fe; padding-bottom:6px; }
+  h3 { font-size:1.05rem; color:#0f766e; margin:18px 0 8px; }
+  p,li { font-size:1rem; margin:8px 0; }
+  ul,ol { margin-left:1.4em; }
+  strong { color:var(--hi); }
+  .callout { background:var(--chip); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:20px 0; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:16px 0; }
+  .card { border:1px solid var(--border); border-radius:10px; padding:16px; background:#f8fafc; }
+  .card.bad { background:#fef2f2; border-color:#fecaca; }
+  .card.good { background:#ecfdf5; border-color:#a7f3d0; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:.92rem; }
+  th,td { border:1px solid var(--border); padding:8px 10px; text-align:left; }
+  th { background:#e0f2fe; color:var(--accent2); }
+  .fig { margin:20px 0; text-align:center; }
+  .fig svg { max-width:100%; height:auto; border:1px solid var(--border); border-radius:8px; }
+  .eq { margin:14px 0; overflow-x:auto; }
+  .mono { font-family:Consolas,monospace; font-size:.88rem; background:#f1f5f9; padding:2px 8px; border-radius:4px; }
+  .pipeline { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:16px 0; }
+  .step { background:#dbeafe; border:1px solid #93c5fd; border-radius:8px; padding:8px 14px; font-size:.82rem; font-weight:600; color:var(--accent2); }
+  .step.new { background:#dcfce7; border-color:#6ee7b7; color:#047857; }
+  .react { padding:10px 14px; border-radius:8px; margin:8px 0; font-size:.92rem; }
+  .react-t { background:#f0f9ff; border:1px solid #bae6fd; }
+  .react-a { background:#fef3c7; border:1px solid #fcd34d; }
+  .react-o { background:#ecfdf5; border:1px solid #a7f3d0; }
+  .flow-v { display:flex; flex-direction:column; align-items:center; gap:0; margin:20px 0; }
+  .flow-box { border:2px solid var(--border); border-radius:8px; padding:12px 20px; min-width:280px; text-align:center; font-size:.9rem; background:#fff; }
+  .flow-box.enc { background:#dbeafe; border-color:#0284c7; }
+  .flow-box.dec { background:#fed7aa; border-color:#ea580c; }
+  .flow-box.train { background:#f0fdf4; border-color:#16a34a; }
+  .flow-box.eval { background:#fef3c7; border-color:#f59e0b; }
+  .flow-box.offline { background:#e0e7ff; border-color:#6366f1; }
+  .flow-box.online { background:#fce7f3; border-color:#db2777; }
+  .phase-label { display:inline-block; font-size:.75rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:4px 12px; border-radius:999px; margin-bottom:12px; }
+  .phase-label.offline { background:#e0e7ff; color:#4338ca; border:1px solid #a5b4fc; }
+  .phase-label.online { background:#fce7f3; color:#be185d; border:1px solid #f9a8d4; }
+  .flow-arrow { color:var(--muted); font-size:1.2rem; line-height:1; padding:4px 0; }
+  .flow-row { display:flex; gap:24px; justify-content:center; flex-wrap:wrap; margin:16px 0; }
+  .detail-list { font-size:.92rem; }
+  .detail-list li { margin:6px 0; }
+  h4 { font-size:.95rem; color:var(--accent2); margin:14px 0 6px; }
+  @media print { .topbar{display:none;} .page{page-break-after:always; box-shadow:none; border:none; min-height:auto;} }
+  @media (max-width:768px) { .cols{grid-template-columns:1fr;} .page{padding:28px 20px;} }
+
+  .roadmap { background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:16px 0; font-size:.92rem; }
+  .roadmap ol { margin:8px 0 0 1.2em; }
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>LLM Fundamentals</h1>
+  <nav>
+    <a href="present-hub.html">All courses</a>
+    
+    <a href="#ch1">Ch1</a><a href="#ch2">Ch2</a><a href="#ch2-arch">Arch</a>
+    <a href="#ch2-inference">Infer</a><a href="#ch2-sampling">Sample</a>
+    <a href="#ch3">Ch3</a><a href="#ch3-llm">LLMs</a>
+    <a href="#ch4">Ch4</a><a href="#ch4-pretrain">Pretrain</a><a href="#ch4-sft">SFT</a>
+    <a href="#ch4-rlhf">RLHF</a><a href="#ch4-eval">Eval</a>
+    <a href="#ch5">Appx·Agent</a><a href="#ch8">Appx·Context</a><a href="#ch11">Models</a>
+    <a href="course-full-rag.html">② RAG &rarr;</a><a href="present-hub.html">Hub</a>
+
+  </nav>
+</div>
+<!-- INTRO -->
+<section class="page" id="intro">
+<div class="roadmap"><strong>Course path (9 chapters)</strong>
+<ol>
+<li><a href="course-full-llm.html">LLM</a></li>
+<li><a href="course-full-rag.html">RAG</a></li>
+<li><a href="course-full-agent.html">Agent Core</a></li>
+<li><a href="course-full-retrieval.html">Retrieval Engineering</a></li>
+<li><a href="course-full-framework.html">LangChain &amp; LangGraph</a></li>
+<li><a href="course-full-protocols.html">MCP &amp; A2A</a></li>
+<li><a href="course-full-openclaw.html">OpenClaw &amp; Hermes</a></li>
+<li><a href="course-full-multiagent.html">Multi-agent &amp; KG</a></li>
+<li><a href="course-full-multimodal.html">Multimodal</a></li>
+</ol></div>
+
+  <span class="tag">Chapter 1</span>
+  <h1 class="page-title">LLM Fundamentals</h1>
+  <p class="page-sub">NLP &rarr; Transformer &rarr; training pipeline &rarr; applications &rarr; model selection</p>
+  <p class="page-sub">Scroll reference &mdash; matches <strong>course-present*.html</strong> slide deck</p>
+  <div class="callout">
+    <p><a href="present-hub.html">Course hub</a> &middot; LLM / RAG / Multimodal are separate documents with aligned content.</p>
+  </div>
+</section>
+<section class="page" id="ch1">
+  <span class="tag">Chapter 1</span>
+  <h1 class="page-title">Why did LLMs emerge?</h1>
+  <p class="page-sub">From NLP to LLM: why traditional AI was not enough</p>
+
+  <h2>Two questions to start (problem-driven)</h2>
+  <div class="cols">
+    <div class="card bad"><h3>Why did Siri feel dumb?</h3><p>Short replies, lost context, brittle rules.</p></div>
+    <div class="card good"><h3>Why did ChatGPT feel smart?</h3><p>Long context, fluent reasoning, general tasks.</p></div>
+  </div>
+  <div class="callout">Root cause of classical NLP: <strong>cannot model long-range context</strong>.</div>
+
+  <h2>NLP in one sentence: everything is prediction</h2>
+  <div class="callout">
+    <p>Statistical NLP learns rules from large corpora. A Language Model <strong>predicts the next word (token) probabilistically</strong> given all previous words.</p>
+    <p>ChatGPT looks like it &quot;understands&quot; and &quot;answers&quot; &mdash; but under the hood it is still <strong>next-token prediction</strong>, one token at a time.</p>
+  </div>
+
+  <h3>Every NLP task = a prediction problem</h3>
+  <table>
+    <tr><th>Task</th><th>What the model predicts</th><th>Example</th></tr>
+    <tr><td><strong>Language modeling</strong></td><td>P(next token | context)</td><td>&quot;I love&quot; &rarr; &quot;Paris&quot;</td></tr>
+    <tr><td><strong>Classification</strong></td><td>P(label | text)</td><td>Sentiment: positive / negative</td></tr>
+    <tr><td><strong>Translation</strong></td><td>P(target word | source + target so far)</td><td>En &rarr; Zh, one token at a time</td></tr>
+    <tr><td><strong>QA / Chat</strong></td><td>P(answer token | question + history)</td><td>&quot;Capital of France?&quot; &rarr; &quot;Paris&quot;</td></tr>
+    <tr><td><strong>ASR (speech-to-text)</strong></td><td>P(text token | audio frames)</td><td>Audio waveform &rarr; transcript</td></tr>
+    <tr><td><strong>TTS (text-to-speech)</strong></td><td>P(audio frame | text + past audio)</td><td>Text &rarr; waveform</td></tr>
+  </table>
+
+  <h3>Prediction loop (train and inference)</h3>
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 160" width="880" height="160">
+      <rect width="880" height="160" fill="#fff"/>
+      <text x="440" y="22" text-anchor="middle" fill="#0c4a6e" font-weight="bold">NLP = predict next unit, repeatedly</text>
+      <rect x="30" y="45" width="140" height="44" rx="6" fill="#f1f5f9" stroke="#64748b"/><text x="100" y="72" text-anchor="middle" font-size="11">Input context</text>
+      <rect x="195" y="45" width="140" height="44" rx="6" fill="#dbeafe" stroke="#0284c7"/><text x="265" y="72" text-anchor="middle" font-size="11">Model f_theta</text>
+      <rect x="360" y="45" width="140" height="44" rx="6" fill="#fef3c7" stroke="#f59e0b"/><text x="430" y="72" text-anchor="middle" font-size="11">P(next token)</text>
+      <rect x="525" y="45" width="120" height="44" rx="6" fill="#dcfce7" stroke="#16a34a"/><text x="585" y="72" text-anchor="middle" font-size="11">Pick token</text>
+      <rect x="670" y="45" width="180" height="44" rx="6" fill="#fce7f3" stroke="#db2777"/><text x="760" y="72" text-anchor="middle" font-size="11">Append to context</text>
+      <line x1="170" y1="67" x2="195" y2="67" stroke="#64748b"/><line x1="335" y1="67" x2="360" y2="67" stroke="#64748b"/>
+      <line x1="500" y1="67" x2="525" y2="67" stroke="#64748b"/><line x1="645" y1="67" x2="670" y2="67" stroke="#64748b"/>
+      <path d="M760 89 L760 115 L100 115 L100 89" stroke="#94a3b8" stroke-width="2" fill="none" stroke-dasharray="4"/>
+      <text x="440" y="135" text-anchor="middle" fill="#64748b" font-size="11">Training: compare prediction vs ground truth, backprop. Inference: loop until EOS.</text>
+    </svg>
+  </div>
+
+  <h2>Four failures of traditional AI</h2>
+  <table>
+    <tr><th>Approach</th><th>Why it failed</th></tr>
+    <tr><td>Rule systems</td><td>Infinite language variation; rules break</td></tr>
+    <tr><td>Traditional ML</td><td>Hand-crafted features; semantics not end-to-end</td></tr>
+    <tr><td>RNN / LSTM</td><td>Sequential, slow; distant tokens fade (vanishing gradient)</td></tr>
+    <tr><td>CNN on text</td><td>Local window; needs many layers for global view</td></tr>
+  </table>
+
+  <h2>Long-range dependency: Germany example</h2>
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 280" width="920" height="280">
+      <rect width="920" height="280" fill="#fff"/>
+      <text x="460" y="28" text-anchor="middle" fill="#0c4a6e" font-size="16" font-weight="bold">I grew up in Germany ... (50 words) ... I speak fluent ______</text>
+      <rect x="40" y="45" width="400" height="200" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+      <text x="240" y="75" text-anchor="middle" fill="#b91c1c" font-size="14" font-weight="bold">RNN: sequential chain</text>
+      <text x="60" y="110" fill="#475569" font-size="13">T1 - T2 - T3 - ... - T50 - [blank]</text>
+      <text x="60" y="140" fill="#64748b" font-size="12">"Germany" signal fades along the chain</text>
+      <text x="60" y="170" fill="#b91c1c" font-size="13">May predict wrong language</text>
+      <rect x="480" y="45" width="400" height="200" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+      <text x="680" y="75" text-anchor="middle" fill="#047857" font-size="14" font-weight="bold">Transformer: Attention</text>
+      <text x="500" y="110" fill="#475569" font-size="13">[blank] connects directly to "Germany"</text>
+      <line x1="580" y1="130" x2="780" y2="130" stroke="#0284c7" stroke-width="3"/>
+      <text x="680" y="155" text-anchor="middle" fill="#0284c7" font-size="12">one hop, full weight</text>
+      <text x="500" y="190" fill="#047857" font-size="13">Correct: German / Deutsch</text>
+    </svg>
+  </div>
+
+  <h2>Language Model: mathematical definition</h2>
+  <div class="eq">$$\mathcal{P}(s_1 \ldots s_n) = \prod_{j=1}^{n} \mathcal{P}(s_j \mid s_1, \ldots, s_{j-1})$$</div>
+  <p><strong>Chain rule:</strong> modeling language = modeling <strong>next-token</strong> probability, repeatedly.</p>
+  <p>GPT approximates $\mathcal{P}(s_{t+1} \mid s_{1:t})$ with a Transformer.</p>
+
+  <h3>Numeric example (toy vocabulary {I, love, Paris})</h3>
+  <div class="eq">$$\mathcal{P}(\text{I love Paris}) = \mathcal{P}(\text{I}) \cdot \mathcal{P}(\text{love}\mid\text{I}) \cdot \mathcal{P}(\text{Paris}\mid\text{I love})$$</div>
+  <p>If $\mathcal{P}(\text{I})=0.02$, $\mathcal{P}(\text{love}\mid\text{I})=0.12$, $\mathcal{P}(\text{Paris}\mid\text{I love})=0.09$:</p>
+  <p><strong>Joint probability</strong> = $0.02 \times 0.12 \times 0.09 = \mathbf{0.000216}$</p>
+
+  <h2>Tokenization &amp; Embedding</h2>
+  <div class="cols">
+    <div>
+      <p><strong>Tokenization:</strong> text &rarr; subword tokens &rarr; integer IDs</p>
+      <p class="mono">"What is the capital of France?"</p>
+      <p class="mono">&rarr; [What, is, the, capital, of, France, ?]</p>
+      <p class="mono">&rarr; [1234, 42, 5, 891, 18, 4021, 31]</p>
+    </div>
+    <div>
+      <div class="eq">$$\mathbf{x}_t = \mathbf{E}[id_t] + \mathbf{PE}_t$$</div>
+      <p>Each ID maps to a vector in $\mathbb{R}^d$ (768, 4096, ...). Similar meaning &rarr; nearby vectors.</p>
+    </div>
+  </div>
+
+  <h3>Word embedding similarity</h3>
+  <p>Semantically related words have <strong>similar vectors</strong>. Classic example:</p>
+  <div class="eq">$$\text{vec}(\text{king}) - \text{vec}(\text{man}) + \text{vec}(\text{woman}) \approx \text{vec}(\text{queen})$$</div>
+  <p>Embeddings encode semantic relationships (gender, geography, tense) as geometric directions in vector space.</p>
+</section>
+<section class="page" id="ch2">
+  <span class="tag">Chapter 2</span>
+  <h1 class="page-title">Why Transformer changed the world</h1>
+  <p class="page-sub">Before formulas: understand why Attention beats RNN and CNN</p>
+
+  <h2>RNN vs CNN vs Attention</h2>
+  <p style="color:var(--muted);font-size:.9rem;margin-bottom:12px">Transformers also power computer vision and audio (ASR/TTS) &mdash; see <a href="#ch9">Ch9</a>.</p>
+  <table>
+    <tr><th>Architecture</th><th>Pattern</th><th>Problem</th></tr>
+    <tr><td><strong>RNN</strong></td><td>T1 &rarr; T2 &rarr; T3 &rarr; ... &rarr; T50</td><td>Serial, no parallel; forgets distant tokens</td></tr>
+    <tr><td><strong>CNN</strong></td><td>Local sliding windows</td><td>Cannot see global context in one layer</td></tr>
+    <tr><td><strong>Attention</strong></td><td>T1 &harr; T2 &harr; ... &harr; T50</td><td>Direct links; parallel; global in one layer</td></tr>
+  </table>
+
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 200" width="900" height="200">
+      <rect width="900" height="200" fill="#fff"/>
+      <text x="225" y="24" text-anchor="middle" fill="#b91c1c" font-weight="bold">RNN: Token1 to Token50 = 49 hops</text>
+      <text x="675" y="24" text-anchor="middle" fill="#047857" font-weight="bold">Attention: Token1 to Token50 = 1 hop</text>
+      <circle cx="80" cy="70" r="20" fill="#fef2f2" stroke="#ef4444"/><text x="80" y="75" text-anchor="middle" font-size="12">T1</text>
+      <circle cx="160" cy="70" r="20" fill="#fef2f2" stroke="#ef4444"/><text x="160" y="75" text-anchor="middle" font-size="12">T2</text>
+      <circle cx="240" cy="70" r="20" fill="#fef2f2" stroke="#ef4444"/><text x="240" y="75" text-anchor="middle" font-size="12">T3</text>
+      <text x="300" y="75" fill="#94a3b8">...</text>
+      <circle cx="360" cy="70" r="20" fill="#fef2f2" stroke="#ef4444"/><text x="360" y="75" text-anchor="middle" font-size="12">T50</text>
+      <line x1="100" y1="70" x2="140" y2="70" stroke="#ef4444" stroke-width="2"/>
+      <line x1="180" y1="70" x2="220" y2="70" stroke="#ef4444" stroke-width="2"/>
+      <line x1="260" y1="70" x2="340" y2="70" stroke="#ef4444" stroke-width="2"/>
+      <circle cx="540" cy="70" r="18" fill="#ecfdf5" stroke="#10b981"/><text x="540" y="75" text-anchor="middle" font-size="11">T1</text>
+      <circle cx="760" cy="70" r="18" fill="#ecfdf5" stroke="#10b981"/><text x="760" y="75" text-anchor="middle" font-size="11">T50</text>
+      <line x1="558" y1="70" x2="742" y2="70" stroke="#0284c7" stroke-width="4"/>
+      <text x="650" y="100" text-anchor="middle" fill="#0284c7" font-size="12">direct connection</text>
+    </svg>
+  </div>
+
+  <h2>Attention intuition: "Who matters most?"</h2>
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 220" width="880" height="220">
+      <rect width="880" height="220" fill="#fff"/>
+      <text x="440" y="30" text-anchor="middle" fill="#334155" font-size="14">The animal did not cross the street because it was tired.</text>
+      <circle cx="720" cy="70" r="24" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+      <text x="720" y="76" text-anchor="middle" fill="#b45309" font-weight="bold">it</text>
+      <circle cx="200" cy="100" r="28" fill="#dbeafe" stroke="#0284c7" stroke-width="2"/>
+      <text x="200" y="106" text-anchor="middle" fill="#0369a1">animal</text>
+      <circle cx="450" cy="100" r="22" fill="#f1f5f9" stroke="#94a3b8"/>
+      <text x="450" y="106" text-anchor="middle" fill="#64748b" font-size="12">street</text>
+      <path d="M700 85 Q450 150 230 115" stroke="#0284c7" stroke-width="5" fill="none"/>
+      <path d="M705 80 Q520 120 440 105" stroke="#cbd5e1" stroke-width="2" fill="none"/>
+      <text x="440" y="170" text-anchor="middle" fill="#0284c7" font-weight="bold">weight 0.84 to "animal"</text>
+    </svg>
+  </div>
+
+  <h2>Scaled dot-product attention</h2>
+  <div class="eq">$$\text{Attention}(Q,K,V)=\text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$</div>
+  <p><strong>Self-attention:</strong> when $Q,K,V$ all come from input $X$:</p>
+  <div class="eq">$$\text{Self-Attention}(X)=\text{softmax}\!\left(\frac{XX^\top}{\sqrt{d_k}}\right)X$$</div>
+  <p>In practice, learnable projections $W_Q, W_K, W_V$ are applied first:</p>
+  <div class="eq">$$\text{Self-Attention}(X,W)=\text{softmax}\!\left(\frac{XW_Q(XW_K)^\top}{\sqrt{d_k}}\right)XW_V$$</div>
+  <ul>
+    <li><strong>Q</strong> Query: what am I looking for?</li>
+    <li><strong>K</strong> Key: how matchable is each token?</li>
+    <li><strong>V</strong> Value: what information do I take?</li>
+    <li><strong>sqrt(d_k)</strong>: scaling to prevent softmax saturation</li>
+  </ul>
+
+  <h3>Hand calculation (3 tokens: cat, sat, mat)</h3>
+  <p>Scores for "sat": cat=0.85, sat=1.41, mat=0.28</p>
+  <p>Softmax weights: <strong>[0.26, 0.58, 0.16]</strong></p>
+  <p>Output = $0.26 V_{cat} + 0.58 V_{sat} + 0.16 V_{mat}$</p>
+
+  <h3>Multi-head attention</h3>
+  <div class="eq">$$\text{MultiHead}(X)=\text{Concat}(\text{head}_1,\ldots,\text{head}_h)\,W_O$$</div>
+  <p>Each head uses its own $(W_Q^{(i)}, W_K^{(i)}, W_V^{(i)})$. Heads can focus on syntax, coreference, or semantics in parallel, then merge via $W_O$.</p>
+  <div class="callout"><strong>Key takeaway:</strong> Transformer = encoder-decoder + self-attention + residual connections + layer normalization. Non-recurrent; context via attention, not hidden state chains.</div>
+</section>
+<section class="page" id="ch2-arch">
+  <span class="tag">Chapter 2 &middot; Architecture</span>
+  <h1 class="page-title">Transformer: Encoder-Decoder Architecture</h1>
+  <p class="page-sub">Vaswani et al. 2017 &mdash; Attention Is All You Need</p>
+
+  <h2>Three model families</h2>
+  <table>
+    <tr><th>Model</th><th>Stack</th><th>Attention type</th><th>Examples</th></tr>
+    <tr><td><strong>Encoder-Decoder</strong></td><td>Both</td><td>Encoder: full &middot; Decoder: masked + cross-attn</td><td>Translation, Whisper ASR</td></tr>
+    <tr><td><strong>Decoder-only (GPT)</strong></td><td>Decoder only</td><td>Causal masked self-attention</td><td>ChatGPT, Claude, Llama</td></tr>
+    <tr><td><strong>Encoder-only (BERT)</strong></td><td>Encoder only</td><td>Bidirectional self-attention</td><td>Search, classification, embeddings</td></tr>
+  </table>
+
+  <h2>Encoder-Decoder architecture diagram</h2>
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400">
+      <rect width="960" height="400" fill="#fff"/>
+      <text x="230" y="22" text-anchor="middle" fill="#0369a1" font-weight="bold">ENCODER</text>
+      <text x="730" y="22" text-anchor="middle" fill="#ea580c" font-weight="bold">DECODER</text>
+      <rect x="70" y="35" width="320" height="32" rx="5" fill="#f1f5f9" stroke="#64748b"/><text x="230" y="56" text-anchor="middle" font-size="11">Input tokens</text>
+      <rect x="70" y="75" width="320" height="32" rx="5" fill="#dbeafe" stroke="#0284c7"/><text x="230" y="96" text-anchor="middle" font-size="11">Embedding + Positional Encoding</text>
+      <rect x="50" y="115" width="360" height="90" rx="6" fill="#dbeafe" stroke="#0284c7" stroke-width="2"/>
+      <text x="230" y="135" text-anchor="middle" font-weight="bold" font-size="11">Encoder Layer x N</text>
+      <text x="230" y="155" text-anchor="middle" font-size="10">Multi-Head Self-Attention</text>
+      <text x="230" y="172" text-anchor="middle" font-size="10">Add and Norm + FFN + Add and Norm</text>
+      <rect x="70" y="215" width="320" height="32" rx="5" fill="#93c5fd" stroke="#0284c7"/><text x="230" y="236" text-anchor="middle" font-size="11" font-weight="bold">Encoder output (K, V)</text>
+      <rect x="570" y="35" width="320" height="32" rx="5" fill="#f1f5f9" stroke="#64748b"/><text x="730" y="56" text-anchor="middle" font-size="11">Output tokens so far (BOS...)</text>
+      <rect x="570" y="75" width="320" height="32" rx="5" fill="#fed7aa" stroke="#ea580c"/><text x="730" y="96" text-anchor="middle" font-size="11">Output Embedding + Pos Encoding</text>
+      <rect x="550" y="115" width="360" height="110" rx="6" fill="#fed7aa" stroke="#ea580c" stroke-width="2"/>
+      <text x="730" y="135" text-anchor="middle" font-weight="bold" font-size="11">Decoder Layer x N</text>
+      <text x="730" y="155" text-anchor="middle" font-size="10">1. Masked Self-Attention (causal)</text>
+      <text x="730" y="172" text-anchor="middle" font-size="10">2. Cross-Attention (Q dec, K/V enc)</text>
+      <text x="730" y="189" text-anchor="middle" font-size="10">3. FFN + Add and Norm each step</text>
+      <rect x="570" y="235" width="320" height="32" rx="5" fill="#fef3c7" stroke="#f59e0b"/><text x="730" y="256" text-anchor="middle" font-size="11">Linear + Softmax</text>
+      <rect x="610" y="280" width="240" height="32" rx="5" fill="#dcfce7" stroke="#16a34a"/><text x="730" y="301" text-anchor="middle" font-size="11" font-weight="bold">P(next token) - append and repeat</text>
+      <path d="M430 231 L540 180" stroke="#0284c7" stroke-width="2" stroke-dasharray="5" fill="none"/>
+      <text x="485" y="195" fill="#0284c7" font-size="10">cross-attn K,V</text>
+    </svg>
+  </div>
+
+  <h2>Encoder layer internals</h2>
+  <div class="flow-v">
+    <div class="flow-box enc">Input X</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box enc">Multi-Head Self-Attention(X,X,X)</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box">Add and LayerNorm (residual)</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box enc">Feed-Forward: FFN(x)=max(0,xW1+b1)W2+b2</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box">Add and LayerNorm</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box enc">Output to next encoder layer</div>
+  </div>
+
+  <h2>Decoder layer internals (3 sub-layers)</h2>
+  <div class="flow-v">
+    <div class="flow-box dec">Masked Self-Attention (cannot see future tokens)</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box dec">Cross-Attention: Q from decoder, K/V from encoder output</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box dec">Position-wise FFN</div>
+  </div>
+
+  <h2>Positional encoding (sin/cos)</h2>
+  <div class="eq">$$PE_{(pos,2i)}=\sin\!\left(\frac{pos}{10000^{2i/d}}\right), \quad PE_{(pos,2i+1)}=\cos\!\left(\frac{pos}{10000^{2i/d}}\right)$$</div>
+  <p>Attention has no built-in order; positional encoding injects token position. Modern models often use <strong>RoPE</strong> (rotary) instead, which extends better to long context.</p>
+
+  <h2>GPT = Decoder-only (ChatGPT path)</h2>
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 340" width="420" height="340">
+      <rect width="420" height="340" fill="#fff"/>
+      <text x="210" y="22" text-anchor="middle" fill="#ea580c" font-weight="bold">GPT (Decoder-only)</text>
+      <rect x="50" y="35" width="320" height="28" rx="5" fill="#f1f5f9" stroke="#64748b"/><text x="210" y="54" text-anchor="middle" font-size="11">Input: prompt tokens + generated tokens</text>
+      <rect x="50" y="70" width="320" height="28" rx="5" fill="#fed7aa" stroke="#ea580c"/><text x="210" y="89" text-anchor="middle" font-size="11">Token Embedding + RoPE</text>
+      <rect x="30" y="105" width="360" height="95" rx="6" fill="#fed7aa" stroke="#ea580c" stroke-width="2"/>
+      <text x="210" y="128" text-anchor="middle" font-weight="bold" font-size="11">Decoder Block x L (same stack repeated)</text>
+      <text x="210" y="148" text-anchor="middle" font-size="10">Causal Masked Multi-Head Self-Attention</text>
+      <text x="210" y="165" text-anchor="middle" font-size="10">Add and Norm + SwiGLU FFN + Add and Norm</text>
+      <text x="210" y="185" text-anchor="middle" font-size="9" fill="#64748b">No encoder. No cross-attention.</text>
+      <rect x="50" y="210" width="320" height="28" rx="5" fill="#fef3c7" stroke="#f59e0b"/><text x="210" y="229" text-anchor="middle" font-size="11">LM Head (Linear to vocab)</text>
+      <rect x="50" y="245" width="320" height="28" rx="5" fill="#dcfce7" stroke="#16a34a"/><text x="210" y="264" text-anchor="middle" font-size="11" font-weight="bold">Softmax - sample next token - append</text>
+      <path d="M210 273 L210 310" stroke="#64748b" stroke-width="2"/>
+      <text x="210" y="328" text-anchor="middle" font-size="10" fill="#64748b">Autoregressive loop until EOS</text>
+    </svg>
+  </div>
+  <p>No encoder stack. Your prompt is left context; model generates rightward with causal mask.</p>
+
+  <h2>How data flows in Transformers</h2>
+  <div class="cols">
+    <div class="card">
+      <h3>Encoder path</h3>
+      <ol class="detail-list">
+        <li>Input tokens (source sentence or prompt)</li>
+        <li>Tokenize &rarr; embed &rarr; add positional encoding</li>
+        <li>Pass through N encoder layers</li>
+        <li>Output: deep representation used as K, V for decoder</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>Decoder path</h3>
+      <ol class="detail-list">
+        <li>Start with &lt;BOS&gt;, grow output token by token</li>
+        <li>Masked self-attention: only see past generated tokens</li>
+        <li>Cross-attention: Q from decoder, K/V from encoder</li>
+        <li>Linear + softmax &rarr; P(next word); if not &lt;EOS&gt;, append and repeat</li>
+      </ol>
+    </div>
+  </div>
+  <div class="callout">Output is always <strong>P(next token)</strong>. This is why ChatGPT responds like a typewriter &mdash; one token at a time until &lt;EOS&gt;.</div>
+
+  <h2>Pre-training vs Fine-tuning</h2>
+  <table>
+    <tr><th></th><th>Pre-training</th><th>Fine-tuning</th></tr>
+    <tr><td>Data</td><td>Billions of web tokens (unlabeled)</td><td>Thousands-millions labeled examples</td></tr>
+    <tr><td>Objective</td><td>Predict next token</td><td>Task-specific (QA, chat, tools)</td></tr>
+    <tr><td>Cost</td><td>$ millions, 1000+ GPUs</td><td>$ hundreds - thousands</td></tr>
+    <tr><td>Result</td><td>Base model (continues text)</td><td>Assistant / domain model</td></tr>
+  </table>
+</section>
+<section class="page" id="ch2-inference">
+  <span class="tag">Chapter 2 &middot; Inference</span>
+  <h1 class="page-title">How an LLM answers your question</h1>
+  <p class="page-sub">Step-by-step decode for: &quot;What is the capital of France?&quot;</p>
+
+  <h2>Seven-step inference loop</h2>
+  <ol>
+    <li>Tokenize &rarr; embed + positional encoding</li>
+    <li>Forward through L Transformer layers</li>
+    <li>LM Head &rarr; logits (vocab size |V|)</li>
+    <li>Softmax &rarr; $\mathcal{P}(\text{next token} \mid \text{context})$</li>
+    <li>Pick token (greedy / top-p) &rarr; <strong>"Paris"</strong></li>
+    <li>Append &rarr; repeat until &lt;EOS&gt;</li>
+  </ol>
+  <div class="callout"><strong>Autoregressive:</strong> one token at a time, like a typewriter.</div>
+
+  <h3>Numeric decode (toy logits)</h3>
+  <table>
+    <tr><th>Token</th><th>Paris</th><th>London</th><th>the</th><th>&lt;EOS&gt;</th></tr>
+    <tr><td>logit</td><td>3.2</td><td>1.1</td><td>0.3</td><td>-1.0</td></tr>
+    <tr><td>softmax</td><td><strong>77.9%</strong></td><td>9.5%</td><td>4.3%</td><td>1.2%</td></tr>
+  </table>
+  <div class="eq">$$\mathcal{P}_i=\frac{e^{z_i/T}}{\sum_j e^{z_j/T}} \quad (T = \text{temperature})$$</div>
+  <p style="color:var(--muted);font-size:.9rem">Next: <a href="#ch2-sampling">Temperature, top-p, decoding strategies</a></p>
+</section>
+<section class="page" id="ch2-sampling">
+  <span class="tag">Chapter 2 &middot; Sampling</span>
+  <h1 class="page-title">Inference parameters: temperature, top-p, top-k</h1>
+  <p class="page-sub">Same model, different settings &rarr; very different output behavior</p>
+  <div class="callout">
+    <p>After the model outputs <strong>logits</strong>, you choose <em>how</em> to pick the next token. API parameters control randomness vs determinism.</p>
+  </div>
+  <h2>Core parameters</h2>
+  <table>
+    <tr><th>Parameter</th><th>What it does</th><th>Typical range</th><th>Use when</th></tr>
+    <tr><td><strong>temperature (T)</strong></td><td>Scales logits before softmax. Low = peaked; high = random</td><td>0 &ndash; 2</td><td>0 for facts/code; 0.7-1.0 chat; &gt;1 creative</td></tr>
+    <tr><td><strong>top-p (nucleus)</strong></td><td>Sample from smallest set with cumulative prob &ge; p</td><td>0.1 &ndash; 1.0</td><td>~0.9 default; lower = safer</td></tr>
+    <tr><td><strong>top-k</strong></td><td>Keep only k highest-probability tokens</td><td>1 &ndash; 100</td><td>k=1 is greedy; often 40-50</td></tr>
+    <tr><td><strong>max_tokens</strong></td><td>Cap generated length</td><td>256 &ndash; 128K</td><td>Cost control, UI limits</td></tr>
+    <tr><td><strong>stop sequences</strong></td><td>Halt when string appears</td><td>custom</td><td>JSON blocks, end markers</td></tr>
+    <tr><td><strong>frequency / presence penalty</strong></td><td>Reduce repetition</td><td>0 &ndash; 2</td><td>Long generations</td></tr>
+    <tr><td><strong>seed</strong></td><td>Fix RNG when supported</td><td>integer</td><td>Reproducible tests</td></tr>
+  </table>
+  <h2>Temperature effect (Paris example logits)</h2>
+  <table>
+    <tr><th>Token</th><th>T=0.1</th><th>T=1.0</th><th>T=2.0</th></tr>
+    <tr><td>Paris</td><td><strong>99.2%</strong></td><td><strong>77.9%</strong></td><td>52.1%</td></tr>
+    <tr><td>London</td><td>0.5%</td><td>9.5%</td><td>18.3%</td></tr>
+    <tr><td>the</td><td>0.2%</td><td>4.3%</td><td>12.8%</td></tr>
+  </table>
+  <h2>Presets by task</h2>
+  <table>
+    <tr><th>Task</th><th>temperature</th><th>top_p</th></tr>
+    <tr><td>Code / JSON</td><td>0 &ndash; 0.2</td><td>1.0</td></tr>
+    <tr><td>RAG factual QA</td><td>0 &ndash; 0.3</td><td>0.9</td></tr>
+    <tr><td>General chat</td><td>0.7</td><td>0.9</td></tr>
+    <tr><td>Creative writing</td><td>1.0 &ndash; 1.2</td><td>0.95</td></tr>
+  </table>
+</section>
+<section class="page" id="ch3">
+  <span class="tag">Chapter 3</span>
+  <h1 class="page-title">Why "intelligence" suddenly emerges</h1>
+  <p class="page-sub">Emergent abilities &amp; Scaling Laws</p>
+  <div class="cols">
+    <div class="card"><h3>&lt; 1B params</h3><p>Advanced <strong>autocomplete</strong>. Weak reasoning.</p></div>
+    <div class="card good"><h3>10B - 100B+ params</h3><p>Suddenly: CoT reasoning, coding, planning, translation.</p></div>
+  </div>
+  <div class="callout"><strong>Emergence:</strong> capabilities absent in small models; nonlinear jump at scale.</div>
+  <h2>Scaling Laws</h2>
+  <div class="eq">$$L(N,D) \approx \left(\frac{N_c}{N}\right)^{\alpha_N} + \left(\frac{D_c}{D}\right)^{\alpha_D}$$</div>
+  <p>Loss decreases predictably with parameters <strong>N</strong>, data tokens <strong>D</strong>, and compute <strong>C</strong>.</p>
+  <p style="color:var(--muted);font-size:.9rem">Continue: <a href="#ch3-llm">What is an LLM</a> &rarr; training and apps first; <a href="#ch11">model selection</a> at the end.</p>
+</section>
+<section class="page" id="ch3-llm">
+  <span class="tag">Ch3 &middot; LLM Landscape</span>
+  <h1 class="page-title">What is an LLM?</h1>
+  <p class="page-sub">Transformer models with 10B+ parameters trained on massive text</p>
+
+  <div class="callout">
+    <p><strong>Definition:</strong> LLMs = Transformer language models with <strong>hundreds of billions+ parameters</strong>, trained on massive text (GPT-3, LLaMA, DeepSeek).</p>
+    <p>They understand language and solve complex tasks via <strong>text generation</strong> (next-token prediction at scale).</p>
+  </div>
+
+  <h2>Five key techniques</h2>
+  <table>
+    <tr><th>Technique</th><th>What it means</th><th>Example</th></tr>
+    <tr><td><strong>Scaling</strong></td><td>More params + data + compute &rarr; better capacity</td><td>GPT-1 117M &rarr; GPT-3 175B</td></tr>
+    <tr><td><strong>Distributed training</strong></td><td>Parallel strategies to train huge models</td><td>Data / tensor / pipeline parallel</td></tr>
+    <tr><td><strong>Ability eliciting</strong></td><td>Prompt design, few-shot, CoT to unlock skills</td><td>&quot;Think step by step&quot;</td></tr>
+    <tr><td><strong>Alignment tuning</strong></td><td>Match human values (HHH)</td><td>RLHF, DPO</td></tr>
+    <tr><td><strong>Tool manipulation</strong></td><td>Compensate for stale knowledge / no action</td><td>RAG, API calls, code exec</td></tr>
+  </table>
+
+  <h2>Open-source LLM family</h2>
+  <table>
+    <tr><th>Family</th><th>Origin</th><th>Notes</th></tr>
+    <tr><td><strong>LLaMA</strong> (Meta)</td><td>Feb 2023; LLaMA 3.2 (Sep 2024): 1B, 3B, 11B, 90B</td><td>Most popular open base; strong benchmarks</td></tr>
+    <tr><td><strong>Alpaca</strong> (Stanford)</td><td>First open instruct model on LLaMA-7B</td><td>52k instruction examples; cheap SFT demo</td></tr>
+    <tr><td><strong>ChatGLM</strong> (Zhipu + Tsinghua)</td><td>Open bilingual model; multimodal image understanding</td><td>Academic + commercial use (with registration)</td></tr>
+    <tr><td><strong>DeepSeek-V3</strong></td><td>Dec 2024; 671B MoE (37B active); MIT license</td><td>Strong code/math; very low API cost</td></tr>
+    <tr><td><strong>Qwen 2.5</strong> (Alibaba)</td><td>Open weights, strong CN/EN</td><td>Common in China ecosystem</td></tr>
+  </table>
+</section>
+<section class="page" id="ch4">
+  <span class="tag">Chapter 4</span>
+  <h1 class="page-title">Modern LLM Training Pipeline</h1>
+  <p class="page-sub">What happens at each stage, how it is done, and how we evaluate</p>
+
+  <h2>Seven-stage pipeline overview</h2>
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 120" width="920" height="120">
+      <rect width="920" height="120" fill="#fff"/>
+      <g font-size="10" font-weight="600">
+        <rect x="10" y="40" width="95" height="40" rx="6" fill="#dbeafe" stroke="#0284c7"/><text x="57" y="65" text-anchor="middle" fill="#0c4a6e">1 Pretrain</text>
+        <rect x="120" y="40" width="95" height="40" rx="6" fill="#dbeafe" stroke="#0284c7"/><text x="167" y="65" text-anchor="middle" fill="#0c4a6e">2 SFT</text>
+        <rect x="230" y="40" width="95" height="40" rx="6" fill="#dbeafe" stroke="#0284c7"/><text x="277" y="65" text-anchor="middle" fill="#0c4a6e">3 RLHF</text>
+        <rect x="340" y="40" width="95" height="40" rx="6" fill="#dcfce7" stroke="#16a34a"/><text x="387" y="65" text-anchor="middle" fill="#047857">4 Tools</text>
+        <rect x="450" y="40" width="95" height="40" rx="6" fill="#dcfce7" stroke="#16a34a"/><text x="497" y="65" text-anchor="middle" fill="#047857">5 Agent</text>
+        <rect x="560" y="40" width="95" height="40" rx="6" fill="#dcfce7" stroke="#16a34a"/><text x="607" y="65" text-anchor="middle" fill="#047857">6 Longctx</text>
+        <rect x="670" y="40" width="95" height="40" rx="6" fill="#dcfce7" stroke="#16a34a"/><text x="717" y="65" text-anchor="middle" fill="#047857">7 Memory</text>
+        <rect x="780" y="40" width="120" height="40" rx="6" fill="#fef3c7" stroke="#f59e0b"/><text x="840" y="65" text-anchor="middle" fill="#b45309">Product</text>
+      </g>
+      <line x1="105" y1="60" x2="120" y2="60" stroke="#64748b"/><line x1="215" y1="60" x2="230" y2="60" stroke="#64748b"/>
+      <line x1="325" y1="60" x2="340" y2="60" stroke="#64748b"/><line x1="435" y1="60" x2="450" y2="60" stroke="#64748b"/>
+      <line x1="545" y1="60" x2="560" y2="60" stroke="#64748b"/><line x1="655" y1="60" x2="670" y2="60" stroke="#64748b"/>
+      <line x1="765" y1="60" x2="780" y2="60" stroke="#64748b"/>
+      <text x="460" y="28" text-anchor="middle" fill="#64748b" font-size="11">Foundation: steps 1-3 | Agent era: steps 4-7</text>
+    </svg>
+  </div>
+
+  <h2>GPT family timeline</h2>
+  <table>
+    <tr><th>Model</th><th>Year</th><th>Params</th><th>Key change</th></tr>
+    <tr><td>GPT-1</td><td>2018</td><td>117M</td><td>First generative pre-trained Transformer</td></tr>
+    <tr><td>GPT-2</td><td>2019</td><td>1.5B</td><td>Stronger generation</td></tr>
+    <tr><td>GPT-3</td><td>2020</td><td>175B</td><td>Few-shot reasoning emerges</td></tr>
+    <tr><td>ChatGPT</td><td>2022</td><td>~175B</td><td>SFT + RLHF = conversational assistant</td></tr>
+    <tr><td>GPT-4</td><td>2023</td><td>&mdash;</td><td>Multimodal in/out; 25K+ word replies; safer &amp; more factual vs 3.5</td></tr>
+    <tr><td>GPT-4o</td><td>May 2024</td><td>&mdash;</td><td>Text + audio + image; 128K context; knowledge Oct 2023</td></tr>
+  </table>
+
+  <h2>What each stage produces</h2>
+  <table>
+    <tr><th>Stage</th><th>Output</th><th>User-visible behavior</th></tr>
+    <tr><td>Pretrain</td><td>Base LLM</td><td>Continues text; ignores instructions</td></tr>
+    <tr><td>SFT</td><td>Instruction model</td><td>Follows questions, chat format</td></tr>
+    <tr><td>RLHF</td><td>Aligned model</td><td>More helpful, safer, better style</td></tr>
+    <tr><td>Agent FT</td><td>Agent model</td><td>Calls tools, multi-step tasks</td></tr>
+  </table>
+  <p style="color:var(--muted);font-size:.9rem">Continue to <a href="#ch4-pretrain">Pretrain</a>, <a href="#ch4-sft">SFT</a>, <a href="#ch4-rlhf">RLHF</a>, <a href="#ch4-eval">Eval</a> for full detail.</p>
+</section>
+<section class="page" id="ch4-pretrain">
+  <span class="tag">Ch4 Stage 1</span>
+  <h1 class="page-title">Pretraining: how it actually works</h1>
+
+  <h2>Objective</h2>
+  <div class="eq">$$\mathcal{L}_{\text{PT}} = -\frac{1}{N}\sum_{t=1}^{N} \log \mathcal{P}_\theta(x_t \mid x_{1:t-1})$$</div>
+  <p>Every position: predict next token from all previous tokens. Wrong prediction updates all weights via backprop.</p>
+
+  <h2>End-to-end workflow</h2>
+  <div class="flow-v">
+    <div class="flow-box">1. Collect raw text (Common Crawl, books, Wikipedia, code)</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box">2. Clean: dedup, filter toxic/PII, language ID, quality score</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box">3. Tokenize entire corpus (BPE / SentencePiece)</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box train">4. Train on GPU cluster (data + tensor + pipeline parallel)</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box">5. Save checkpoint (base model)</div><div class="flow-arrow">&darr;</div>
+    <div class="flow-box eval">6. Evaluate on validation set</div>
+  </div>
+
+  <h2>Data mix (typical)</h2>
+  <table>
+    <tr><th>Source</th><th>Role</th><th>Share</th></tr>
+    <tr><td>Web crawl</td><td>Scale, diversity</td><td>60-80%</td></tr>
+    <tr><td>Books</td><td>Long-form coherence</td><td>5-10%</td></tr>
+    <tr><td>Wikipedia</td><td>Factual knowledge</td><td>3-5%</td></tr>
+    <tr><td>Code</td><td>Programming</td><td>5-15%</td></tr>
+  </table>
+
+  <h2>Distributed training (how 175B is possible)</h2>
+  <ul>
+    <li><strong>Data parallel:</strong> same model on each GPU, different batches, average gradients</li>
+    <li><strong>Tensor parallel:</strong> split weight matrices across GPUs in one layer</li>
+    <li><strong>Pipeline parallel:</strong> split layers across GPUs</li>
+    <li><strong>Mixed precision (BF16):</strong> faster, less memory</li>
+  </ul>
+
+  <h2>Evaluation after pretraining</h2>
+  <table>
+    <tr><th>Metric</th><th>Meaning</th><th>Target</th></tr>
+    <tr><td><strong>Perplexity (PPL)</strong></td><td>Model surprise on validation text</td><td>Lower is better</td></tr>
+    <tr><td><strong>Val loss</strong></td><td>Negative log-likelihood curve</td><td>Smooth decrease</td></tr>
+    <tr><td><strong>LAMBADA / HellaSwag</strong></td><td>Zero-shot benchmarks</td><td>Higher accuracy</td></tr>
+  </table>
+  <div class="callout">After pretrain the model <strong>cannot chat</strong> &mdash; it only continues text. Example: Q: &quot;2+2=&quot; may continue with essay about math, not &quot;4&quot;.</div>
+</section>
+<section class="page" id="ch4-sft">
+  <span class="tag">Ch4 Stage 2</span>
+  <h1 class="page-title">SFT / Instruction Tuning</h1>
+  <p class="page-sub">Teach the model to follow instructions</p>
+
+  <div class="cols">
+    <div class="card bad"><h3>After pretrain</h3><p>Q: "What is 2+2?"<br>May continue: "...and why math matters..."</p></div>
+    <div class="card good"><h3>After SFT</h3><p>Q: "What is 2+2?"<br>Answer: "2+2 equals 4."</p></div>
+  </div>
+
+  <h2>Data format</h2>
+  <pre style="padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:.85rem;overflow-x:auto">&lt;|user|&gt; What is the capital of France?
+&lt;|assistant|&gt; The capital of France is Paris.</pre>
+
+  <h2>Training procedure</h2>
+  <div class="eq">$$\mathcal{L}_{\text{SFT}} = -\sum_{t \in \text{answer only}} \log \mathcal{P}_\theta(y_t \mid x, y_{1:t-1})$$</div>
+  <ol>
+    <li>Load <strong>pretrained weights</strong> (not random init)</li>
+    <li>Format as chat template</li>
+    <li><strong>Mask loss on prompt</strong> &mdash; only train on assistant reply tokens</li>
+    <li>Train 1-3 epochs on 10k-1M examples, LR ~1e-5</li>
+  </ol>
+
+  <h2>Fine-tuning methods</h2>
+  <table>
+    <tr><th>Method</th><th>Trains</th><th>GPU need</th><th>Use when</th></tr>
+    <tr><td><strong>Full FT</strong></td><td>All params</td><td>Very high</td><td>Max quality, big budget</td></tr>
+    <tr><td><strong>LoRA</strong></td><td>Low-rank adapters (~0.1% params)</td><td>Low</td><td>Alpaca, most open FT</td></tr>
+    <tr><td><strong>QLoRA</strong></td><td>LoRA on 4-bit base</td><td>1x 24GB GPU</td><td>Consumer hardware</td></tr>
+  </table>
+
+  <h2>Evaluation after SFT</h2>
+  <table>
+    <tr><th>Benchmark</th><th>Tests</th></tr>
+    <tr><td><strong>MMLU</strong></td><td>57-subject multiple choice knowledge</td></tr>
+    <tr><td><strong>MT-Bench / AlpacaEval</strong></td><td>Multi-turn quality (GPT-4 as judge)</td></tr>
+    <tr><td><strong>Human side-by-side</strong></td><td>Win rate A vs B</td></tr>
+    <tr><td><strong>Format compliance</strong></td><td>JSON / length / structure adherence</td></tr>
+  </table>
+</section>
+<section class="page" id="ch4-rlhf">
+  <span class="tag">Ch4 Stage 3</span>
+  <h1 class="page-title">RLHF and DPO</h1>
+  <p class="page-sub">Ouyang et al. 2022</p>
+
+  <h2>Why SFT alone fails</h2>
+  <ul>
+    <li>SFT data is small; many valid answers exist</li>
+    <li>Model can be verbose, toxic, or hallucinate confidently</li>
+    <li>Need: helpful, honest, harmless (HHH)</li>
+  </ul>
+
+  <h2>RLHF three-step flowchart</h2>
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" width="900" height="320">
+      <rect width="900" height="320" fill="#fff"/>
+      <text x="450" y="20" text-anchor="middle" fill="#0c4a6e" font-weight="bold">RLHF Pipeline</text>
+      <rect x="30" y="35" width="840" height="55" rx="8" fill="#f0f9ff" stroke="#0284c7"/>
+      <text x="50" y="58" fill="#0369a1" font-weight="bold">Step 1: SFT</text>
+      <text x="50" y="78" fill="#475569" font-size="12">Human writes ideal answers. Train imitation. Output = pi_SFT</text>
+      <rect x="30" y="100" width="840" height="75" rx="8" fill="#fef3c7" stroke="#f59e0b"/>
+      <text x="50" y="122" fill="#b45309" font-weight="bold">Step 2: Train Reward Model</text>
+      <text x="50" y="142" fill="#475569" font-size="12">Same prompt, generate 4-9 responses. Humans rank best to worst.</text>
+      <text x="50" y="162" fill="#475569" font-size="12">Train RM r(x,y) to predict ranking (Bradley-Terry loss).</text>
+      <rect x="30" y="185" width="840" height="75" rx="8" fill="#ecfdf5" stroke="#16a34a"/>
+      <text x="50" y="207" fill="#047857" font-weight="bold">Step 3: PPO fine-tune LLM</text>
+      <text x="50" y="227" fill="#475569" font-size="12">Generate y, score with RM, PPO update LLM to maximize reward.</text>
+      <text x="50" y="247" fill="#475569" font-size="12">KL penalty keeps LLM close to pi_SFT (prevent reward hacking).</text>
+    </svg>
+  </div>
+
+  <div class="eq">$$\max_\theta \; \mathbb{E}[r_\phi(x,y)] - \beta\, D_{\text{KL}}(\pi_\theta \,\|\, \pi_{\text{SFT}})$$</div>
+  <p><strong>PPO:</strong> Proximal Policy Optimization &mdash; limits policy change per step.</p>
+  <p><strong>DPO:</strong> trains directly on preference pairs (y_w preferred over y_l) without separate reward model.</p>
+
+  <h2>Evaluation after RLHF</h2>
+  <table>
+    <tr><th>Type</th><th>How</th></tr>
+    <tr><td>Human eval</td><td>Side-by-side win rate vs SFT baseline</td></tr>
+    <tr><td>Reward model score</td><td>Average RM on test prompts</td></tr>
+    <tr><td>Safety red-teaming</td><td>Adversarial prompts, refusal rate</td></tr>
+    <tr><td>TruthfulQA</td><td>Hallucination / factuality</td></tr>
+    <tr><td>Chatbot Arena Elo</td><td>Crowdsourced preference ranking</td></tr>
+  </table>
+</section>
+<section class="page" id="ch4-eval">
+  <span class="tag">Ch4 Stages 4-7 + Eval</span>
+  <h1 class="page-title">Agent-era training and full evaluation</h1>
+
+  <h2>Stages 4-7</h2>
+  <table>
+    <tr><th>Stage</th><th>How (concrete)</th><th>Evaluation</th></tr>
+    <tr><td><strong>Tool Learning</strong></td><td>Curate (prompt, tool_call JSON) pairs; function schema in prompt</td><td>Tool call accuracy, BFCL benchmark</td></tr>
+    <tr><td><strong>Agent FT</strong></td><td>ReAct trajectories: Thought, Action, Observation</td><td>Task success rate, SWE-bench</td></tr>
+    <tr><td><strong>Long-context</strong></td><td>RoPE scaling, continue train on long docs</td><td>Needle-in-haystack, RULER</td></tr>
+    <tr><td><strong>Memory Align</strong></td><td>When to save/recall user facts</td><td>Multi-session recall accuracy</td></tr>
+  </table>
+
+  <h2>Master evaluation matrix</h2>
+  <table>
+    <tr><th>Stage</th><th>Automatic</th><th>Human</th><th>Production</th></tr>
+    <tr><td>Pretrain</td><td>PPL, val loss</td><td>Sample continuations</td><td>Train curves, GPU util</td></tr>
+    <tr><td>SFT</td><td>MMLU, CE loss</td><td>MT-Bench, side-by-side</td><td>Instruction follow rate</td></tr>
+    <tr><td>RLHF</td><td>RM score, TruthfulQA</td><td>Win rate, red team</td><td>Thumbs up/down</td></tr>
+    <tr><td>Agent</td><td>Task success, tool accuracy</td><td>End-to-end completion</td><td>Badcase replay</td></tr>
+  </table>
+
+  <h2>ChatGPT 3-step summary</h2>
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 180" width="880" height="180">
+      <rect width="880" height="180" fill="#fff"/>
+      <rect x="20" y="25" width="250" height="130" rx="8" fill="#dbeafe" stroke="#0284c7" stroke-width="2"/>
+      <text x="145" y="50" text-anchor="middle" fill="#0c4a6e" font-weight="bold">Pretrain</text>
+      <text x="145" y="75" text-anchor="middle" font-size="11">Internet text</text>
+      <text x="145" y="93" text-anchor="middle" font-size="11">Next-token loss</text>
+      <text x="145" y="111" text-anchor="middle" font-size="11">Eval: PPL</text>
+      <text x="145" y="135" text-anchor="middle" font-size="10" fill="#64748b">Base model</text>
+      <rect x="315" y="25" width="250" height="130" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+      <text x="440" y="50" text-anchor="middle" fill="#b45309" font-weight="bold">SFT</text>
+      <text x="440" y="75" text-anchor="middle" font-size="11">Human QA pairs</text>
+      <text x="440" y="93" text-anchor="middle" font-size="11">Supervised loss</text>
+      <text x="440" y="111" text-anchor="middle" font-size="11">Eval: MMLU</text>
+      <text x="440" y="135" text-anchor="middle" font-size="10" fill="#64748b">Instruction model</text>
+      <rect x="610" y="25" width="250" height="130" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+      <text x="735" y="50" text-anchor="middle" fill="#047857" font-weight="bold">RLHF</text>
+      <text x="735" y="75" text-anchor="middle" font-size="11">Human preferences</text>
+      <text x="735" y="93" text-anchor="middle" font-size="11">RM + PPO / DPO</text>
+      <text x="735" y="111" text-anchor="middle" font-size="11">Eval: win rate</text>
+      <text x="735" y="135" text-anchor="middle" font-size="10" fill="#64748b">ChatGPT</text>
+      <line x1="270" y1="90" x2="315" y2="90" stroke="#64748b" stroke-width="2"/>
+      <line x1="565" y1="90" x2="610" y2="90" stroke="#64748b" stroke-width="2"/>
+    </svg>
+  </div>
+  <div class="callout"><strong>PM rule:</strong> Define eval <em>before</em> training. Pretrain = capability ceiling. SFT = instruction. RLHF = preference. Agent = action in the real world.</div>
+</section>
+<section class="page" id="ch5">
+  <span class="tag">Appendix · LLM ≠ Agent</span>
+  <h1 class="page-title">Why LLM cannot be an Agent alone</h1>
+  <p class="page-sub">The brain still needs arms, legs, and memory</p>
+  <div class="cols">
+    <div class="card bad"><h3>1. No long-term memory</h3><p>Each chat is a fresh start. Need Memory system.</p></div>
+    <div class="card bad"><h3>2. Cannot act</h3><p>Only emits tokens. Need Tools (API, code, DB).</p></div>
+    <div class="card bad"><h3>3. No planning</h3><p>"Do market analysis" fails in one shot. Need Planning.</p></div>
+    <div class="card bad"><h3>4. No environment</h3><p>Blind to real world. Need Environment feedback.</p></div>
+  </div>
+
+  <h2>Soul diagram: Agent = LLM + execution system</h2>
+  <div class="fig">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 380" width="880" height="380">
+      <rect width="880" height="380" fill="#fff"/>
+      <rect x="340" y="10" width="200" height="40" rx="8" fill="#f1f5f9" stroke="#64748b"/>
+      <text x="440" y="36" text-anchor="middle" fill="#475569">User</text>
+      <line x1="440" y1="50" x2="440" y2="65" stroke="#64748b" stroke-width="2"/>
+      <rect x="340" y="65" width="200" height="55" rx="10" fill="#fed7aa" stroke="#ea580c" stroke-width="2"/>
+      <text x="440" y="92" text-anchor="middle" fill="#9a3412" font-size="16" font-weight="bold">LLM</text>
+      <text x="440" y="110" text-anchor="middle" fill="#78716c" font-size="11">Reasoning Brain</text>
+      <rect x="60" y="180" width="160" height="65" rx="10" fill="#dbeafe" stroke="#0284c7" stroke-width="2"/>
+      <text x="140" y="210" text-anchor="middle" fill="#0c4a6e" font-weight="bold">Memory</text>
+      <text x="140" y="228" text-anchor="middle" fill="#64748b" font-size="10">vector DB / history</text>
+      <rect x="360" y="180" width="160" height="65" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+      <text x="440" y="210" text-anchor="middle" fill="#15803d" font-weight="bold">Planning</text>
+      <text x="440" y="228" text-anchor="middle" fill="#64748b" font-size="10">task decomposition</text>
+      <rect x="660" y="180" width="160" height="65" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+      <text x="740" y="210" text-anchor="middle" fill="#b45309" font-weight="bold">Tools</text>
+      <text x="740" y="228" text-anchor="middle" fill="#64748b" font-size="10">Browser / Python / API</text>
+      <line x1="380" y1="120" x2="140" y2="180" stroke="#64748b" stroke-width="2"/>
+      <line x1="440" y1="120" x2="440" y2="180" stroke="#64748b" stroke-width="2"/>
+      <line x1="500" y1="120" x2="740" y2="180" stroke="#64748b" stroke-width="2"/>
+      <rect x="620" y="280" width="80" height="30" rx="5" fill="#f8fafc" stroke="#94a3b8"/>
+      <text x="660" y="300" text-anchor="middle" font-size="10">Database</text>
+      <rect x="720" y="280" width="80" height="30" rx="5" fill="#f8fafc" stroke="#94a3b8"/>
+      <text x="760" y="300" text-anchor="middle" font-size="10">Weather</text>
+      <line x1="740" y1="245" x2="740" y2="280" stroke="#94a3b8"/>
+    </svg>
+  </div>
+  <div class="eq">$$\text{Agent} = \text{LLM} + \text{Memory} + \text{Planning} + \text{Tools} + \text{Environment}$$</div>
+</section>
+<section class="page" id="ch6">
+  <span class="tag">Appendix · Agent preview</span>
+  <h1 class="page-title">How agents are trained</h1>
+  <p class="page-sub">Behavior training, not just prompts</p>
+  <ol>
+    <li><strong>Tool Calling</strong> &mdash; learn when/how to call APIs<br>
+      <span class="mono">User: NYC weather? &rarr; {"tool":"weather_api","city":"New York"}</span></li>
+    <li><strong>Planning</strong> &mdash; research &rarr; collect &rarr; analyze &rarr; report</li>
+    <li><strong>Reflection</strong> &mdash; "Did I answer wrong? Should I retry?"</li>
+    <li><strong>ReAct</strong> &mdash; Thought &rarr; Action &rarr; Observation loop</li>
+  </ol>
+  <h2>ReAct loop</h2>
+  <div class="react react-t"><strong>Thought:</strong> User wants NYC weather. I need the weather tool.</div>
+  <div class="react react-a"><strong>Action:</strong> {"tool":"weather_api","city":"New York"}</div>
+  <div class="react react-o"><strong>Observation:</strong> {"temp":22,"unit":"C","condition":"sunny"}</div>
+  <div class="react react-t"><strong>Thought:</strong> I have data. Answer in natural language.</div>
+  <div class="react react-a"><strong>Action:</strong> Reply: "New York is 22C and sunny today."</div>
+  <div class="callout">ChatGPT chat = one generation pass &middot; Agent = many Thought-Action-Obs cycles</div>
+  <p style="color:var(--muted);font-size:.9rem;margin-top:12px">Path: <a href="course-full-agent.html">③ Agent</a> &rarr; <a href="course-full-retrieval.html">④ Retrieval</a> &rarr; <a href="course-full-framework.html">⑤ LangChain/LangGraph</a> &rarr; <a href="course-full-protocols.html">⑥ MCP/A2A</a> &rarr; <a href="course-full-openclaw.html">⑦ OpenClaw</a> &rarr; <a href="course-full-multiagent.html">⑧ Multi-agent</a>.</p>
+</section>
+<section class="page" id="ch8">
+  <span class="tag">Appendix · Long context</span>
+  <h1 class="page-title">Long context &amp; memory</h1>
+  <p class="page-sub">Context Engineering</p>
+  <p><strong>AI Coding Agent</strong> needs in one window:</p>
+  <ul>
+    <li>Entire repository</li>
+    <li>Git history and PR comments</li>
+    <li>API documentation</li>
+    <li>Error logs and stack traces</li>
+  </ul>
+  <div class="cols">
+    <div class="card"><h3>Short-term memory</h3><p>Context window (128k tokens)</p></div>
+    <div class="card"><h3>Long-term memory</h3><p>Vector DB + user profile DB</p></div>
+  </div>
+  <p style="font-size:.9rem;color:var(--muted)">Implementation: <a href="course-full-framework.html">⑤ SqliteSaver + Store</a> &middot; <a href="course-full-multiagent.html">⑧ Multi-agent</a> (course path, not this appendix number).</p>
+  <div class="callout"><strong>Context Engineering</strong> &mdash; design what enters the prompt, in what order, with what priority.</div>
+</section>
+<section class="page" id="ch10">
+  <span class="tag">Appendix · Applications</span>
+  <h1 class="page-title">Applications of LLMs</h1>
+  <p class="page-sub">Real-world domains beyond chat</p>
+
+  <table>
+    <tr><th>Domain</th><th>How LLM is used</th><th>Examples / models</th></tr>
+    <tr><td><strong>Customer support</strong></td><td>Answer inquiries, troubleshoot, conversational FAQ</td><td>Chatbot + RAG on product docs</td></tr>
+    <tr><td><strong>Content generation</strong></td><td>Articles, blogs, social posts, product copy</td><td>GPT-4o, Claude; human edit required</td></tr>
+    <tr><td><strong>Recommendations</strong></td><td>Analyze preferences, personalized suggestions</td><td>Embedding + LLM ranking</td></tr>
+    <tr><td><strong>Healthcare</strong></td><td>Info extraction, advice, mental health chat, report simplification</td><td>Med-PaLM, PubMedQA (not a doctor!)</td></tr>
+    <tr><td><strong>Virtual assistants</strong></td><td>Task execution, personalized responses</td><td>Siri successor pattern: LLM + tools</td></tr>
+    <tr><td><strong>Education</strong></td><td>Explain concepts, answer student questions, tutoring</td><td>SFT on pedagogical data</td></tr>
+    <tr><td><strong>Finance</strong></td><td>Sentiment, NER, numerical claim detection, reasoning</td><td>BloombergGPT, FinGPT</td></tr>
+    <tr><td><strong>Law</strong></td><td>Research assistant, draft review</td><td>GPT-4 scored top 10% on bar exam</td></tr>
+    <tr><td><strong>Civil engineering (course context)</strong></td><td>Report drafting, code/regulation Q&amp;A, schedule analysis</td><td>LLM + RAG on project docs + BIM data</td></tr>
+  </table>
+
+  <div class="callout"><strong>Pattern:</strong> Raw LLM alone is rarely enough. Production = LLM + <strong>RAG</strong> (domain docs) + <strong>tools</strong> (calculator, DB) + <strong>human oversight</strong> (healthcare, law, finance).</div>
+</section>
+<section class="page" id="ch11">
+  <span class="tag">Appendix · Model selection</span>
+  <h1 class="page-title">Model selection and deployment</h1>
+  <p class="page-sub">After you understand training, agents, and applications &mdash; now pick the right model and settings</p>
+  <div class="callout">
+    <p><strong>Why last?</strong> Comparison only makes sense once you know pretrain/SFT/RLHF, RAG, agents, and use cases.</p>
+    <p>Selection = <strong>which model</strong> + <strong>which inference params</strong> + <strong>which tools</strong> (RAG, API).</p>
+  </div>
+  <ol>
+    <li>Match model to task (multimodal? Chinese? self-host?)</li>
+    <li>Set temperature / top-p for the task (see <a href="#ch2-sampling">Ch2 sampling</a>)</li>
+    <li>Know hard boundaries (cutoff, hallucination, context)</li>
+    <li>A/B test on real queries before production</li>
+  </ol>
+  <p style="color:var(--muted);font-size:.9rem"><a href="#ch11-models">Frontier model comparison</a> &middot; <a href="#ch11-boundaries">Capability boundaries</a></p>
+</section>
+<section class="page" id="ch11-models">
+  <span class="tag">Ch11 &middot; Model Comparison</span>
+  <h1 class="page-title">OpenAI vs DeepSeek vs others (2025-2026)</h1>
+  <p class="page-sub">Frontier models compared &mdash; specs from official docs; benchmarks vary by task</p>
+
+  <h2>Frontier model comparison</h2>
+  <table>
+    <tr><th>Model</th><th>Vendor</th><th>Architecture</th><th>Context</th><th>Modal</th><th>Open?</th><th>Strengths</th></tr>
+    <tr><td><strong>GPT-4o</strong></td><td>OpenAI</td><td>Closed</td><td>128K</td><td>Text + image + audio</td><td>API only</td><td>Multimodal, ecosystem, tool use, reliability</td></tr>
+    <tr><td><strong>GPT-4</strong></td><td>OpenAI</td><td>Closed</td><td>128K</td><td>Text + image</td><td>API only</td><td>Longer answers, safer, more factual vs 3.5</td></tr>
+    <tr><td><strong>DeepSeek-V3</strong></td><td>DeepSeek</td><td>671B MoE (37B active)</td><td>128K</td><td>Text</td><td>MIT open weights</td><td>Code, math, cost (~10x cheaper than GPT-4o API)</td></tr>
+    <tr><td><strong>DeepSeek-R1</strong></td><td>DeepSeek</td><td>RL-trained reasoning</td><td>128K</td><td>Text</td><td>Open</td><td>Chain-of-thought math/reasoning; slower, verbose</td></tr>
+    <tr><td><strong>Claude 3.5 Sonnet</strong></td><td>Anthropic</td><td>Closed</td><td>200K</td><td>Text + image</td><td>API only</td><td>Long documents, coding, safety-focused</td></tr>
+    <tr><td><strong>Llama 3.2</strong></td><td>Meta</td><td>1B-90B dense</td><td>128K</td><td>Text (+ vision 11B/90B)</td><td>Open</td><td>Self-host, fine-tune, on-device</td></tr>
+    <tr><td><strong>ChatGLM</strong></td><td>Zhipu / Tsinghua</td><td>6B+</td><td>8K-128K</td><td>Text + image</td><td>Open (academic)</td><td>Chinese-English bilingual</td></tr>
+    <tr><td><strong>Qwen 2.5</strong></td><td>Alibaba</td><td>0.5B-72B</td><td>128K</td><td>Text (+ vision variants)</td><td>Open</td><td>CN/EN, coding, local deploy</td></tr>
+  </table>
+
+  <h2>GPT-4o details</h2>
+  <ul>
+    <li>Released May 2024: <strong>multimodal</strong> (text, audio, image in/out)</li>
+    <li>Context window: <strong>128K tokens</strong>; knowledge cutoff: <strong>Oct 2023</strong> (per OpenAI model card)</li>
+    <li>Max output: ~16K tokens (standard); Realtime variant uses 32K context</li>
+  </ul>
+
+  <h2>When to choose which?</h2>
+  <table>
+    <tr><th>Scenario</th><th>Recommended</th><th>Why</th></tr>
+    <tr><td>Multimodal app (voice + image)</td><td>GPT-4o</td><td>Native audio/image; mature API</td></tr>
+    <tr><td>High-volume text API, cost-sensitive</td><td>DeepSeek-V3</td><td>Strong benchmarks, open weights, low price</td></tr>
+    <tr><td>Hard math / logic proofs</td><td>DeepSeek-R1 or o-series</td><td>RL reasoning training; shows CoT</td></tr>
+    <tr><td>Self-host / fine-tune on private data</td><td>Llama 3.2 / Qwen / DeepSeek</td><td>Open weights, no vendor lock-in</td></tr>
+    <tr><td>100-page document analysis</td><td>Claude 3.5 (200K)</td><td>Larger advertised context</td></tr>
+    <tr><td>Chinese bilingual assistant</td><td>ChatGLM / Qwen</td><td>Strong CN/EN bilingual</td></tr>
+    <tr><td>Agent with tools + memory</td><td>Any frontier + your stack</td><td>Model is brain; RAG/tools matter more than small benchmark gaps</td></tr>
+  </table>
+
+  <h2>Benchmark snapshot (indicative, not absolute)</h2>
+  <table>
+    <tr><th>Benchmark</th><th>Tests</th><th>GPT-4o ~</th><th>DeepSeek-V3 ~</th><th>DeepSeek-R1 ~</th></tr>
+    <tr><td>MMLU</td><td>General knowledge</td><td>~88%</td><td>~88%</td><td>~90%</td></tr>
+    <tr><td>HumanEval</td><td>Code generation</td><td>~90%</td><td>~82-90%</td><td>Strong</td></tr>
+    <tr><td>MATH</td><td>Math reasoning</td><td>Good</td><td>~90%</td><td>~97% (specialized)</td></tr>
+  </table>
+  <p style="color:var(--muted);font-size:.85rem">Benchmarks shift with each model version. Use as rough guide; always eval on <em>your</em> task.</p>
+</section>
+<section class="page" id="ch11-boundaries">
+  <span class="tag">Ch11 &middot; Boundaries</span>
+  <h1 class="page-title">Model capability boundaries</h1>
+  <p class="page-sub">What LLMs cannot do reliably &mdash; even frontier models</p>
+
+  <div class="callout" style="background:#fef2f2;border-left-color:#ef4444">
+    <p><strong>Core truth:</strong> LLMs predict plausible tokens. They do <em>not</em> have guaranteed access to truth, real-time world state, or persistent memory unless you add tools.</p>
+  </div>
+
+  <h2>Seven hard boundaries</h2>
+  <table>
+    <tr><th>Boundary</th><th>What happens</th><th>Mitigation</th></tr>
+    <tr><td><strong>Knowledge cutoff</strong></td><td>GPT-4o trained through Oct 2023; unaware of 2024+ events</td><td>RAG, web search tool, newer model</td></tr>
+    <tr><td><strong>Hallucination</strong></td><td>Confident but false facts, fake citations, wrong numbers</td><td>RAG + cite sources, human review, lower temperature</td></tr>
+    <tr><td><strong>Context vs effective context</strong></td><td>Advertised 128K-200K, but accuracy drops long before limit (2025 research: MECW often &lt;&lt; advertised)</td><td>Chunk + retrieve; do not dump entire repo blindly</td></tr>
+    <tr><td><strong>No real-world action</strong></td><td>Can only emit text unless given tools</td><td>Agent + APIs + code execution</td></tr>
+    <tr><td><strong>Math / logic edge cases</strong></td><td>Fail on multi-step arithmetic, constraint puzzles without CoT</td><td>Calculator tool, R1/o-series, verify with code</td></tr>
+    <tr><td><strong>Privacy / security</strong></td><td>Cloud API may log prompts; model may leak training patterns</td><td>Self-host open model, PII filtering, enterprise API</td></tr>
+    <tr><td><strong>Consistency</strong></td><td>Same question, different runs &rarr; different answers (sampling)</td><td>temperature=0, structured output, caching</td></tr>
+  </table>
+
+  <h2>Closed vs open model tradeoffs</h2>
+  <table>
+    <tr><th></th><th>Closed (GPT-4o, Claude)</th><th>Open (DeepSeek, Llama, Qwen)</th></tr>
+    <tr><td>Transparency</td><td>Black box weights</td><td>Inspect / fine-tune weights</td></tr>
+    <tr><td>Cost at scale</td><td>Higher API fees</td><td>Self-host can be cheaper</td></tr>
+    <tr><td>Multimodal</td><td>GPT-4o native audio/image</td><td>Most open models text-first</td></tr>
+    <tr><td>Compliance</td><td>Vendor handles infra</td><td>You own data residency</td></tr>
+    <tr><td>Peak capability</td><td>Often leads on general tasks</td><td>DeepSeek-R1 competitive on reasoning</td></tr>
+  </table>
+
+  <h2>PM decision framework</h2>
+  <ol>
+    <li>Define task + eval set <strong>before</strong> picking a model</li>
+    <li>Check: need multimodal? real-time data? self-host?</li>
+    <li>Run A/B on 50-100 real user queries</li>
+    <li>Add RAG/tools where boundaries hit (cutoff, hallucination, action)</li>
+    <li>Monitor production: thumbs down, badcase replay, cost per task</li>
+  </ol>
+</section>
+<section class="page" id="summary">
+  <span class="tag">Summary</span>
+  <h1 class="page-title">The full picture</h1>
+  <p>Traditional AI: input &rarr; output</p>
+  <p>LLM: input &rarr; <strong>reason</strong> &rarr; generate</p>
+  <p>Agent: goal &rarr; <strong>plan</strong> &rarr; act &rarr; feedback &rarr; iterate</p>
+  <p style="margin-top:12px"><strong>NLP core:</strong> everything is next-token (next-unit) prediction.</p>
+  <p><strong>RAG:</strong> offline index build + online retrieve-then-predict.</p>
+  <p><strong>Multimodal:</strong> same prediction idea for vision (ViT, SAM, Diffusion) and audio (Whisper ASR, TTS).</p>
+  <p><strong>Models:</strong> pick by task (GPT-4o multimodal, DeepSeek cost/reasoning, Llama self-host) &mdash; know the <a href="#ch11-boundaries">boundaries</a>.</p>
+  <div class="eq" style="margin-top:24px">$$\text{Agent} = \text{LLM} + \text{Memory} + \text{Planning} + \text{Tools} + \text{Environment}$$</div>
+  <p style="margin-top:20px;font-size:1.2rem;color:var(--muted)">LLM is the brain. Agent is the whole person.</p>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

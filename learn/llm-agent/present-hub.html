@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Course Hub</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:#f8fafc; color:#1e293b; line-height:1.6; padding:40px 24px; }
+  .wrap { max-width:760px; margin:0 auto; }
+  h1 { color:#0c4a6e; margin-bottom:8px; }
+  .sub { color:#64748b; margin-bottom:24px; }
+  .path { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px 24px; margin-bottom:24px; font-size:.92rem; }
+  .path ol { margin:12px 0 0 1.4em; color:#475569; }
+  .path li { margin:4px 0; }
+  .grid { display:grid; gap:16px; }
+  .card {
+    background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:24px;
+    box-shadow:0 4px 20px rgba(15,23,42,.06);
+  }
+  .card h2 { font-size:1.15rem; color:#0369a1; margin-bottom:8px; }
+  .card p { font-size:.92rem; color:#475569; margin-bottom:16px; }
+  .links { display:flex; flex-wrap:wrap; gap:10px; }
+  .links a {
+    display:inline-block; padding:8px 16px; border-radius:8px; text-decoration:none;
+    font-size:.88rem; font-weight:600;
+  }
+  .a-present { background:#0369a1; color:#fff; }
+  .a-scroll { background:#f0f9ff; color:#0369a1; border:1px solid #bae6fd; }
+  .note { margin-top:32px; padding:16px; background:#f0f9ff; border-left:4px solid #0369a1; border-radius:0 8px 8px 0; font-size:.9rem; color:#475569; }
+  .tag { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#64748b; }
+  .back { display:inline-block; margin-bottom:20px; font-size:.9rem; color:#0369a1; text-decoration:none; }
+  .back:hover { text-decoration:underline; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../../notes.html">&larr; 返回 Vienne.AI 学习笔记</a>
+  <a class="back" href="../../index.html#learning" style="margin-left:16px">主页</a>
+  <h1>从 LLM 到 AI Agent · 课程中心</h1>
+  <p class="sub">九章完整路径 &mdash; 每章配套 16:9 幻灯片 + 竖版 scroll 文档，内容一致。</p>
+
+  <div class="path">
+    <strong>Learning path</strong>
+    <ol>
+      <li>LLM &rarr; predict next token</li>
+      <li>RAG &rarr; look up first, then think</li>
+      <li>Agent Core &rarr; ReAct, tools, intent, context</li>
+      <li>Retrieval Engineering &rarr; BM25, hybrid, rerank, eval</li>
+      <li>LangChain &amp; LangGraph &rarr; compare first, then build + memory</li>
+      <li>MCP &amp; A2A &rarr; tool protocol + agent protocol</li>
+      <li>OpenClaw &amp; Hermes &rarr; self-hosted agent stack</li>
+      <li>Multi-agent &amp; KG</li>
+      <li>Multimodal (CV / ASR / TTS)</li>
+    </ol>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <span class="tag">Chapter 1</span>
+      <h2>LLM Fundamentals</h2>
+      <p>Transformer, inference, sampling, Pretrain / SFT / RLHF, model selection.</p>
+      <div class="links">
+        <a class="a-present" href="course-present.html">16:9 Slides</a>
+        <a class="a-scroll" href="course-full-llm.html">Scroll doc</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag">Chapter 2</span>
+      <h2>RAG: External Knowledge</h2>
+      <p>Problem-first: hallucination, stale data, private docs. <strong>Look up first, then think.</strong></p>
+      <div class="links">
+        <a class="a-present" href="course-present-rag.html">16:9 Slides</a>
+        <a class="a-scroll" href="course-full-rag.html">Scroll doc</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag">Chapter 3</span>
+      <h2>Agent Core</h2>
+      <p>Why LLM &ne; Agent. ReAct loop, tool calling, intent routing, multi-turn context.</p>
+      <div class="links">
+        <a class="a-present" href="course-present-agent.html">16:9 Slides</a>
+        <a class="a-scroll" href="course-full-agent.html">Scroll doc</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag">Chapter 4</span>
+      <h2>Retrieval Engineering</h2>
+      <p>BM25, dense, hybrid, rerank, model selection, RAG eval metrics.</p>
+      <div class="links">
+        <a class="a-present" href="course-present-retrieval.html">16:9 Slides</a>
+        <a class="a-scroll" href="course-full-retrieval.html">Scroll doc</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag">Chapter 5</span>
+      <h2>LangChain &amp; LangGraph</h2>
+      <p>Framework comparison first, then LangChain RAG chain, LangGraph ReAct, SqliteSaver + Store.</p>
+      <div class="links">
+        <a class="a-present" href="course-present-framework.html">16:9 Slides</a>
+        <a class="a-scroll" href="course-full-framework.html">Scroll doc</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag">Chapter 6</span>
+      <h2>MCP &amp; A2A</h2>
+      <p>Model Context Protocol (tools), build MCP server, Agent-to-Agent handoffs.</p>
+      <div class="links">
+        <a class="a-present" href="course-present-protocols.html">16:9 Slides</a>
+        <a class="a-scroll" href="course-full-protocols.html">Scroll doc</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag">Chapter 7</span>
+      <h2>OpenClaw &amp; Hermes</h2>
+      <p>Nous Hermes tool-calling models, OpenClaw agent OS, Skills, ClawHub, self-host lab.</p>
+      <div class="links">
+        <a class="a-present" href="course-present-openclaw.html">16:9 Slides</a>
+        <a class="a-scroll" href="course-full-openclaw.html">Scroll doc</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag">Chapter 8</span>
+      <h2>Multi-agent &amp; Knowledge Graph</h2>
+      <p>Supervisor, handoff, critic patterns. GraphRAG vs vector RAG.</p>
+      <div class="links">
+        <a class="a-present" href="course-present-multiagent.html">16:9 Slides</a>
+        <a class="a-scroll" href="course-full-multiagent.html">Scroll doc</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag">Chapter 9</span>
+      <h2>Multimodal: CV, ASR, TTS</h2>
+      <p>ViT, SAM, Stable Diffusion. Whisper ASR. Neural TTS.</p>
+      <div class="links">
+        <a class="a-present" href="course-present-multimodal.html">16:9 Slides</a>
+        <a class="a-scroll" href="course-full-multimodal.html">Scroll doc</a>
+      </div>
+    </div>
+    <div class="card">
+      <span class="tag">Eval</span>
+      <h2>Evaluation Guide</h2>
+      <p>Cross-chapter metrics, golden-set workflow, per-chapter eval sections, debug decision tree.</p>
+      <div class="links">
+        <a class="a-scroll" href="course-full-eval.html">Scroll doc</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>iPad:</strong> Run <code>serve-present.bat</code> on PC, open <code>http://PC_IP:8080/present-hub.html</code> in Safari.
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenClaw & Hermes</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root { --bg:#fff; --text:#1e293b; --muted:#64748b; --accent:#0369a1; --accent2:#0c4a6e; --hi:#b45309; --border:#e2e8f0; --chip:#f0f9ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:#f8fafc; color:var(--text); line-height:1.6; }
+  .topbar { position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .topbar h1 { font-size:1rem; color:var(--accent2); }
+  .topbar nav { display:flex; gap:8px; flex-wrap:wrap; }
+  .topbar a { font-size:.72rem; color:var(--accent); text-decoration:none; padding:4px 10px; border-radius:999px; background:var(--chip); border:1px solid #bae6fd; }
+  .page { max-width:1100px; margin:0 auto 32px; background:var(--bg); border:1px solid var(--border); border-radius:12px; box-shadow:0 4px 24px rgba(15,23,42,.06); padding:48px 56px; }
+  .page-title { font-size:2rem; color:var(--accent2); margin-bottom:8px; }
+  .page-sub { color:var(--muted); font-size:1.1rem; margin-bottom:28px; }
+  .tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); background:var(--chip); padding:4px 10px; border-radius:999px; border:1px solid #bae6fd; margin-bottom:16px; }
+  h2 { font-size:1.35rem; color:var(--accent); margin:28px 0 12px; border-bottom:2px solid #e0f2fe; padding-bottom:6px; }
+  h3 { font-size:1.05rem; color:#0f766e; margin:18px 0 8px; }
+  p,li { font-size:1rem; margin:8px 0; }
+  ul,ol { margin-left:1.4em; }
+  strong { color:var(--hi); }
+  .callout { background:var(--chip); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:20px 0; }
+  .roadmap { background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:16px 0; font-size:.92rem; }
+  .roadmap ol { margin:8px 0 0 1.2em; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:16px 0; }
+  .card { border:1px solid var(--border); border-radius:10px; padding:16px; background:#f8fafc; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:.92rem; }
+  th,td { border:1px solid var(--border); padding:8px 10px; text-align:left; }
+  th { background:#e0f2fe; color:var(--accent2); }
+  .mono { font-family:Consolas,monospace; font-size:.88rem; background:#f1f5f9; padding:2px 8px; border-radius:4px; }
+  pre { padding:14px; background:#f8fafc; border:1px solid var(--border); border-radius:8px; font-size:.85rem; overflow-x:auto; }
+  .react { padding:10px 14px; border-radius:8px; margin:8px 0; font-size:.92rem; }
+  .react-t { background:#f0f9ff; border:1px solid #bae6fd; }
+  .react-a { background:#fef3c7; border:1px solid #fcd34d; }
+  .react-o { background:#ecfdf5; border:1px solid #a7f3d0; }
+  .fig { margin:20px 0; text-align:center; }
+  .fig svg { max-width:100%; height:auto; border:1px solid var(--border); border-radius:8px; }
+  .fig-cap { font-size:.85rem; color:var(--muted); margin-top:8px; }
+  .steps { counter-reset:step; list-style:none; margin-left:0; padding:0; }
+  .steps li { counter-increment:step; padding:12px 12px 12px 48px; position:relative; border-left:3px solid #bae6fd; margin:8px 0; background:#f8fafc; border-radius:0 8px 8px 0; }
+  .steps li::before { content:counter(step); position:absolute; left:12px; top:12px; width:24px; height:24px; background:var(--accent); color:#fff; border-radius:50%; font-size:.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  pre code { font-family:Consolas,monospace; }
+  .flow-v { display:flex; flex-direction:column; align-items:center; gap:0; margin:20px 0; }
+  .flow-box { border:2px solid var(--border); border-radius:8px; padding:12px 20px; min-width:280px; text-align:center; font-size:.9rem; background:#fff; }
+  .flow-arrow { color:var(--muted); font-size:1.2rem; padding:4px 0; }
+  .eq { margin:14px 0; overflow-x:auto; }
+
+</style></head><body>
+<div class="topbar"><h1>⑦ OpenClaw & Hermes</h1><nav><a href="present-hub.html">Hub</a><a href="#intro">Intro</a><a href="#hermes">Hermes</a><a href="#openclaw">OpenClaw</a><a href="#skills">Skills</a><a href="#together">Together</a><a href="#lab">Lab</a><a href="course-full-protocols.html">&larr; MCP</a><a href="course-full-multiagent.html">Multi &rarr;</a></nav></div>
+
+<div class="roadmap"><strong>Course path (9 chapters)</strong>
+<ol>
+<li><a href="course-full-llm.html">LLM</a></li>
+<li><a href="course-full-rag.html">RAG</a></li>
+<li><a href="course-full-agent.html">Agent Core</a></li>
+<li><a href="course-full-retrieval.html">Retrieval Engineering</a></li>
+<li><a href="course-full-framework.html">LangChain &amp; LangGraph</a></li>
+<li><a href="course-full-protocols.html">MCP &amp; A2A</a></li>
+<li><a href="course-full-openclaw.html">OpenClaw &amp; Hermes</a></li>
+<li><a href="course-full-multiagent.html">Multi-agent &amp; KG</a></li>
+<li><a href="course-full-multimodal.html">Multimodal</a></li>
+</ol></div>
+<section class="page" id="intro"><span class="tag">Chapter 7</span>
+<h1 class="page-title">OpenClaw &amp; Hermes</h1>
+<p class="page-sub">Self-hosted personal agent — open alternative to Claude Desktop stack</p>
+<p>Prev: <a href="course-full-protocols.html">MCP &amp; A2A</a>. Next: <a href="course-full-multiagent.html">Multi-agent &amp; KG</a>.</p>
+</section>
+
+<section class="page" id="closed-vs-open"><span class="tag">Context</span>
+<h1 class="page-title">Closed stack vs open stack</h1>
+<table>
+<tr><th>Layer</th><th>Closed (Anthropic)</th><th>Open (self-host)</th></tr>
+<tr><td>Model</td><td>Claude API</td><td><strong>Hermes</strong> via Ollama/vLLM</td></tr>
+<tr><td>Runtime</td><td>Claude Desktop / API app</td><td><strong>OpenClaw</strong> agent OS</td></tr>
+<tr><td>Tools</td><td>MCP servers</td><td>Skills + MCP compatible</td></tr>
+<tr><td>Skills</td><td>Claude Skills</td><td>ClawHub marketplace</td></tr>
+<tr><td>Channels</td><td>Web, API</td><td>Telegram, Discord, CLI, Web</td></tr>
+</table>
+</section>
+
+<section class="page" id="hermes"><span class="tag">Hermes</span>
+<h1 class="page-title">Hermes (Nous Hermes) — the model</h1>
+<p>Open-weight models fine-tuned for <strong>function calling</strong> and agentic chat. Solves: base Llama/Mistral often emit invalid tool JSON.</p>
+
+<h2>Model lineup (check Nous Research for latest)</h2>
+<table>
+<tr><th>Model</th><th>Base</th><th>Use</th></tr>
+<tr><td>Hermes 3</td><td>Llama 3.1</td><td>General agent + tools</td></tr>
+<tr><td>Hermes 2</td><td>Mistral / Yi</td><td>Lighter self-host</td></tr>
+</table>
+
+<h2>Run locally</h2>
+<pre><code># Ollama
+ollama pull hermes3
+ollama run hermes3
+
+# OpenAI-compatible endpoint for OpenClaw / LangChain
+# OPENAI_BASE_URL=http://localhost:11434/v1
+# OPENAI_API_KEY=ollama
+
+from openai import OpenAI
+client = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
+r = client.chat.completions.create(
+    model="hermes3",
+    messages=[{"role":"user","content":"What's 2+2?"}],
+    tools=[{"type":"function","function":{"name":"calc","parameters":{"type":"object","properties":{"x":{"type":"number"}}}}}],
+)
+print(r.choices[0].message)</code></pre>
+
+<h2>Hermes vs base model (what to demo in class)</h2>
+<p>Same 5 tool-calling prompts on Llama-3.1-base vs Hermes-3 — count valid JSON tool_calls. Hermes should win on schema adherence.</p>
+</section>
+
+<section class="page" id="openclaw"><span class="tag">OpenClaw</span>
+<h1 class="page-title">OpenClaw — the agent operating system</h1>
+<p>Always-on assistant runtime. Not a library you import — a <strong>daemon</strong> that connects channels to model + skills.</p>
+
+<h2>Core components</h2>
+<table>
+<tr><th>Part</th><th>Function</th></tr>
+<tr><td><strong>Gateway</strong></td><td>Receives messages from Telegram/Discord/etc.</td></tr>
+<tr><td><strong>Heartbeat</strong></td><td>Scheduled wake (cron-like): daily briefings, reminders</td></tr>
+<tr><td><strong>Agent loop</strong></td><td>Hermes (or other model) plans &rarr; tools &rarr; reply</td></tr>
+<tr><td><strong>Skill loader</strong></td><td>Installs ClawHub packages (prompt + tools + config)</td></tr>
+<tr><td><strong>Memory</strong></td><td>Session + optional vector memory</td></tr>
+</table>
+
+<h2>Typical config flow</h2>
+<ol class="steps">
+<li>Install OpenClaw (follow project docs for your OS).</li>
+<li>Set model endpoint to Ollama Hermes or cloud fallback.</li>
+<li><span class="mono">openclaw skills install &lt;skill-name&gt;</span> from ClawHub.</li>
+<li>Connect Telegram bot token in config.</li>
+<li>Send message — gateway &rarr; agent loop &rarr; skill tools &rarr; reply on Telegram.</li>
+</ol>
+
+<h2>Example config (illustrative YAML)</h2>
+<pre><code># ~/.openclaw/config.yaml — field names vary by version; check docs
+model:
+  provider: openai_compatible
+  base_url: http://127.0.0.1:11434/v1
+  api_key: ollama
+  name: hermes3
+
+channels:
+  telegram:
+    enabled: true
+    bot_token: "${TELEGRAM_BOT_TOKEN}"
+
+skills:
+  - name: calendar-assistant
+    source: clawhub
+  - name: web-search
+    source: clawhub
+
+heartbeat:
+  - cron: "0 8 * * *"
+    prompt: "Summarize today's calendar and unread priority emails"</code></pre>
+
+<h2>Install sequence (class demo)</h2>
+<pre><code># Terminal 1 — model
+ollama pull hermes3
+ollama serve
+
+# Terminal 2 — OpenClaw (example; use official install command)
+# curl -fsSL https://openclaw.ai/install.sh | bash
+openclaw init
+openclaw skills search calendar
+openclaw skills install calendar-assistant
+openclaw channel add telegram
+openclaw start</code></pre>
+</section>
+
+<section class="page" id="skills"><span class="tag">Skills</span>
+<h1 class="page-title">What is a Skill?</h1>
+<p>A Skill is a <strong>packaged capability</strong> — not just a prompt, not just a tool.</p>
+
+<pre><code># Conceptual skill package structure
+my-skill/
+  skill.yaml          # name, description, triggers
+  system_prompt.md    # behavior instructions
+  tools/              # optional scripts the agent can run
+    fetch_calendar.py
+  config.schema.json  # user-configurable options</code></pre>
+
+<p>Same idea as Claude Skills: user installs "Calendar Assistant" — agent knows when and how to use it.</p>
+
+<h2>ClawHub</h2>
+<p>Community skill marketplace for OpenClaw. Browse, install, publish — like npm for agent behaviors.</p>
+</section>
+
+<section class="page" id="together"><span class="tag">Together</span>
+<h1 class="page-title">How Hermes + OpenClaw work together</h1>
+<ol>
+<li>User messages on Telegram: "Summarize my calendar and email the team"</li>
+<li>OpenClaw gateway receives message</li>
+<li>Hermes model decides: need calendar skill + email skill</li>
+<li>Skills execute tools (calendar API, SMTP or API)</li>
+<li>Hermes composes summary reply &rarr; sent to Telegram</li>
+<li>Heartbeat can trigger same flow at 8am daily without user prompt</li>
+</ol>
+
+<h2>OpenClaw vs LangGraph (your product decision)</h2>
+<table>
+<tr><th></th><th>LangGraph</th><th>OpenClaw</th></tr>
+<tr><td>Build for</td><td>SaaS product backend</td><td>Personal / team assistant</td></tr>
+<tr><td>Customize via</td><td>Python graph code</td><td>Skills + YAML config</td></tr>
+<tr><td>Channels</td><td>You implement API</td><td>Built-in messengers</td></tr>
+<tr><td>Model</td><td>Any via LangChain</td><td>Optimized for local Hermes</td></tr>
+</table>
+</section>
+
+<section class="page" id="lab"><span class="tag">Lab</span>
+<h1 class="page-title">Lab: OpenClaw + Hermes</h1>
+<ol class="steps">
+<li>Install Ollama + pull Hermes model.</li>
+<li>Test 5 tool-calling prompts in Python (OpenAI-compatible API).</li>
+<li>Install OpenClaw; point to local Hermes endpoint.</li>
+<li>Install one ClawHub skill; trigger via CLI or messenger.</li>
+<li>Compare: same task on base Llama vs Hermes — tool JSON validity rate.</li>
+</ol>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body></html>

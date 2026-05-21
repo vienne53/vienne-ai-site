@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LangChain & LangGraph</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root { --bg:#fff; --text:#1e293b; --muted:#64748b; --accent:#0369a1; --accent2:#0c4a6e; --hi:#b45309; --border:#e2e8f0; --chip:#f0f9ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:#f8fafc; color:var(--text); line-height:1.6; }
+  .topbar { position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .topbar h1 { font-size:1rem; color:var(--accent2); }
+  .topbar nav { display:flex; gap:8px; flex-wrap:wrap; }
+  .topbar a { font-size:.72rem; color:var(--accent); text-decoration:none; padding:4px 10px; border-radius:999px; background:var(--chip); border:1px solid #bae6fd; }
+  .page { max-width:1100px; margin:0 auto 32px; background:var(--bg); border:1px solid var(--border); border-radius:12px; box-shadow:0 4px 24px rgba(15,23,42,.06); padding:48px 56px; }
+  .page-title { font-size:2rem; color:var(--accent2); margin-bottom:8px; }
+  .page-sub { color:var(--muted); font-size:1.1rem; margin-bottom:28px; }
+  .tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); background:var(--chip); padding:4px 10px; border-radius:999px; border:1px solid #bae6fd; margin-bottom:16px; }
+  h2 { font-size:1.35rem; color:var(--accent); margin:28px 0 12px; border-bottom:2px solid #e0f2fe; padding-bottom:6px; }
+  h3 { font-size:1.05rem; color:#0f766e; margin:18px 0 8px; }
+  p,li { font-size:1rem; margin:8px 0; }
+  ul,ol { margin-left:1.4em; }
+  strong { color:var(--hi); }
+  .callout { background:var(--chip); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:20px 0; }
+  .roadmap { background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:16px 0; font-size:.92rem; }
+  .roadmap ol { margin:8px 0 0 1.2em; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:16px 0; }
+  .card { border:1px solid var(--border); border-radius:10px; padding:16px; background:#f8fafc; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:.92rem; }
+  th,td { border:1px solid var(--border); padding:8px 10px; text-align:left; }
+  th { background:#e0f2fe; color:var(--accent2); }
+  .mono { font-family:Consolas,monospace; font-size:.88rem; background:#f1f5f9; padding:2px 8px; border-radius:4px; }
+  pre { padding:14px; background:#f8fafc; border:1px solid var(--border); border-radius:8px; font-size:.85rem; overflow-x:auto; }
+  .react { padding:10px 14px; border-radius:8px; margin:8px 0; font-size:.92rem; }
+  .react-t { background:#f0f9ff; border:1px solid #bae6fd; }
+  .react-a { background:#fef3c7; border:1px solid #fcd34d; }
+  .react-o { background:#ecfdf5; border:1px solid #a7f3d0; }
+  .fig { margin:20px 0; text-align:center; }
+  .fig svg { max-width:100%; height:auto; border:1px solid var(--border); border-radius:8px; }
+  .fig-cap { font-size:.85rem; color:var(--muted); margin-top:8px; }
+  .steps { counter-reset:step; list-style:none; margin-left:0; padding:0; }
+  .steps li { counter-increment:step; padding:12px 12px 12px 48px; position:relative; border-left:3px solid #bae6fd; margin:8px 0; background:#f8fafc; border-radius:0 8px 8px 0; }
+  .steps li::before { content:counter(step); position:absolute; left:12px; top:12px; width:24px; height:24px; background:var(--accent); color:#fff; border-radius:50%; font-size:.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  pre code { font-family:Consolas,monospace; }
+  .flow-v { display:flex; flex-direction:column; align-items:center; gap:0; margin:20px 0; }
+  .flow-box { border:2px solid var(--border); border-radius:8px; padding:12px 20px; min-width:280px; text-align:center; font-size:.9rem; background:#fff; }
+  .flow-arrow { color:var(--muted); font-size:1.2rem; padding:4px 0; }
+  .eq { margin:14px 0; overflow-x:auto; }
+
+</style></head><body>
+<div class="topbar"><h1>⑤ LangChain & LangGraph</h1><nav><a href="present-hub.html">Hub</a><a href="#intro">Intro</a><a href="#arch-compare">选型</a><a href="#langchain">LangChain</a><a href="#langgraph">LangGraph</a><a href="#memory-short">Short</a><a href="#memory-long">Long</a><a href="#lab">Lab</a><a href="course-full-retrieval.html">&larr; Retrieval</a><a href="course-full-protocols.html">MCP &rarr;</a></nav></div>
+
+<div class="roadmap"><strong>Course path (9 chapters)</strong>
+<ol>
+<li><a href="course-full-llm.html">LLM</a></li>
+<li><a href="course-full-rag.html">RAG</a></li>
+<li><a href="course-full-agent.html">Agent Core</a></li>
+<li><a href="course-full-retrieval.html">Retrieval Engineering</a></li>
+<li><a href="course-full-framework.html">LangChain &amp; LangGraph</a></li>
+<li><a href="course-full-protocols.html">MCP &amp; A2A</a></li>
+<li><a href="course-full-openclaw.html">OpenClaw &amp; Hermes</a></li>
+<li><a href="course-full-multiagent.html">Multi-agent &amp; KG</a></li>
+<li><a href="course-full-multimodal.html">Multimodal</a></li>
+</ol></div>
+<section class="page" id="intro"><span class="tag">Chapter 5</span>
+<h1 class="page-title">LangChain &amp; LangGraph</h1>
+<p class="page-sub">Architecture selection first, then implementation + memory</p>
+<p>Prerequisites: <a href="course-full-agent.html">Agent Core</a>. Next: <a href="course-full-protocols.html">MCP &amp; A2A</a>.</p>
+</section>
+
+<section class="page" id="arch-compare"><span class="tag">Selection</span>
+<h1 class="page-title">Which framework? Compare first</h1>
+
+<h2>Five options developers actually use</h2>
+<table>
+<tr><th>Option</th><th>What it is</th><th>Pick when</th></tr>
+<tr><td><strong>Raw OpenAI SDK</strong></td><td>while-loop + tool_calls</td><td>Learning, full control, tiny codebase</td></tr>
+<tr><td><strong>LangChain</strong></td><td>Composable chains (LCEL)</td><td>Fixed RAG / ETL pipelines, no agent loop</td></tr>
+<tr><td><strong>LangGraph</strong></td><td>Stateful graph on top of LC</td><td>ReAct agent, branches, checkpoint, human-in-loop</td></tr>
+<tr><td><strong>CrewAI / AutoGen</strong></td><td>Role-based multi-agent</td><td>Predefined roles, less graph coding</td></tr>
+<tr><td><strong>OpenClaw</strong></td><td>Personal agent OS</td><td>See <a href="course-full-openclaw.html">Chapter 7</a></td></tr>
+</table>
+
+<h2>LangChain vs LangGraph (decision table)</h2>
+<table>
+<tr><th>Question</th><th>LangChain</th><th>LangGraph</th></tr>
+<tr><td>Flow shape?</td><td>A &rarr; B &rarr; C (DAG)</td><td>Cycles: agent &harr; tools</td></tr>
+<tr><td>Who runs the loop?</td><td>You write while True</td><td>Graph edges</td></tr>
+<tr><td>Session resume?</td><td>DIY pickle / DB</td><td>SqliteSaver built-in</td></tr>
+<tr><td>Route by intent?</td><td>RunnableBranch</td><td>conditional_edges</td></tr>
+<tr><td>Multi-agent?</td><td>Awkward</td><td>Supervisor subgraph</td></tr>
+</table>
+
+<div class="callout"><strong>80% rule:</strong> One-shot RAG &rarr; LangChain. Anything with tools in a loop &rarr; LangGraph.</div>
+</section>
+
+<section class="page" id="langchain"><span class="tag">LangChain</span>
+<h1 class="page-title">LangChain in practice</h1>
+
+<h2>Step 1 — Install &amp; model</h2>
+<pre><code>pip install langchain langchain-openai langchain-community chromadb
+
+from langchain_openai import ChatOpenAI
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)</code></pre>
+
+<h2>Step 2 — RAG chain (most common use)</h2>
+<pre><code>from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
+
+docs = [...]  # your chunked documents
+retriever = Chroma.from_documents(docs, OpenAIEmbeddings()).as_retriever(k=4)
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "Answer ONLY from context. Cite chunk id.\n\n{context}"),
+    ("human", "{question}"),
+])
+
+rag_chain = (
+    {"context": retriever, "question": RunnablePassthrough()}
+    | prompt | llm | StrOutputParser()
+)
+rag_chain.invoke("What is the refund window?")</code></pre>
+
+<h2>Step 3 — Add a tool (single shot, not loop)</h2>
+<pre><code>from langchain_core.tools import tool
+
+@tool
+def lookup_order(order_id: str) -> str:
+    # Return JSON string for order status
+    return '{"status":"shipped","eta":"2025-06-01"}'
+
+llm_tools = llm.bind_tools([lookup_order])
+msg = llm_tools.invoke("Status of ORD-99?")
+# If msg.tool_calls: execute lookup_order(**args) then call llm again with result</code></pre>
+
+<p><strong>LangChain stops here</strong> when you need automatic multi-step tool loops — use LangGraph below.</p>
+</section>
+
+<section class="page" id="langgraph"><span class="tag">LangGraph</span>
+<h1 class="page-title">LangGraph in practice</h1>
+
+<h2>Step 1 — State schema</h2>
+<pre><code>from typing import Annotated, TypedDict
+from langgraph.graph.message import add_messages
+
+class AgentState(TypedDict):
+    messages: Annotated[list, add_messages]</code></pre>
+
+<h2>Step 2 — Nodes: model + tools</h2>
+<pre><code>from langgraph.prebuilt import ToolNode, tools_condition
+from langgraph.graph import StateGraph, START, END
+
+def call_model(state: AgentState):
+    response = llm_tools.invoke(state["messages"])
+    return {"messages": [response]}
+
+builder = StateGraph(AgentState)
+builder.add_node("agent", call_model)
+builder.add_node("tools", ToolNode([lookup_order, search_docs]))
+builder.add_edge(START, "agent")
+builder.add_conditional_edges("agent", tools_condition)  # tools or END
+builder.add_edge("tools", "agent")
+graph = builder.compile()</code></pre>
+
+<h2>Step 3 — Intent router (conditional entry)</h2>
+<pre><code>def route_intent(state):
+    last = state["messages"][-1].content
+    if "order" in last.lower():
+        return "order_agent"
+    return "rag_agent"
+
+builder.add_conditional_edges(START, route_intent)</code></pre>
+
+<h2>Step 4 — Human approval before dangerous tool</h2>
+<pre><code>graph = builder.compile(interrupt_before=["tools"])
+# First invoke pauses before tools; user approves; then graph.invoke(None, config) continues</code></pre>
+</section>
+
+<section class="page" id="memory-short"><span class="tag">Memory</span>
+<h1 class="page-title">SqliteSaver — short-term session memory</h1>
+<p>Stores full graph state per <span class="mono">thread_id</span>. User closes tab, comes back — conversation continues.</p>
+
+<pre><code>from langgraph.checkpoint.sqlite import SqliteSaver
+
+checkpointer = SqliteSaver.from_conn_string("checkpoints.db")
+graph = builder.compile(checkpointer=checkpointer)
+
+config = {"configurable": {"thread_id": "support-user-42"}}
+graph.invoke({"messages": [("user", "Refund for ORD-8821")]}, config)
+# ... later same day, same thread_id ...
+graph.invoke({"messages": [("user", "Yes item was damaged")]}, config)
+# Agent still knows ORD-8821 without re-asking</code></pre>
+
+<h3>Debug: time travel</h3>
+<pre><code>for snap in graph.get_state_history(config):
+    print(snap.metadata["step"], snap.values["messages"][-1])</code></pre>
+</section>
+
+<section class="page" id="memory-long"><span class="tag">Memory</span>
+<h1 class="page-title">Store — long-term cross-session memory</h1>
+<p>Checkpoint = one chat thread. Store = user facts across new threads.</p>
+
+<pre><code>from langgraph.store.memory import InMemoryStore
+
+store = InMemoryStore()
+graph = builder.compile(checkpointer=checkpointer, store=store)
+NS = ("users", "alice")
+
+def agent_with_memory(state, *, store):
+    prefs = store.search(NS, query=state["messages"][-1].content, limit=3)
+    mem = "\n".join(p.value.get("text","") for p in prefs)
+    sys = f"User memory:\n{mem}"
+    ...
+
+# After user says "I prefer email contact":
+store.put(NS, "contact", {"text": "Prefers email over phone"})</code></pre>
+
+<table>
+<tr><th></th><th>Checkpoint</th><th>Store</th></tr>
+<tr><td>Key</td><td>thread_id</td><td>(namespace, key)</td></tr>
+<tr><td>Survives new chat?</td><td>No</td><td>Yes</td></tr>
+<tr><td>Example</td><td>Current ticket context</td><td>"User is VIP", "Prefers EN"</td></tr>
+</table>
+</section>
+
+<section class="page" id="lab"><span class="tag">Lab</span>
+<h1 class="page-title">Lab: LangGraph support agent</h1>
+<ol class="steps">
+<li>LangChain RAG chain for FAQ only (baseline).</li>
+<li>Rebuild as LangGraph: agent + search_docs tool.</li>
+<li>Add SqliteSaver — same thread_id, verify no re-fetch of order ID.</li>
+<li>Add Store — new thread_id next day, preference still loaded.</li>
+<li>Add <span class="mono">interrupt_before=["tools"]</span> on refund tool; demo approve/deny.</li>
+</ol>
+
+<h2>Complete minimal project (copy-paste start)</h2>
+<pre><code># support_agent.py — run after pip install langgraph langgraph-checkpoint-sqlite langchain-openai
+from typing import Annotated, TypedDict
+from langgraph.graph import StateGraph, START, END
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode, tools_condition
+from langgraph.checkpoint.sqlite import SqliteSaver
+from langchain_openai import ChatOpenAI
+from langchain_core.tools import tool
+
+@tool
+def search_docs(q: str) -> str:
+    return "Refund window: 30 days if unopened."
+
+@tool
+def refund(order_id: str) -> str:
+    return f"Refund initiated for {order_id}"
+
+llm = ChatOpenAI(model="gpt-4o-mini").bind_tools([search_docs, refund])
+
+class S(TypedDict):
+    messages: Annotated[list, add_messages]
+
+def agent(s: S):
+    return {"messages": [llm.invoke(s["messages"])]}
+
+g = StateGraph(S)
+g.add_node("agent", agent)
+g.add_node("tools", ToolNode([search_docs, refund]))
+g.add_edge(START, "agent")
+g.add_conditional_edges("agent", tools_condition)
+g.add_edge("tools", "agent")
+app = g.compile(checkpointer=SqliteSaver.from_conn_string("ckpt.db"),
+                interrupt_before=["tools"])
+cfg = {"configurable": {"thread_id": "u1"}}
+app.invoke({"messages": [("user", "Refund ORD-99?")]}, cfg)</code></pre>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body></html>
