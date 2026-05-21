@@ -1,0 +1,7 @@
+新建文件夹/
+node_modules/
+.env
+.env.txt
+server/owner-facts.txt
+scripts/sync.config.json
+.git/
